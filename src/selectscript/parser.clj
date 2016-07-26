@@ -26,12 +26,15 @@
          parseInt
          visitor)
 
-(defmacro expr2 [op ctx two]
+(defmacro expr [op ctx two]
     `{:op ~op
-        :elem [(.visit visitor (.e1 ~ctx))
+        :elem [(visit (.e1 ~ctx))
             (if ~two
-                (.visit visitor (.e2 ~ctx)))]})
+                (visit (.e2 ~ctx)))]})
 
+(defn visit
+    [elem]
+    (.visit visitor elem))
 
 (def visitor (proxy [SelectScriptBaseVisitor] []
     (visitAssign    [ctx] (-assign     ctx))
@@ -46,32 +49,32 @@
     (visitStmt_list [ctx] (-stmt_list  ctx))
     (visitValue     [ctx] (-value      ctx))
 
-    (visitEx_ex     [ctx] (expr2 :ex    ctx 0))
-    (visitEx_not    [ctx] (expr2 :not   ctx 0))
-    (visitEx_pos    [ctx] (expr2 :pos   ctx 0))
-    (visitEx_neg    [ctx] (expr2 :neg   ctx 0))
-    (visitEx_pow    [ctx] (expr2 :pow   ctx 1))
-    (visitEx_div    [ctx] (expr2 :div   ctx 1))
-    (visitEx_mod    [ctx] (expr2 :mod   ctx 1))
-    (visitEx_mul    [ctx] (expr2 :mul   ctx 1))
-    (visitEx_add    [ctx] (expr2 :add   ctx 1))
-    (visitEx_sub    [ctx] (expr2 :sub   ctx 1))
-    (visitEx_left   [ctx] (expr2 :left  ctx 1))
-    (visitEx_right  [ctx] (expr2 :right ctx 1))
-    (visitEx_iand   [ctx] (expr2 :iand  ctx 1))
-    (visitEx_ixor   [ctx] (expr2 :ixor  ctx 1))
-    (visitEx_ior    [ctx] (expr2 :ior   ctx 1))
-    (visitEx_inot   [ctx] (expr2 :inot  ctx 0))
-    (visitEx_lt     [ctx] (expr2 :lt    ctx 1))
-    (visitEx_le     [ctx] (expr2 :le    ctx 1))
-    (visitEx_ge     [ctx] (expr2 :ge    ctx 1))
-    (visitEx_gt     [ctx] (expr2 :gt    ctx 1))
-    (visitEx_ne     [ctx] (expr2 :ne    ctx 1))
-    (visitEx_in     [ctx] (expr2 :in    ctx 1))
-    (visitEx_eq     [ctx] (expr2 :eq    ctx 1))
-    (visitEx_and    [ctx] (expr2 :and   ctx 1))
-    (visitEx_xor    [ctx] (expr2 :xor   ctx 1))
-    (visitEx_or     [ctx] (expr2 :or    ctx 1))
+    (visitEx_ex     [ctx] (expr :ex    ctx 0))
+    (visitEx_not    [ctx] (expr :not   ctx 0))
+    (visitEx_pos    [ctx] (expr :pos   ctx 0))
+    (visitEx_neg    [ctx] (expr :neg   ctx 0))
+    (visitEx_pow    [ctx] (expr :pow   ctx 1))
+    (visitEx_div    [ctx] (expr :div   ctx 1))
+    (visitEx_mod    [ctx] (expr :mod   ctx 1))
+    (visitEx_mul    [ctx] (expr :mul   ctx 1))
+    (visitEx_add    [ctx] (expr :add   ctx 1))
+    (visitEx_sub    [ctx] (expr :sub   ctx 1))
+    (visitEx_left   [ctx] (expr :left  ctx 1))
+    (visitEx_right  [ctx] (expr :right ctx 1))
+    (visitEx_iand   [ctx] (expr :iand  ctx 1))
+    (visitEx_ixor   [ctx] (expr :ixor  ctx 1))
+    (visitEx_ior    [ctx] (expr :ior   ctx 1))
+    (visitEx_inot   [ctx] (expr :inot  ctx 0))
+    (visitEx_lt     [ctx] (expr :lt    ctx 1))
+    (visitEx_le     [ctx] (expr :le    ctx 1))
+    (visitEx_ge     [ctx] (expr :ge    ctx 1))
+    (visitEx_gt     [ctx] (expr :gt    ctx 1))
+    (visitEx_ne     [ctx] (expr :ne    ctx 1))
+    (visitEx_in     [ctx] (expr :in    ctx 1))
+    (visitEx_eq     [ctx] (expr :eq    ctx 1))
+    (visitEx_and    [ctx] (expr :and   ctx 1))
+    (visitEx_xor    [ctx] (expr :xor   ctx 1))
+    (visitEx_or     [ctx] (expr :or    ctx 1))
 ))
 
 
@@ -83,10 +86,10 @@
         (new SelectScriptLexer
         (new ANTLRInputStream string)))))]
 
-        (.visit visitor tree)))
+        (visit tree)))
 
 
-(parse "a= (3+3);")
+(parse "3+3;")
 
 
 (defn cutString
@@ -116,7 +119,7 @@
     [ctx]
     {:op :assign
      :elem [(-repo (.repo_ ctx))
-                   (-stmt (.value_ ctx))]})
+                   (visit (.value_ ctx))]})
 
 
 (defn -dict
@@ -127,7 +130,7 @@
 (defn -dict_elem
     [ctx]
     {(-dict_id (.id_ ctx)),
-     (-stmt (.value_ ctx))})
+     (visit (.value_ ctx))})
 
 
 (defn -dict_id
@@ -154,7 +157,7 @@
 
 (defn -prog
     [ctx]
-    (map -stmt (.elem_ ctx)))
+    (map visit (.elem_ ctx)))
 
 
 (defn -repo
@@ -173,7 +176,7 @@
 
 (defn -stmt_list
     [ctx]
-    (map -stmt (.elem_ ctx)))
+    (map visit (.elem_ ctx)))
 
 
 (defn -value
