@@ -41,6 +41,207 @@ public interface SelectScriptVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitDict_elem(SelectScriptParser.Dict_elemContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link SelectScriptParser#dict_id}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDict_id(SelectScriptParser.Dict_idContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link SelectScriptParser#element}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitElement(SelectScriptParser.ElementContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ex_else}
+	 * labeled alternative in {@link SelectScriptParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEx_else(SelectScriptParser.Ex_elseContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ex_le}
+	 * labeled alternative in {@link SelectScriptParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEx_le(SelectScriptParser.Ex_leContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ex_ne}
+	 * labeled alternative in {@link SelectScriptParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEx_ne(SelectScriptParser.Ex_neContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ex_right}
+	 * labeled alternative in {@link SelectScriptParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEx_right(SelectScriptParser.Ex_rightContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ex_inot}
+	 * labeled alternative in {@link SelectScriptParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEx_inot(SelectScriptParser.Ex_inotContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ex_lt}
+	 * labeled alternative in {@link SelectScriptParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEx_lt(SelectScriptParser.Ex_ltContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ex_sub}
+	 * labeled alternative in {@link SelectScriptParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEx_sub(SelectScriptParser.Ex_subContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ex_mod}
+	 * labeled alternative in {@link SelectScriptParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEx_mod(SelectScriptParser.Ex_modContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ex_mul}
+	 * labeled alternative in {@link SelectScriptParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEx_mul(SelectScriptParser.Ex_mulContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ex_ixor}
+	 * labeled alternative in {@link SelectScriptParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEx_ixor(SelectScriptParser.Ex_ixorContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ex_left}
+	 * labeled alternative in {@link SelectScriptParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEx_left(SelectScriptParser.Ex_leftContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ex_iand}
+	 * labeled alternative in {@link SelectScriptParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEx_iand(SelectScriptParser.Ex_iandContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ex_ior}
+	 * labeled alternative in {@link SelectScriptParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEx_ior(SelectScriptParser.Ex_iorContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ex_div}
+	 * labeled alternative in {@link SelectScriptParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEx_div(SelectScriptParser.Ex_divContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ex_neg}
+	 * labeled alternative in {@link SelectScriptParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEx_neg(SelectScriptParser.Ex_negContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ex_not}
+	 * labeled alternative in {@link SelectScriptParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEx_not(SelectScriptParser.Ex_notContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ex_or}
+	 * labeled alternative in {@link SelectScriptParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEx_or(SelectScriptParser.Ex_orContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ex_pos}
+	 * labeled alternative in {@link SelectScriptParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEx_pos(SelectScriptParser.Ex_posContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ex_and}
+	 * labeled alternative in {@link SelectScriptParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEx_and(SelectScriptParser.Ex_andContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ex_pow}
+	 * labeled alternative in {@link SelectScriptParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEx_pow(SelectScriptParser.Ex_powContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ex_ge}
+	 * labeled alternative in {@link SelectScriptParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEx_ge(SelectScriptParser.Ex_geContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ex_xor}
+	 * labeled alternative in {@link SelectScriptParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEx_xor(SelectScriptParser.Ex_xorContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ex_add}
+	 * labeled alternative in {@link SelectScriptParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEx_add(SelectScriptParser.Ex_addContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ex_in}
+	 * labeled alternative in {@link SelectScriptParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEx_in(SelectScriptParser.Ex_inContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ex_ex}
+	 * labeled alternative in {@link SelectScriptParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEx_ex(SelectScriptParser.Ex_exContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ex_gt}
+	 * labeled alternative in {@link SelectScriptParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEx_gt(SelectScriptParser.Ex_gtContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ex_eq}
+	 * labeled alternative in {@link SelectScriptParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEx_eq(SelectScriptParser.Ex_eqContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link SelectScriptParser#function}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

@@ -8,6 +8,7 @@ DOT 	: '.';
 SEP 	: ',';
 END 	: ';';
 COLON	: ':';
+AD 		: '@' ;
 
 AND 	: A N D ;
 XOR 	: X O R ;
@@ -15,8 +16,8 @@ OR  	: O R   ;
 NOT 	: N O T ;
 IN  	: I N   ;
 
-IRSHIFT	: '>>' | 'irshift';
-ILSHIFT	: '<<' | 'ilshift';
+SHIFTR	: '>>' | 'irshift';
+SHIFTL	: '<<' | 'ilshift';
 IAND	: '&'  | 'iand';
 IXOR	: '^'  | 'ixor';
 IOR		: '|'  | 'ior';
@@ -49,8 +50,6 @@ LIST_END   : ']' ;
 DICT_BEGIN : '{' ;
 DICT_END   : '}' ;
 
-AGE : '@' ;
-
 DOLLAR : '$';
 
 PROCEDURE:  P R O C (E D U R E)? ;
@@ -81,11 +80,11 @@ COST    : C O S T;
 ASC    : A S C (E N D I N G)? ;
 DESC   : D E S C (E N D I N G)? ;
 
-AS_SET  : S E T ;
-AS_LIST : L I S T ;
-AS_VALUE: V A L (U E)? ;
-AS_DICT	: D I C T (I O N A R Y)? ;
-AS_VOID : V O I D ;
+//AS_SET  : S E T ;
+//AS_LIST : L I S T ;
+//AS_VALUE: V A L (U E)? ;
+//AS_DICT	: D I C T (I O N A R Y)? ;
+//AS_VOID : V O I D ;
 
 DEL_F : 'del';
 MEM_F : 'mem';
@@ -165,20 +164,62 @@ dict
 ;
 
 dict_elem
-	: (str_ = STRING | id_ = IDENTIFIER) COLON value_ = stmt
+	: id_ = dict_id COLON value_ = stmt
 ;
 
+dict_id
+	: str_ = STRING | id_ = IDENTIFIER
+;
+
+element
+	: atom (
+		(LIST_BEGIN stmt_list LIST_END)
+		|
+		(DOT dict_id)+
+	)+
+;
+
+expr
+	:  			MUL 	e1=expr		# ex_ex
+	| 			NOT 	e1=expr		# ex_not
+	| 			ADD 	e1=expr		# ex_pos
+	| 			SUB 	e1=expr		# ex_neg
+	| e1=expr	POW 	e2=expr		# ex_pow
+	| e1=expr	DIV		e2=expr		# ex_div
+	| e1=expr	MOD		e2=expr		# ex_mod
+	| e1=expr	MUL		e2=expr		# ex_mul
+	| e1=expr	ADD		e2=expr		# ex_add
+	| e1=expr	SUB		e2=expr		# ex_sub
+	| e1=expr	SHIFTL	e2=expr		# ex_left
+	| e1=expr	SHIFTR	e2=expr		# ex_right
+	| e1=expr 	IAND	e2=expr		# ex_iand
+	| e1=expr	IXOR	e2=expr  	# ex_ixor
+	| e1=expr	IOR		e2=expr		# ex_ior
+	| 			INV		e1=expr		# ex_inot
+ 	| e1=expr 	LT		e2=expr		# ex_lt
+	| e1=expr 	LE		e2=expr		# ex_le
+	| e1=expr 	GE		e2=expr		# ex_ge
+	| e1=expr 	GT		e2=expr		# ex_gt
+ 	| e1=expr 	NE		e2=expr		# ex_ne
+ 	| e1=expr 	IN		e2=expr		# ex_in
+ 	| e1=expr 	EQ		e2=expr		# ex_eq
+	| e1=expr 	AND		e2=expr		# ex_and
+	| e1=expr 	XOR		e2=expr		# ex_xor
+	| e1=expr 	OR		e2=expr		# ex_or
+	| atom							# ex_else
+;
 
 function
-	: repo_ = repo '(' (params_ = stmt_list)? ')'
+	: repo_ = repo '(' (elem_ = stmt_list)? ')'
 ;
 
 list
-	: LIST_BEGIN (params_ = stmt_list)? LIST_END
+	: LIST_BEGIN (elem_ = stmt_list)? LIST_END
 ;
 
 repo
 	: name_ = IDENTIFIER
+	//| elem_ = element
 ;
 
 set
@@ -187,6 +228,7 @@ set
 
 stmt
 	: assign
+	| expr
 	| atom
 ;
 
