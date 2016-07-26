@@ -10,18 +10,15 @@
                  SelectScriptBaseVisitor)))
 
 (declare -assign
-         -atom
          -dict
          -dict_elem
          -dict_id
          -element
-         -expr
          -function
          -list
          -prog
          -repo
          -set
-         -stmt
          -stmt_list
          -value
 
@@ -38,17 +35,14 @@
 
 (def visitor (proxy [SelectScriptBaseVisitor] []
     (visitAssign    [ctx] (-assign     ctx))
-    (visitAtom      [ctx] (-atom       ctx))
     (visitDict      [ctx] (-dict       ctx))
     (visitDict_elem [ctx] (-dict_elem  ctx))
     (visitDict_id   [ctx] (-dict_id    ctx))
-    (visitExpr      [ctx] (-expr       ctx))
     (visitFunction  [ctx] (-function   ctx))
     (visitList      [ctx] (-list       ctx))
     (visitProg      [ctx] (-prog       ctx))
     (visitRepo      [ctx] (-repo       ctx))
     (visitSet       [ctx] (-set        ctx))
-    (visitStmt      [ctx] (-stmt       ctx))
     (visitStmt_list [ctx] (-stmt_list  ctx))
     (visitValue     [ctx] (-value      ctx))
 
@@ -92,7 +86,7 @@
         (.visit visitor tree)))
 
 
-(parse "2**3;")
+(parse "a= (3+3);")
 
 
 (defn cutString
@@ -123,10 +117,6 @@
     {:op :assign
      :elem [(-repo (.repo_ ctx))
                    (-stmt (.value_ ctx))]})
-
-(defn -atom
-    [ctx]
-    (.visitChildren visitor ctx))
 
 
 (defn -dict
@@ -179,10 +169,6 @@
         (if (.elem_ ctx)
             (set  (-stmt_list (.elem_ ctx)))
              (set ())) })
-
-(defn -stmt
-    [ctx]
-    (.visitChildren visitor ctx))
 
 
 (defn -stmt_list

@@ -229,7 +229,7 @@ set
 stmt
 	: assign
 	| expr
-	| atom
+//	| atom
 ;
 
 stmt_list
