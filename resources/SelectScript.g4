@@ -151,6 +151,7 @@ assign
 atom
 	: repository
 	| function
+	| if_expr
 	| list
 	| dict
 	| set
@@ -215,6 +216,11 @@ expr
 function
 	: repo_ = repository (COLON extra_ = repository)? '(' (elem_ = stmt_list)? ')'
 ;
+
+if_expr
+	: IF '(' if_=stmt (SEP then_=stmt (SEP else_=stmt)?)? ')'
+;
+
 
 list
 	: LIST_BEGIN (elem_ = stmt_list)? LIST_END

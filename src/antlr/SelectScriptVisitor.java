@@ -248,6 +248,12 @@ public interface SelectScriptVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitFunction(SelectScriptParser.FunctionContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link SelectScriptParser#if_expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIf_expr(SelectScriptParser.If_exprContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link SelectScriptParser#list}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

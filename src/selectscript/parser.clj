@@ -19,6 +19,7 @@
          -dict_id
          -element
          -function
+         -if_expr
          -list
          -prog
          -set
@@ -46,6 +47,7 @@
     (visitDict_id   [ctx] (-dict_id    ctx))
     (visitElement   [ctx] (-element    ctx))
     (visitFunction  [ctx] (-function   ctx))
+    (visitIf_expr   [ctx] (-if_expr    ctx))
     (visitList      [ctx] (-list       ctx))
     (visitProg      [ctx] (-prog       ctx))
     (visitSet       [ctx] (-set        ctx))
@@ -176,6 +178,15 @@
      :params (if (.elem_ ctx)
                 (-stmt_list (.elem_ ctx))
                 () )})
+
+(defn -if_expr [ctx]
+    {:if (-stmt (.if_ ctx))
+     :then (if (.then_ ctx)
+               (-stmt (.then_ ctx))
+               {:value true})
+     :else (if (.else_ ctx)
+               (-stmt (.else_ ctx))
+               {:value false})})
 
 
 (defn -list [ctx]
