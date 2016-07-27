@@ -152,6 +152,7 @@ atom
 	: repository
 	| function
 	| if_expr
+	| try_expr
 	| list
 	| dict
 	| set
@@ -244,6 +245,11 @@ stmt
 stmt_list
 	: elem_ += stmt (SEP elem_ += stmt)*
 ;
+
+try_expr
+	: TRY '(' try_=stmt (SEP catch_=stmt)? ')'
+;
+
 
 value
 	: str_   = STRING

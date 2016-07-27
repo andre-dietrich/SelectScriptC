@@ -25,6 +25,7 @@
          -set
          -stmt
          -stmt_list
+         -try_expr
          -value
          -variable
 
@@ -53,6 +54,7 @@
     (visitSet       [ctx] (-set        ctx))
     (visitStmt      [ctx] (-stmt       ctx))
     (visitStmt_list [ctx] (-stmt_list  ctx))
+    (visitTry_expr  [ctx] (-try_expr   ctx))
     (visitValue     [ctx] (-value      ctx))
     (visitVariable  [ctx] (-variable   ctx))
 
@@ -209,6 +211,13 @@
     (if (.seq_ ctx)
         (-prog (.seq_ ctx))
         (.visitChildren visitor ctx)))
+
+
+(defn -try_expr [ctx]
+    {:try (-stmt (.try_ ctx))
+     :catch (if (.catch_ ctx)
+                (-stmt (.catch_ ctx))
+                {:value nil})})
 
 
 (defn -stmt_list [ctx]
