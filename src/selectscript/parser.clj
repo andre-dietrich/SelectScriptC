@@ -21,6 +21,8 @@
          -function
          -if_expr
          -list
+         -loc
+         -loop
          -prog
          -set
          -stmt
@@ -36,7 +38,7 @@
 
 (defmacro expr [op ctx two]
     `{:op ~op
-        :elem [(visit (.e1 ~ctx))
+        :param [(visit (.e1 ~ctx))
             (if ~two
                 (visit (.e2 ~ctx)))]})
 
@@ -50,6 +52,8 @@
     (visitFunction  [ctx] (-function   ctx))
     (visitIf_expr   [ctx] (-if_expr    ctx))
     (visitList      [ctx] (-list       ctx))
+    (visitLoc       [ctx] (-loc        ctx))
+    (visitLoop      [ctx] (-loop       ctx))
     (visitProg      [ctx] (-prog       ctx))
     (visitSet       [ctx] (-set        ctx))
     (visitStmt      [ctx] (-stmt       ctx))
@@ -84,8 +88,8 @@
     (visitEx_and    [ctx] (expr :and   ctx 1))
     (visitEx_xor    [ctx] (expr :xor   ctx 1))
     (visitEx_or     [ctx] (expr :or    ctx 1))
-    ;;(visitEx_else   [ctx] (.visitChildren visitor ctx))
 ))
+
 
 (defn visit
     [ctx]
@@ -128,8 +132,8 @@
 
 (defn -assign [ctx]
     {:op :assign
-     :elem [(visit (.repo_  ctx))
-            (visit (.value_ ctx))]})
+     :params [(visit (.repo_  ctx))
+              (visit (.value_ ctx))]})
 
 
 (defn -atom [ctx]
@@ -169,9 +173,11 @@
                                     elem))
                           (children ctx (inc i) max))))))
 
-    {:element (if (.stmt_ ctx)
-                  (visit (.stmt_ ctx))
-                  (-variable (.var_ ctx)))
+    {:element (if (.var_ ctx)
+                  (-variable (.var_ ctx))
+                  (if (.stmt_ ctx)
+                      (-stmt (.stmt_ ctx))
+                      (-loc  (.loc_ ctx))))
      :params (remove nil? (children ctx))})
 
 
@@ -195,6 +201,19 @@
     {:list (if (.elem_ ctx)
                (-stmt_list (.elem_ ctx))
                () )})
+
+
+(defn -loop [ctx]
+    {:loop (-stmt (.do_ ctx))})
+
+
+(defn -loc [ctx]
+    (let [loc {:loc (if (.id_ ctx)
+                    (.getText (.id_ ctx))
+                    "")}]
+         (if (.extra_ ctx)
+             (assoc loc :extra (-stmt (.extra_ ctx)))
+             loc)))
 
 
 (defn -prog [ctx]

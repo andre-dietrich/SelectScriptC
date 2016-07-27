@@ -153,6 +153,8 @@ atom
 	| function
 	| if_expr
 	| try_expr
+	| loc
+	| loop
 	| list
 	| dict
 	| set
@@ -174,6 +176,7 @@ dict_id
 
 element
 	: (     var_  = variable
+	  |     loc_  = loc
 	  | '(' stmt_ = stmt ')' )
 
 	(
@@ -225,6 +228,15 @@ if_expr
 
 list
 	: LIST_BEGIN (elem_ = stmt_list)? LIST_END
+;
+
+loc
+	: (id_=IDENTIFIER DOT)? LOC (DOLLAR '(' extra_=stmt ')')?
+;
+
+
+loop
+	: LOOP do_=stmt
 ;
 
 repository
