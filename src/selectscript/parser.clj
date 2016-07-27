@@ -22,6 +22,7 @@
          -list
          -prog
          -set
+         -stmt
          -stmt_list
          -value
          -variable
@@ -48,6 +49,7 @@
     (visitList      [ctx] (-list       ctx))
     (visitProg      [ctx] (-prog       ctx))
     (visitSet       [ctx] (-set        ctx))
+    (visitStmt      [ctx] (-stmt       ctx))
     (visitStmt_list [ctx] (-stmt_list  ctx))
     (visitValue     [ctx] (-value      ctx))
     (visitVariable  [ctx] (-variable   ctx))
@@ -149,17 +151,19 @@
 
 (defn -element [ctx]
     (defn children
-    	([ctx] (children ctx 2 (.getChildCount ctx)))
-    	([ctx i max] (if (< i max)
-                         (lazy-seq
-                             (cons (let [elem (visit (.getChild ctx i))]
-                                        (if (string? elem)
-                                            {:value (if (not= (first elem) "\"")
-                                                        (if (not= (first elem) "'")
-                                                            elem)
-                                                        (cutString elem))}
-                                        elem))
-                                    (children ctx (inc i) max))))))
+    	([ctx]
+            (children ctx 2 (.getChildCount ctx)))
+    	([ctx i max]
+            (if (< i max)
+                (lazy-seq
+                    (cons (let [elem (visit (.getChild ctx i))]
+                               (if (string? elem)
+                                   {:value (if (not= (first elem) "\"")
+                                               (if (not= (first elem) "'")
+                                                    elem)
+                                               (cutString elem))}
+                                    elem))
+                          (children ctx (inc i) max))))))
 
     {:element (if (.stmt_ ctx)
                   (visit (.stmt_ ctx))
@@ -188,6 +192,12 @@
     {:set (if (.elem_ ctx)
               (set (-stmt_list (.elem_ ctx)))
               (set ()) )})
+
+
+(defn -stmt [ctx]
+    (if (.seq_ ctx)
+        (-prog (.seq_ ctx))
+        (.visitChildren visitor ctx)))
 
 
 (defn -stmt_list [ctx]

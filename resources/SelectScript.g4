@@ -232,6 +232,7 @@ set
 stmt
 	: assign
 	| expr
+	| '(' seq_ = prog ')'
 ;
 
 stmt_list
