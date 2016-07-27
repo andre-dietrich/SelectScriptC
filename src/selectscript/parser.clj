@@ -9,7 +9,11 @@
                  SelectScriptParser
                  SelectScriptBaseVisitor)))
 
-(declare -assign
+(use 'clojure.tools.trace)
+(trace-ns 'selectscript.parser)
+
+(declare -atom
+         -assign
          -dict
          -dict_elem
          -dict_id
@@ -17,14 +21,15 @@
          -function
          -list
          -prog
-         -repo
          -set
          -stmt_list
          -value
+         -variable
 
          parse
          parseInt
-         visitor)
+         visitor
+         visit)
 
 (defmacro expr [op ctx two]
     `{:op ~op
@@ -32,22 +37,20 @@
             (if ~two
                 (visit (.e2 ~ctx)))]})
 
-(defn visit
-    [elem]
-    (.visit visitor elem))
-
 (def visitor (proxy [SelectScriptBaseVisitor] []
     (visitAssign    [ctx] (-assign     ctx))
+    (visitAtom      [ctx] (-atom       ctx))
     (visitDict      [ctx] (-dict       ctx))
     (visitDict_elem [ctx] (-dict_elem  ctx))
     (visitDict_id   [ctx] (-dict_id    ctx))
+    (visitElement   [ctx] (-element    ctx))
     (visitFunction  [ctx] (-function   ctx))
     (visitList      [ctx] (-list       ctx))
     (visitProg      [ctx] (-prog       ctx))
-    (visitRepo      [ctx] (-repo       ctx))
     (visitSet       [ctx] (-set        ctx))
     (visitStmt_list [ctx] (-stmt_list  ctx))
     (visitValue     [ctx] (-value      ctx))
+    (visitVariable  [ctx] (-variable   ctx))
 
     (visitEx_ex     [ctx] (expr :ex    ctx 0))
     (visitEx_not    [ctx] (expr :not   ctx 0))
@@ -75,21 +78,23 @@
     (visitEx_and    [ctx] (expr :and   ctx 1))
     (visitEx_xor    [ctx] (expr :xor   ctx 1))
     (visitEx_or     [ctx] (expr :or    ctx 1))
+    ;;(visitEx_else   [ctx] (.visitChildren visitor ctx))
 ))
+
+(defn visit
+    [ctx]
+    (.visit visitor ctx))
 
 
 (defn parse
     [string]
     (let [tree (.prog
         (new SelectScriptParser
-        (new CommonTokenStream
-        (new SelectScriptLexer
-        (new ANTLRInputStream string)))))]
+            (new CommonTokenStream
+                (new SelectScriptLexer
+                    (new ANTLRInputStream string)))))]
 
         (visit tree)))
-
-
-(parse "3+3;")
 
 
 (defn cutString
@@ -115,76 +120,89 @@
                 (Integer/parseInt (del0 string)))))
 
 
-(defn -assign
-    [ctx]
+(defn -assign [ctx]
     {:op :assign
-     :elem [(-repo (.repo_ ctx))
-                   (visit (.value_ ctx))]})
+     :elem [(visit (.repo_  ctx))
+            (visit (.value_ ctx))]})
 
 
-(defn -dict
-    [ctx]
+(defn -atom [ctx]
+    (if (.elem_ ctx)
+        (visit (.elem_ ctx))
+        (.visitChildren visitor ctx)))
+
+
+(defn -dict [ctx]
     {:dict (into {} (map -dict_elem (.elem_ ctx)))})
 
 
-(defn -dict_elem
-    [ctx]
+(defn -dict_elem [ctx]
     {(-dict_id (.id_ ctx)),
      (visit (.value_ ctx))})
 
 
-(defn -dict_id
-    [ctx]
+(defn -dict_id [ctx]
     (if (.id_ ctx)
         (.getText (.id_ ctx))
         (cutString (.getText (.str_ ctx)))))
 
 
-(defn -function
-    [ctx]
-    {:fct (-repo (.repo_ ctx))
+(defn -element [ctx]
+    (defn children
+    	([ctx] (children ctx 2 (.getChildCount ctx)))
+    	([ctx i max] (if (< i max)
+                         (lazy-seq
+                             (cons (let [elem (visit (.getChild ctx i))]
+                                        (if (string? elem)
+                                            {:value (if (not= (first elem) "\"")
+                                                        (if (not= (first elem) "'")
+                                                            elem)
+                                                        (cutString elem))}
+                                        elem))
+                                    (children ctx (inc i) max))))))
+
+    {:element (if (.stmt_ ctx)
+                  (visit (.stmt_ ctx))
+                  (-variable (.var_ ctx)))
+     :params (remove nil? (children ctx))})
+
+
+(defn -function [ctx]
+    {:fct (visit (.repo_ ctx))
      :params (if (.elem_ ctx)
                 (-stmt_list (.elem_ ctx))
                 () )})
 
 
-(defn -list
-    [ctx]
+(defn -list [ctx]
     {:list (if (.elem_ ctx)
-            (-stmt_list (.elem_ ctx))
-            () )})
+               (-stmt_list (.elem_ ctx))
+               () )})
 
 
-(defn -prog
-    [ctx]
+(defn -prog [ctx]
     (map visit (.elem_ ctx)))
 
 
-(defn -repo
-    [ctx]
-    (if (.name_ ctx)
-        {:var (.getText ctx)}))
+(defn -set [ctx]
+    {:set (if (.elem_ ctx)
+              (set (-stmt_list (.elem_ ctx)))
+              (set ()) )})
 
 
-(defn -set
-    [ctx]
-    {:set
-        (if (.elem_ ctx)
-            (set  (-stmt_list (.elem_ ctx)))
-             (set ())) })
-
-
-(defn -stmt_list
-    [ctx]
+(defn -stmt_list [ctx]
     (map visit (.elem_ ctx)))
 
 
-(defn -value
-  [ctx]
-  {:value (if (.true_ ctx) true
-            (if (.false_ ctx) false
-              (if (.none_ ctx) nil
-                (let [string (.getText ctx)]
-                  (if (.int_ ctx) (parseInt string)
-                      (if (.float_ ctx) (read-string string)
-                          (if (.str_ ctx) (cutString string))))))))})
+(defn -value [ctx]
+    {:value (cond
+            (.true_  ctx) true
+            (.false_ ctx) false
+            (.none_  ctx) nil
+            (.int_   ctx) (parseInt (.getText ctx))
+            (.float_ ctx) (read-string (.getText ctx))
+            (.str_   ctx) (cutString (.getText ctx)))})
+
+
+(defn -variable [ctx]
+    {:var (.getText ctx)})

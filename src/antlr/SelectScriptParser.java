@@ -30,11 +30,12 @@ public class SelectScriptParser extends Parser {
 	public static final int
 		RULE_prog = 0, RULE_assign = 1, RULE_atom = 2, RULE_dict = 3, RULE_dict_elem = 4, 
 		RULE_dict_id = 5, RULE_element = 6, RULE_expr = 7, RULE_function = 8, 
-		RULE_list = 9, RULE_repo = 10, RULE_set = 11, RULE_stmt = 12, RULE_stmt_list = 13, 
-		RULE_value = 14;
+		RULE_list = 9, RULE_repository = 10, RULE_set = 11, RULE_stmt = 12, RULE_stmt_list = 13, 
+		RULE_value = 14, RULE_variable = 15;
 	public static final String[] ruleNames = {
 		"prog", "assign", "atom", "dict", "dict_elem", "dict_id", "element", "expr", 
-		"function", "list", "repo", "set", "stmt", "stmt_list", "value"
+		"function", "list", "repository", "set", "stmt", "stmt_list", "value", 
+		"variable"
 	};
 
 	private static final String[] _LITERAL_NAMES = {
@@ -137,20 +138,20 @@ public class SelectScriptParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(33); 
+			setState(35); 
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			do {
 				{
 				{
-				setState(30);
+				setState(32);
 				((ProgContext)_localctx).stmt = stmt();
 				((ProgContext)_localctx).elem_.add(((ProgContext)_localctx).stmt);
-				setState(31);
+				setState(33);
 				match(END);
 				}
 				}
-				setState(35); 
+				setState(37); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << NOT) | (1L << INV) | (1L << ADD) | (1L << SUB) | (1L << MUL) | (1L << LIST_BEGIN) | (1L << DICT_BEGIN))) != 0) || ((((_la - 73)) & ~0x3f) == 0 && ((1L << (_la - 73)) & ((1L << (STRING - 73)) | (1L << (FLOAT - 73)) | (1L << (INTEGER - 73)) | (1L << (TRUE - 73)) | (1L << (FALSE - 73)) | (1L << (NONE - 73)) | (1L << (IDENTIFIER - 73)))) != 0) );
@@ -168,11 +169,11 @@ public class SelectScriptParser extends Parser {
 	}
 
 	public static class AssignContext extends ParserRuleContext {
-		public RepoContext repo_;
+		public RepositoryContext repo_;
 		public StmtContext value_;
 		public TerminalNode ASSIGN() { return getToken(SelectScriptParser.ASSIGN, 0); }
-		public RepoContext repo() {
-			return getRuleContext(RepoContext.class,0);
+		public RepositoryContext repository() {
+			return getRuleContext(RepositoryContext.class,0);
 		}
 		public StmtContext stmt() {
 			return getRuleContext(StmtContext.class,0);
@@ -194,11 +195,11 @@ public class SelectScriptParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(37);
-			((AssignContext)_localctx).repo_ = repo();
-			setState(38);
-			match(ASSIGN);
 			setState(39);
+			((AssignContext)_localctx).repo_ = repository();
+			setState(40);
+			match(ASSIGN);
+			setState(41);
 			((AssignContext)_localctx).value_ = stmt();
 			}
 		}
@@ -214,11 +215,9 @@ public class SelectScriptParser extends Parser {
 	}
 
 	public static class AtomContext extends ParserRuleContext {
-		public ValueContext value() {
-			return getRuleContext(ValueContext.class,0);
-		}
-		public RepoContext repo() {
-			return getRuleContext(RepoContext.class,0);
+		public StmtContext elem_;
+		public RepositoryContext repository() {
+			return getRuleContext(RepositoryContext.class,0);
 		}
 		public FunctionContext function() {
 			return getRuleContext(FunctionContext.class,0);
@@ -250,59 +249,52 @@ public class SelectScriptParser extends Parser {
 		AtomContext _localctx = new AtomContext(_ctx, getState());
 		enterRule(_localctx, 4, RULE_atom);
 		try {
-			setState(51);
+			setState(52);
 			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,1,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(41);
-				value();
+				setState(43);
+				repository();
 				}
 				break;
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(42);
-				repo();
+				setState(44);
+				function();
 				}
 				break;
 			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(43);
-				function();
+				setState(45);
+				list();
 				}
 				break;
 			case 4:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(44);
-				list();
+				setState(46);
+				dict();
 				}
 				break;
 			case 5:
 				enterOuterAlt(_localctx, 5);
 				{
-				setState(45);
-				dict();
+				setState(47);
+				set();
 				}
 				break;
 			case 6:
 				enterOuterAlt(_localctx, 6);
 				{
-				setState(46);
-				set();
-				}
-				break;
-			case 7:
-				enterOuterAlt(_localctx, 7);
-				{
-				setState(47);
-				match(T__0);
 				setState(48);
-				stmt();
+				match(T__0);
 				setState(49);
+				((AtomContext)_localctx).elem_ = stmt();
+				setState(50);
 				match(T__1);
 				}
 				break;
@@ -352,29 +344,29 @@ public class SelectScriptParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(53);
-			match(DICT_BEGIN);
 			setState(54);
+			match(DICT_BEGIN);
+			setState(55);
 			((DictContext)_localctx).dict_elem = dict_elem();
 			((DictContext)_localctx).elem_.add(((DictContext)_localctx).dict_elem);
-			setState(59);
+			setState(60);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==SEP) {
 				{
 				{
-				setState(55);
-				match(SEP);
 				setState(56);
+				match(SEP);
+				setState(57);
 				((DictContext)_localctx).dict_elem = dict_elem();
 				((DictContext)_localctx).elem_.add(((DictContext)_localctx).dict_elem);
 				}
 				}
-				setState(61);
+				setState(62);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(62);
+			setState(63);
 			match(DICT_END);
 			}
 		}
@@ -416,11 +408,11 @@ public class SelectScriptParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(64);
-			((Dict_elemContext)_localctx).id_ = dict_id();
 			setState(65);
-			match(COLON);
+			((Dict_elemContext)_localctx).id_ = dict_id();
 			setState(66);
+			match(COLON);
+			setState(67);
 			((Dict_elemContext)_localctx).value_ = stmt();
 			}
 		}
@@ -455,19 +447,19 @@ public class SelectScriptParser extends Parser {
 		Dict_idContext _localctx = new Dict_idContext(_ctx, getState());
 		enterRule(_localctx, 10, RULE_dict_id);
 		try {
-			setState(70);
+			setState(71);
 			switch (_input.LA(1)) {
 			case STRING:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(68);
+				setState(69);
 				((Dict_idContext)_localctx).str_ = match(STRING);
 				}
 				break;
 			case IDENTIFIER:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(69);
+				setState(70);
 				((Dict_idContext)_localctx).id_ = match(IDENTIFIER);
 				}
 				break;
@@ -487,18 +479,20 @@ public class SelectScriptParser extends Parser {
 	}
 
 	public static class ElementContext extends ParserRuleContext {
-		public AtomContext atom() {
-			return getRuleContext(AtomContext.class,0);
+		public VariableContext var_;
+		public StmtContext stmt_;
+		public VariableContext variable() {
+			return getRuleContext(VariableContext.class,0);
+		}
+		public List<StmtContext> stmt() {
+			return getRuleContexts(StmtContext.class);
+		}
+		public StmtContext stmt(int i) {
+			return getRuleContext(StmtContext.class,i);
 		}
 		public List<TerminalNode> LIST_BEGIN() { return getTokens(SelectScriptParser.LIST_BEGIN); }
 		public TerminalNode LIST_BEGIN(int i) {
 			return getToken(SelectScriptParser.LIST_BEGIN, i);
-		}
-		public List<Stmt_listContext> stmt_list() {
-			return getRuleContexts(Stmt_listContext.class);
-		}
-		public Stmt_listContext stmt_list(int i) {
-			return getRuleContext(Stmt_listContext.class,i);
 		}
 		public List<TerminalNode> LIST_END() { return getTokens(SelectScriptParser.LIST_END); }
 		public TerminalNode LIST_END(int i) {
@@ -513,6 +507,10 @@ public class SelectScriptParser extends Parser {
 		}
 		public Dict_idContext dict_id(int i) {
 			return getRuleContext(Dict_idContext.class,i);
+		}
+		public List<TerminalNode> SEP() { return getTokens(SelectScriptParser.SEP); }
+		public TerminalNode SEP(int i) {
+			return getToken(SelectScriptParser.SEP, i);
 		}
 		public ElementContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -533,61 +531,102 @@ public class SelectScriptParser extends Parser {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(72);
-			atom();
-			setState(83); 
-			_errHandler.sync(this);
-			_la = _input.LA(1);
-			do {
+			setState(78);
+			switch (_input.LA(1)) {
+			case IDENTIFIER:
 				{
-				setState(83);
-				switch (_input.LA(1)) {
-				case LIST_BEGIN:
+				setState(73);
+				((ElementContext)_localctx).var_ = variable();
+				}
+				break;
+			case T__0:
+				{
+				setState(74);
+				match(T__0);
+				setState(75);
+				((ElementContext)_localctx).stmt_ = stmt();
+				setState(76);
+				match(T__1);
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+			setState(97); 
+			_errHandler.sync(this);
+			_alt = 1;
+			do {
+				switch (_alt) {
+				case 1:
 					{
-					{
-					setState(73);
-					match(LIST_BEGIN);
-					setState(74);
-					stmt_list();
-					setState(75);
-					match(LIST_END);
-					}
-					}
-					break;
-				case DOT:
-					{
-					setState(79); 
-					_errHandler.sync(this);
-					_alt = 1;
-					do {
-						switch (_alt) {
-						case 1:
-							{
-							{
-							setState(77);
-							match(DOT);
-							setState(78);
-							dict_id();
-							}
-							}
-							break;
-						default:
-							throw new NoViableAltException(this);
-						}
-						setState(81); 
+					setState(97);
+					switch (_input.LA(1)) {
+					case LIST_BEGIN:
+						{
+						{
+						setState(80);
+						match(LIST_BEGIN);
+						setState(81);
+						stmt();
+						setState(86);
 						_errHandler.sync(this);
-						_alt = getInterpreter().adaptivePredict(_input,4,_ctx);
-					} while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER );
+						_la = _input.LA(1);
+						while (_la==SEP) {
+							{
+							{
+							setState(82);
+							match(SEP);
+							setState(83);
+							stmt();
+							}
+							}
+							setState(88);
+							_errHandler.sync(this);
+							_la = _input.LA(1);
+						}
+						setState(89);
+						match(LIST_END);
+						}
+						}
+						break;
+					case DOT:
+						{
+						setState(93); 
+						_errHandler.sync(this);
+						_alt = 1;
+						do {
+							switch (_alt) {
+							case 1:
+								{
+								{
+								setState(91);
+								match(DOT);
+								setState(92);
+								dict_id();
+								}
+								}
+								break;
+							default:
+								throw new NoViableAltException(this);
+							}
+							setState(95); 
+							_errHandler.sync(this);
+							_alt = getInterpreter().adaptivePredict(_input,6,_ctx);
+						} while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER );
+						}
+						break;
+					default:
+						throw new NoViableAltException(this);
+					}
 					}
 					break;
 				default:
 					throw new NoViableAltException(this);
 				}
-				}
-				setState(85); 
+				setState(99); 
 				_errHandler.sync(this);
-				_la = _input.LA(1);
-			} while ( _la==DOT || _la==LIST_BEGIN );
+				_alt = getInterpreter().adaptivePredict(_input,8,_ctx);
+			} while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER );
 			}
 		}
 		catch (RecognitionException re) {
@@ -615,6 +654,9 @@ public class SelectScriptParser extends Parser {
 	public static class Ex_elseContext extends ExprContext {
 		public AtomContext atom() {
 			return getRuleContext(AtomContext.class,0);
+		}
+		public ValueContext value() {
+			return getRuleContext(ValueContext.class,0);
 		}
 		public Ex_elseContext(ExprContext ctx) { copyFrom(ctx); }
 		@Override
@@ -1061,7 +1103,7 @@ public class SelectScriptParser extends Parser {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(99);
+			setState(116);
 			switch (_input.LA(1)) {
 			case MUL:
 				{
@@ -1069,9 +1111,9 @@ public class SelectScriptParser extends Parser {
 				_ctx = _localctx;
 				_prevctx = _localctx;
 
-				setState(88);
+				setState(102);
 				match(MUL);
-				setState(89);
+				setState(103);
 				((Ex_exContext)_localctx).e1 = expr(27);
 				}
 				break;
@@ -1080,9 +1122,9 @@ public class SelectScriptParser extends Parser {
 				_localctx = new Ex_notContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(90);
+				setState(104);
 				match(NOT);
-				setState(91);
+				setState(105);
 				((Ex_notContext)_localctx).e1 = expr(26);
 				}
 				break;
@@ -1091,9 +1133,9 @@ public class SelectScriptParser extends Parser {
 				_localctx = new Ex_posContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(92);
+				setState(106);
 				match(ADD);
-				setState(93);
+				setState(107);
 				((Ex_posContext)_localctx).e1 = expr(25);
 				}
 				break;
@@ -1102,9 +1144,9 @@ public class SelectScriptParser extends Parser {
 				_localctx = new Ex_negContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(94);
+				setState(108);
 				match(SUB);
-				setState(95);
+				setState(109);
 				((Ex_negContext)_localctx).e1 = expr(24);
 				}
 				break;
@@ -1113,9 +1155,9 @@ public class SelectScriptParser extends Parser {
 				_localctx = new Ex_inotContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(96);
+				setState(110);
 				match(INV);
-				setState(97);
+				setState(111);
 				((Ex_inotContext)_localctx).e1 = expr(12);
 				}
 				break;
@@ -1133,35 +1175,58 @@ public class SelectScriptParser extends Parser {
 				_localctx = new Ex_elseContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(98);
-				atom();
+				setState(114);
+				switch (_input.LA(1)) {
+				case T__0:
+				case LIST_BEGIN:
+				case DICT_BEGIN:
+				case IDENTIFIER:
+					{
+					setState(112);
+					atom();
+					}
+					break;
+				case STRING:
+				case FLOAT:
+				case INTEGER:
+				case TRUE:
+				case FALSE:
+				case NONE:
+					{
+					setState(113);
+					value();
+					}
+					break;
+				default:
+					throw new NoViableAltException(this);
+				}
 				}
 				break;
 			default:
 				throw new NoViableAltException(this);
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(166);
+			setState(183);
 			_errHandler.sync(this);
-			_alt = getInterpreter().adaptivePredict(_input,9,_ctx);
+			_alt = getInterpreter().adaptivePredict(_input,12,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					if ( _parseListeners!=null ) triggerExitRuleEvent();
 					_prevctx = _localctx;
 					{
-					setState(164);
+					setState(181);
 					_errHandler.sync(this);
-					switch ( getInterpreter().adaptivePredict(_input,8,_ctx) ) {
+					switch ( getInterpreter().adaptivePredict(_input,11,_ctx) ) {
 					case 1:
 						{
 						_localctx = new Ex_powContext(new ExprContext(_parentctx, _parentState));
 						((Ex_powContext)_localctx).e1 = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(101);
+						setState(118);
 						if (!(precpred(_ctx, 23))) throw new FailedPredicateException(this, "precpred(_ctx, 23)");
-						setState(102);
+						setState(119);
 						match(POW);
-						setState(103);
+						setState(120);
 						((Ex_powContext)_localctx).e2 = expr(24);
 						}
 						break;
@@ -1170,11 +1235,11 @@ public class SelectScriptParser extends Parser {
 						_localctx = new Ex_divContext(new ExprContext(_parentctx, _parentState));
 						((Ex_divContext)_localctx).e1 = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(104);
+						setState(121);
 						if (!(precpred(_ctx, 22))) throw new FailedPredicateException(this, "precpred(_ctx, 22)");
-						setState(105);
+						setState(122);
 						match(DIV);
-						setState(106);
+						setState(123);
 						((Ex_divContext)_localctx).e2 = expr(23);
 						}
 						break;
@@ -1183,11 +1248,11 @@ public class SelectScriptParser extends Parser {
 						_localctx = new Ex_modContext(new ExprContext(_parentctx, _parentState));
 						((Ex_modContext)_localctx).e1 = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(107);
+						setState(124);
 						if (!(precpred(_ctx, 21))) throw new FailedPredicateException(this, "precpred(_ctx, 21)");
-						setState(108);
+						setState(125);
 						match(MOD);
-						setState(109);
+						setState(126);
 						((Ex_modContext)_localctx).e2 = expr(22);
 						}
 						break;
@@ -1196,11 +1261,11 @@ public class SelectScriptParser extends Parser {
 						_localctx = new Ex_mulContext(new ExprContext(_parentctx, _parentState));
 						((Ex_mulContext)_localctx).e1 = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(110);
+						setState(127);
 						if (!(precpred(_ctx, 20))) throw new FailedPredicateException(this, "precpred(_ctx, 20)");
-						setState(111);
+						setState(128);
 						match(MUL);
-						setState(112);
+						setState(129);
 						((Ex_mulContext)_localctx).e2 = expr(21);
 						}
 						break;
@@ -1209,11 +1274,11 @@ public class SelectScriptParser extends Parser {
 						_localctx = new Ex_addContext(new ExprContext(_parentctx, _parentState));
 						((Ex_addContext)_localctx).e1 = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(113);
+						setState(130);
 						if (!(precpred(_ctx, 19))) throw new FailedPredicateException(this, "precpred(_ctx, 19)");
-						setState(114);
+						setState(131);
 						match(ADD);
-						setState(115);
+						setState(132);
 						((Ex_addContext)_localctx).e2 = expr(20);
 						}
 						break;
@@ -1222,11 +1287,11 @@ public class SelectScriptParser extends Parser {
 						_localctx = new Ex_subContext(new ExprContext(_parentctx, _parentState));
 						((Ex_subContext)_localctx).e1 = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(116);
+						setState(133);
 						if (!(precpred(_ctx, 18))) throw new FailedPredicateException(this, "precpred(_ctx, 18)");
-						setState(117);
+						setState(134);
 						match(SUB);
-						setState(118);
+						setState(135);
 						((Ex_subContext)_localctx).e2 = expr(19);
 						}
 						break;
@@ -1235,11 +1300,11 @@ public class SelectScriptParser extends Parser {
 						_localctx = new Ex_leftContext(new ExprContext(_parentctx, _parentState));
 						((Ex_leftContext)_localctx).e1 = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(119);
+						setState(136);
 						if (!(precpred(_ctx, 17))) throw new FailedPredicateException(this, "precpred(_ctx, 17)");
-						setState(120);
+						setState(137);
 						match(SHIFTL);
-						setState(121);
+						setState(138);
 						((Ex_leftContext)_localctx).e2 = expr(18);
 						}
 						break;
@@ -1248,11 +1313,11 @@ public class SelectScriptParser extends Parser {
 						_localctx = new Ex_rightContext(new ExprContext(_parentctx, _parentState));
 						((Ex_rightContext)_localctx).e1 = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(122);
+						setState(139);
 						if (!(precpred(_ctx, 16))) throw new FailedPredicateException(this, "precpred(_ctx, 16)");
-						setState(123);
+						setState(140);
 						match(SHIFTR);
-						setState(124);
+						setState(141);
 						((Ex_rightContext)_localctx).e2 = expr(17);
 						}
 						break;
@@ -1261,11 +1326,11 @@ public class SelectScriptParser extends Parser {
 						_localctx = new Ex_iandContext(new ExprContext(_parentctx, _parentState));
 						((Ex_iandContext)_localctx).e1 = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(125);
+						setState(142);
 						if (!(precpred(_ctx, 15))) throw new FailedPredicateException(this, "precpred(_ctx, 15)");
-						setState(126);
+						setState(143);
 						match(IAND);
-						setState(127);
+						setState(144);
 						((Ex_iandContext)_localctx).e2 = expr(16);
 						}
 						break;
@@ -1274,11 +1339,11 @@ public class SelectScriptParser extends Parser {
 						_localctx = new Ex_ixorContext(new ExprContext(_parentctx, _parentState));
 						((Ex_ixorContext)_localctx).e1 = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(128);
+						setState(145);
 						if (!(precpred(_ctx, 14))) throw new FailedPredicateException(this, "precpred(_ctx, 14)");
-						setState(129);
+						setState(146);
 						match(IXOR);
-						setState(130);
+						setState(147);
 						((Ex_ixorContext)_localctx).e2 = expr(15);
 						}
 						break;
@@ -1287,11 +1352,11 @@ public class SelectScriptParser extends Parser {
 						_localctx = new Ex_iorContext(new ExprContext(_parentctx, _parentState));
 						((Ex_iorContext)_localctx).e1 = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(131);
+						setState(148);
 						if (!(precpred(_ctx, 13))) throw new FailedPredicateException(this, "precpred(_ctx, 13)");
-						setState(132);
+						setState(149);
 						match(IOR);
-						setState(133);
+						setState(150);
 						((Ex_iorContext)_localctx).e2 = expr(14);
 						}
 						break;
@@ -1300,11 +1365,11 @@ public class SelectScriptParser extends Parser {
 						_localctx = new Ex_ltContext(new ExprContext(_parentctx, _parentState));
 						((Ex_ltContext)_localctx).e1 = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(134);
+						setState(151);
 						if (!(precpred(_ctx, 11))) throw new FailedPredicateException(this, "precpred(_ctx, 11)");
-						setState(135);
+						setState(152);
 						match(LT);
-						setState(136);
+						setState(153);
 						((Ex_ltContext)_localctx).e2 = expr(12);
 						}
 						break;
@@ -1313,11 +1378,11 @@ public class SelectScriptParser extends Parser {
 						_localctx = new Ex_leContext(new ExprContext(_parentctx, _parentState));
 						((Ex_leContext)_localctx).e1 = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(137);
+						setState(154);
 						if (!(precpred(_ctx, 10))) throw new FailedPredicateException(this, "precpred(_ctx, 10)");
-						setState(138);
+						setState(155);
 						match(LE);
-						setState(139);
+						setState(156);
 						((Ex_leContext)_localctx).e2 = expr(11);
 						}
 						break;
@@ -1326,11 +1391,11 @@ public class SelectScriptParser extends Parser {
 						_localctx = new Ex_geContext(new ExprContext(_parentctx, _parentState));
 						((Ex_geContext)_localctx).e1 = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(140);
+						setState(157);
 						if (!(precpred(_ctx, 9))) throw new FailedPredicateException(this, "precpred(_ctx, 9)");
-						setState(141);
+						setState(158);
 						match(GE);
-						setState(142);
+						setState(159);
 						((Ex_geContext)_localctx).e2 = expr(10);
 						}
 						break;
@@ -1339,11 +1404,11 @@ public class SelectScriptParser extends Parser {
 						_localctx = new Ex_gtContext(new ExprContext(_parentctx, _parentState));
 						((Ex_gtContext)_localctx).e1 = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(143);
+						setState(160);
 						if (!(precpred(_ctx, 8))) throw new FailedPredicateException(this, "precpred(_ctx, 8)");
-						setState(144);
+						setState(161);
 						match(GT);
-						setState(145);
+						setState(162);
 						((Ex_gtContext)_localctx).e2 = expr(9);
 						}
 						break;
@@ -1352,11 +1417,11 @@ public class SelectScriptParser extends Parser {
 						_localctx = new Ex_neContext(new ExprContext(_parentctx, _parentState));
 						((Ex_neContext)_localctx).e1 = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(146);
+						setState(163);
 						if (!(precpred(_ctx, 7))) throw new FailedPredicateException(this, "precpred(_ctx, 7)");
-						setState(147);
+						setState(164);
 						match(NE);
-						setState(148);
+						setState(165);
 						((Ex_neContext)_localctx).e2 = expr(8);
 						}
 						break;
@@ -1365,11 +1430,11 @@ public class SelectScriptParser extends Parser {
 						_localctx = new Ex_inContext(new ExprContext(_parentctx, _parentState));
 						((Ex_inContext)_localctx).e1 = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(149);
+						setState(166);
 						if (!(precpred(_ctx, 6))) throw new FailedPredicateException(this, "precpred(_ctx, 6)");
-						setState(150);
+						setState(167);
 						match(IN);
-						setState(151);
+						setState(168);
 						((Ex_inContext)_localctx).e2 = expr(7);
 						}
 						break;
@@ -1378,11 +1443,11 @@ public class SelectScriptParser extends Parser {
 						_localctx = new Ex_eqContext(new ExprContext(_parentctx, _parentState));
 						((Ex_eqContext)_localctx).e1 = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(152);
+						setState(169);
 						if (!(precpred(_ctx, 5))) throw new FailedPredicateException(this, "precpred(_ctx, 5)");
-						setState(153);
+						setState(170);
 						match(EQ);
-						setState(154);
+						setState(171);
 						((Ex_eqContext)_localctx).e2 = expr(6);
 						}
 						break;
@@ -1391,11 +1456,11 @@ public class SelectScriptParser extends Parser {
 						_localctx = new Ex_andContext(new ExprContext(_parentctx, _parentState));
 						((Ex_andContext)_localctx).e1 = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(155);
+						setState(172);
 						if (!(precpred(_ctx, 4))) throw new FailedPredicateException(this, "precpred(_ctx, 4)");
-						setState(156);
+						setState(173);
 						match(AND);
-						setState(157);
+						setState(174);
 						((Ex_andContext)_localctx).e2 = expr(5);
 						}
 						break;
@@ -1404,11 +1469,11 @@ public class SelectScriptParser extends Parser {
 						_localctx = new Ex_xorContext(new ExprContext(_parentctx, _parentState));
 						((Ex_xorContext)_localctx).e1 = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(158);
+						setState(175);
 						if (!(precpred(_ctx, 3))) throw new FailedPredicateException(this, "precpred(_ctx, 3)");
-						setState(159);
+						setState(176);
 						match(XOR);
-						setState(160);
+						setState(177);
 						((Ex_xorContext)_localctx).e2 = expr(4);
 						}
 						break;
@@ -1417,20 +1482,20 @@ public class SelectScriptParser extends Parser {
 						_localctx = new Ex_orContext(new ExprContext(_parentctx, _parentState));
 						((Ex_orContext)_localctx).e1 = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(161);
+						setState(178);
 						if (!(precpred(_ctx, 2))) throw new FailedPredicateException(this, "precpred(_ctx, 2)");
-						setState(162);
+						setState(179);
 						match(OR);
-						setState(163);
+						setState(180);
 						((Ex_orContext)_localctx).e2 = expr(3);
 						}
 						break;
 					}
 					} 
 				}
-				setState(168);
+				setState(185);
 				_errHandler.sync(this);
-				_alt = getInterpreter().adaptivePredict(_input,9,_ctx);
+				_alt = getInterpreter().adaptivePredict(_input,12,_ctx);
 			}
 			}
 		}
@@ -1446,11 +1511,16 @@ public class SelectScriptParser extends Parser {
 	}
 
 	public static class FunctionContext extends ParserRuleContext {
-		public RepoContext repo_;
+		public RepositoryContext repo_;
+		public RepositoryContext extra_;
 		public Stmt_listContext elem_;
-		public RepoContext repo() {
-			return getRuleContext(RepoContext.class,0);
+		public List<RepositoryContext> repository() {
+			return getRuleContexts(RepositoryContext.class);
 		}
+		public RepositoryContext repository(int i) {
+			return getRuleContext(RepositoryContext.class,i);
+		}
+		public TerminalNode COLON() { return getToken(SelectScriptParser.COLON, 0); }
 		public Stmt_listContext stmt_list() {
 			return getRuleContext(Stmt_listContext.class,0);
 		}
@@ -1472,20 +1542,31 @@ public class SelectScriptParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(169);
-			((FunctionContext)_localctx).repo_ = repo();
-			setState(170);
+			setState(186);
+			((FunctionContext)_localctx).repo_ = repository();
+			setState(189);
+			_la = _input.LA(1);
+			if (_la==COLON) {
+				{
+				setState(187);
+				match(COLON);
+				setState(188);
+				((FunctionContext)_localctx).extra_ = repository();
+				}
+			}
+
+			setState(191);
 			match(T__0);
-			setState(172);
+			setState(193);
 			_la = _input.LA(1);
 			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << NOT) | (1L << INV) | (1L << ADD) | (1L << SUB) | (1L << MUL) | (1L << LIST_BEGIN) | (1L << DICT_BEGIN))) != 0) || ((((_la - 73)) & ~0x3f) == 0 && ((1L << (_la - 73)) & ((1L << (STRING - 73)) | (1L << (FLOAT - 73)) | (1L << (INTEGER - 73)) | (1L << (TRUE - 73)) | (1L << (FALSE - 73)) | (1L << (NONE - 73)) | (1L << (IDENTIFIER - 73)))) != 0)) {
 				{
-				setState(171);
+				setState(192);
 				((FunctionContext)_localctx).elem_ = stmt_list();
 				}
 			}
 
-			setState(174);
+			setState(195);
 			match(T__1);
 			}
 		}
@@ -1525,18 +1606,18 @@ public class SelectScriptParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(176);
+			setState(197);
 			match(LIST_BEGIN);
-			setState(178);
+			setState(199);
 			_la = _input.LA(1);
 			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << NOT) | (1L << INV) | (1L << ADD) | (1L << SUB) | (1L << MUL) | (1L << LIST_BEGIN) | (1L << DICT_BEGIN))) != 0) || ((((_la - 73)) & ~0x3f) == 0 && ((1L << (_la - 73)) & ((1L << (STRING - 73)) | (1L << (FLOAT - 73)) | (1L << (INTEGER - 73)) | (1L << (TRUE - 73)) | (1L << (FALSE - 73)) | (1L << (NONE - 73)) | (1L << (IDENTIFIER - 73)))) != 0)) {
 				{
-				setState(177);
+				setState(198);
 				((ListContext)_localctx).elem_ = stmt_list();
 				}
 			}
 
-			setState(180);
+			setState(201);
 			match(LIST_END);
 			}
 		}
@@ -1551,28 +1632,45 @@ public class SelectScriptParser extends Parser {
 		return _localctx;
 	}
 
-	public static class RepoContext extends ParserRuleContext {
-		public Token name_;
-		public TerminalNode IDENTIFIER() { return getToken(SelectScriptParser.IDENTIFIER, 0); }
-		public RepoContext(ParserRuleContext parent, int invokingState) {
+	public static class RepositoryContext extends ParserRuleContext {
+		public VariableContext variable() {
+			return getRuleContext(VariableContext.class,0);
+		}
+		public ElementContext element() {
+			return getRuleContext(ElementContext.class,0);
+		}
+		public RepositoryContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_repo; }
+		@Override public int getRuleIndex() { return RULE_repository; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof SelectScriptVisitor ) return ((SelectScriptVisitor<? extends T>)visitor).visitRepo(this);
+			if ( visitor instanceof SelectScriptVisitor ) return ((SelectScriptVisitor<? extends T>)visitor).visitRepository(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 
-	public final RepoContext repo() throws RecognitionException {
-		RepoContext _localctx = new RepoContext(_ctx, getState());
-		enterRule(_localctx, 20, RULE_repo);
+	public final RepositoryContext repository() throws RecognitionException {
+		RepositoryContext _localctx = new RepositoryContext(_ctx, getState());
+		enterRule(_localctx, 20, RULE_repository);
 		try {
-			enterOuterAlt(_localctx, 1);
-			{
-			setState(182);
-			((RepoContext)_localctx).name_ = match(IDENTIFIER);
+			setState(205);
+			_errHandler.sync(this);
+			switch ( getInterpreter().adaptivePredict(_input,16,_ctx) ) {
+			case 1:
+				enterOuterAlt(_localctx, 1);
+				{
+				setState(203);
+				variable();
+				}
+				break;
+			case 2:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(204);
+				element();
+				}
+				break;
 			}
 		}
 		catch (RecognitionException re) {
@@ -1611,18 +1709,18 @@ public class SelectScriptParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(184);
+			setState(207);
 			match(DICT_BEGIN);
-			setState(186);
+			setState(209);
 			_la = _input.LA(1);
 			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << NOT) | (1L << INV) | (1L << ADD) | (1L << SUB) | (1L << MUL) | (1L << LIST_BEGIN) | (1L << DICT_BEGIN))) != 0) || ((((_la - 73)) & ~0x3f) == 0 && ((1L << (_la - 73)) & ((1L << (STRING - 73)) | (1L << (FLOAT - 73)) | (1L << (INTEGER - 73)) | (1L << (TRUE - 73)) | (1L << (FALSE - 73)) | (1L << (NONE - 73)) | (1L << (IDENTIFIER - 73)))) != 0)) {
 				{
-				setState(185);
+				setState(208);
 				((SetContext)_localctx).elem_ = stmt_list();
 				}
 			}
 
-			setState(188);
+			setState(211);
 			match(DICT_END);
 			}
 		}
@@ -1659,20 +1757,20 @@ public class SelectScriptParser extends Parser {
 		StmtContext _localctx = new StmtContext(_ctx, getState());
 		enterRule(_localctx, 24, RULE_stmt);
 		try {
-			setState(192);
+			setState(215);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,13,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,18,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(190);
+				setState(213);
 				assign();
 				}
 				break;
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(191);
+				setState(214);
 				expr(0);
 				}
 				break;
@@ -1720,23 +1818,23 @@ public class SelectScriptParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(194);
+			setState(217);
 			((Stmt_listContext)_localctx).stmt = stmt();
 			((Stmt_listContext)_localctx).elem_.add(((Stmt_listContext)_localctx).stmt);
-			setState(199);
+			setState(222);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==SEP) {
 				{
 				{
-				setState(195);
+				setState(218);
 				match(SEP);
-				setState(196);
+				setState(219);
 				((Stmt_listContext)_localctx).stmt = stmt();
 				((Stmt_listContext)_localctx).elem_.add(((Stmt_listContext)_localctx).stmt);
 				}
 				}
-				setState(201);
+				setState(224);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
@@ -1781,52 +1879,87 @@ public class SelectScriptParser extends Parser {
 		ValueContext _localctx = new ValueContext(_ctx, getState());
 		enterRule(_localctx, 28, RULE_value);
 		try {
-			setState(208);
+			setState(231);
 			switch (_input.LA(1)) {
 			case STRING:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(202);
+				setState(225);
 				((ValueContext)_localctx).str_ = match(STRING);
 				}
 				break;
 			case FLOAT:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(203);
+				setState(226);
 				((ValueContext)_localctx).float_ = match(FLOAT);
 				}
 				break;
 			case INTEGER:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(204);
+				setState(227);
 				((ValueContext)_localctx).int_ = match(INTEGER);
 				}
 				break;
 			case TRUE:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(205);
+				setState(228);
 				((ValueContext)_localctx).true_ = match(TRUE);
 				}
 				break;
 			case FALSE:
 				enterOuterAlt(_localctx, 5);
 				{
-				setState(206);
+				setState(229);
 				((ValueContext)_localctx).false_ = match(FALSE);
 				}
 				break;
 			case NONE:
 				enterOuterAlt(_localctx, 6);
 				{
-				setState(207);
+				setState(230);
 				((ValueContext)_localctx).none_ = match(NONE);
 				}
 				break;
 			default:
 				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class VariableContext extends ParserRuleContext {
+		public Token name_;
+		public TerminalNode IDENTIFIER() { return getToken(SelectScriptParser.IDENTIFIER, 0); }
+		public VariableContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_variable; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof SelectScriptVisitor ) return ((SelectScriptVisitor<? extends T>)visitor).visitVariable(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+
+	public final VariableContext variable() throws RecognitionException {
+		VariableContext _localctx = new VariableContext(_ctx, getState());
+		enterRule(_localctx, 30, RULE_variable);
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(233);
+			((VariableContext)_localctx).name_ = match(IDENTIFIER);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1896,76 +2029,86 @@ public class SelectScriptParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3Q\u00d5\4\2\t\2\4"+
+		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3Q\u00ee\4\2\t\2\4"+
 		"\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t"+
-		"\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\3\2\3\2\3\2\6\2$\n\2"+
-		"\r\2\16\2%\3\3\3\3\3\3\3\3\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\5\4"+
-		"\66\n\4\3\5\3\5\3\5\3\5\7\5<\n\5\f\5\16\5?\13\5\3\5\3\5\3\6\3\6\3\6\3"+
-		"\6\3\7\3\7\5\7I\n\7\3\b\3\b\3\b\3\b\3\b\3\b\3\b\6\bR\n\b\r\b\16\bS\6\b"+
-		"V\n\b\r\b\16\bW\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\5\tf\n"+
+		"\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\3\2\3\2\3"+
+		"\2\6\2&\n\2\r\2\16\2\'\3\3\3\3\3\3\3\3\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4"+
+		"\3\4\5\4\67\n\4\3\5\3\5\3\5\3\5\7\5=\n\5\f\5\16\5@\13\5\3\5\3\5\3\6\3"+
+		"\6\3\6\3\6\3\7\3\7\5\7J\n\7\3\b\3\b\3\b\3\b\3\b\5\bQ\n\b\3\b\3\b\3\b\3"+
+		"\b\7\bW\n\b\f\b\16\bZ\13\b\3\b\3\b\3\b\3\b\6\b`\n\b\r\b\16\ba\6\bd\n\b"+
+		"\r\b\16\be\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\5\tu\n"+
+		"\t\5\tw\n\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3"+
 		"\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t"+
 		"\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3"+
-		"\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t"+
-		"\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\7\t\u00a7\n\t\f\t\16\t\u00aa"+
-		"\13\t\3\n\3\n\3\n\5\n\u00af\n\n\3\n\3\n\3\13\3\13\5\13\u00b5\n\13\3\13"+
-		"\3\13\3\f\3\f\3\r\3\r\5\r\u00bd\n\r\3\r\3\r\3\16\3\16\5\16\u00c3\n\16"+
-		"\3\17\3\17\3\17\7\17\u00c8\n\17\f\17\16\17\u00cb\13\17\3\20\3\20\3\20"+
-		"\3\20\3\20\3\20\5\20\u00d3\n\20\3\20\2\3\20\21\2\4\6\b\n\f\16\20\22\24"+
-		"\26\30\32\34\36\2\2\u00f5\2#\3\2\2\2\4\'\3\2\2\2\6\65\3\2\2\2\b\67\3\2"+
-		"\2\2\nB\3\2\2\2\fH\3\2\2\2\16J\3\2\2\2\20e\3\2\2\2\22\u00ab\3\2\2\2\24"+
-		"\u00b2\3\2\2\2\26\u00b8\3\2\2\2\30\u00ba\3\2\2\2\32\u00c2\3\2\2\2\34\u00c4"+
-		"\3\2\2\2\36\u00d2\3\2\2\2 !\5\32\16\2!\"\7\7\2\2\"$\3\2\2\2# \3\2\2\2"+
-		"$%\3\2\2\2%#\3\2\2\2%&\3\2\2\2&\3\3\2\2\2\'(\5\26\f\2()\7\25\2\2)*\5\32"+
-		"\16\2*\5\3\2\2\2+\66\5\36\20\2,\66\5\26\f\2-\66\5\22\n\2.\66\5\24\13\2"+
-		"/\66\5\b\5\2\60\66\5\30\r\2\61\62\7\3\2\2\62\63\5\32\16\2\63\64\7\4\2"+
-		"\2\64\66\3\2\2\2\65+\3\2\2\2\65,\3\2\2\2\65-\3\2\2\2\65.\3\2\2\2\65/\3"+
-		"\2\2\2\65\60\3\2\2\2\65\61\3\2\2\2\66\7\3\2\2\2\678\7\'\2\28=\5\n\6\2"+
-		"9:\7\6\2\2:<\5\n\6\2;9\3\2\2\2<?\3\2\2\2=;\3\2\2\2=>\3\2\2\2>@\3\2\2\2"+
-		"?=\3\2\2\2@A\7(\2\2A\t\3\2\2\2BC\5\f\7\2CD\7\b\2\2DE\5\32\16\2E\13\3\2"+
-		"\2\2FI\7K\2\2GI\7Q\2\2HF\3\2\2\2HG\3\2\2\2I\r\3\2\2\2JU\5\6\4\2KL\7%\2"+
-		"\2LM\5\34\17\2MN\7&\2\2NV\3\2\2\2OP\7\5\2\2PR\5\f\7\2QO\3\2\2\2RS\3\2"+
-		"\2\2SQ\3\2\2\2ST\3\2\2\2TV\3\2\2\2UK\3\2\2\2UQ\3\2\2\2VW\3\2\2\2WU\3\2"+
-		"\2\2WX\3\2\2\2X\17\3\2\2\2YZ\b\t\1\2Z[\7\36\2\2[f\5\20\t\35\\]\7\r\2\2"+
-		"]f\5\20\t\34^_\7\34\2\2_f\5\20\t\33`a\7\35\2\2af\5\20\t\32bc\7\24\2\2"+
-		"cf\5\20\t\16df\5\6\4\2eY\3\2\2\2e\\\3\2\2\2e^\3\2\2\2e`\3\2\2\2eb\3\2"+
-		"\2\2ed\3\2\2\2f\u00a8\3\2\2\2gh\f\31\2\2hi\7!\2\2i\u00a7\5\20\t\32jk\f"+
-		"\30\2\2kl\7\37\2\2l\u00a7\5\20\t\31mn\f\27\2\2no\7 \2\2o\u00a7\5\20\t"+
-		"\30pq\f\26\2\2qr\7\36\2\2r\u00a7\5\20\t\27st\f\25\2\2tu\7\34\2\2u\u00a7"+
-		"\5\20\t\26vw\f\24\2\2wx\7\35\2\2x\u00a7\5\20\t\25yz\f\23\2\2z{\7\20\2"+
-		"\2{\u00a7\5\20\t\24|}\f\22\2\2}~\7\17\2\2~\u00a7\5\20\t\23\177\u0080\f"+
-		"\21\2\2\u0080\u0081\7\21\2\2\u0081\u00a7\5\20\t\22\u0082\u0083\f\20\2"+
-		"\2\u0083\u0084\7\22\2\2\u0084\u00a7\5\20\t\21\u0085\u0086\f\17\2\2\u0086"+
-		"\u0087\7\23\2\2\u0087\u00a7\5\20\t\20\u0088\u0089\f\r\2\2\u0089\u008a"+
-		"\7\32\2\2\u008a\u00a7\5\20\t\16\u008b\u008c\f\f\2\2\u008c\u008d\7\30\2"+
-		"\2\u008d\u00a7\5\20\t\r\u008e\u008f\f\13\2\2\u008f\u0090\7\31\2\2\u0090"+
-		"\u00a7\5\20\t\f\u0091\u0092\f\n\2\2\u0092\u0093\7\33\2\2\u0093\u00a7\5"+
-		"\20\t\13\u0094\u0095\f\t\2\2\u0095\u0096\7\27\2\2\u0096\u00a7\5\20\t\n"+
-		"\u0097\u0098\f\b\2\2\u0098\u0099\7\16\2\2\u0099\u00a7\5\20\t\t\u009a\u009b"+
-		"\f\7\2\2\u009b\u009c\7\26\2\2\u009c\u00a7\5\20\t\b\u009d\u009e\f\6\2\2"+
-		"\u009e\u009f\7\n\2\2\u009f\u00a7\5\20\t\7\u00a0\u00a1\f\5\2\2\u00a1\u00a2"+
-		"\7\13\2\2\u00a2\u00a7\5\20\t\6\u00a3\u00a4\f\4\2\2\u00a4\u00a5\7\f\2\2"+
-		"\u00a5\u00a7\5\20\t\5\u00a6g\3\2\2\2\u00a6j\3\2\2\2\u00a6m\3\2\2\2\u00a6"+
-		"p\3\2\2\2\u00a6s\3\2\2\2\u00a6v\3\2\2\2\u00a6y\3\2\2\2\u00a6|\3\2\2\2"+
-		"\u00a6\177\3\2\2\2\u00a6\u0082\3\2\2\2\u00a6\u0085\3\2\2\2\u00a6\u0088"+
-		"\3\2\2\2\u00a6\u008b\3\2\2\2\u00a6\u008e\3\2\2\2\u00a6\u0091\3\2\2\2\u00a6"+
-		"\u0094\3\2\2\2\u00a6\u0097\3\2\2\2\u00a6\u009a\3\2\2\2\u00a6\u009d\3\2"+
-		"\2\2\u00a6\u00a0\3\2\2\2\u00a6\u00a3\3\2\2\2\u00a7\u00aa\3\2\2\2\u00a8"+
-		"\u00a6\3\2\2\2\u00a8\u00a9\3\2\2\2\u00a9\21\3\2\2\2\u00aa\u00a8\3\2\2"+
-		"\2\u00ab\u00ac\5\26\f\2\u00ac\u00ae\7\3\2\2\u00ad\u00af\5\34\17\2\u00ae"+
-		"\u00ad\3\2\2\2\u00ae\u00af\3\2\2\2\u00af\u00b0\3\2\2\2\u00b0\u00b1\7\4"+
-		"\2\2\u00b1\23\3\2\2\2\u00b2\u00b4\7%\2\2\u00b3\u00b5\5\34\17\2\u00b4\u00b3"+
-		"\3\2\2\2\u00b4\u00b5\3\2\2\2\u00b5\u00b6\3\2\2\2\u00b6\u00b7\7&\2\2\u00b7"+
-		"\25\3\2\2\2\u00b8\u00b9\7Q\2\2\u00b9\27\3\2\2\2\u00ba\u00bc\7\'\2\2\u00bb"+
-		"\u00bd\5\34\17\2\u00bc\u00bb\3\2\2\2\u00bc\u00bd\3\2\2\2\u00bd\u00be\3"+
-		"\2\2\2\u00be\u00bf\7(\2\2\u00bf\31\3\2\2\2\u00c0\u00c3\5\4\3\2\u00c1\u00c3"+
-		"\5\20\t\2\u00c2\u00c0\3\2\2\2\u00c2\u00c1\3\2\2\2\u00c3\33\3\2\2\2\u00c4"+
-		"\u00c9\5\32\16\2\u00c5\u00c6\7\6\2\2\u00c6\u00c8\5\32\16\2\u00c7\u00c5"+
-		"\3\2\2\2\u00c8\u00cb\3\2\2\2\u00c9\u00c7\3\2\2\2\u00c9\u00ca\3\2\2\2\u00ca"+
-		"\35\3\2\2\2\u00cb\u00c9\3\2\2\2\u00cc\u00d3\7K\2\2\u00cd\u00d3\7L\2\2"+
-		"\u00ce\u00d3\7M\2\2\u00cf\u00d3\7N\2\2\u00d0\u00d3\7O\2\2\u00d1\u00d3"+
-		"\7P\2\2\u00d2\u00cc\3\2\2\2\u00d2\u00cd\3\2\2\2\u00d2\u00ce\3\2\2\2\u00d2"+
-		"\u00cf\3\2\2\2\u00d2\u00d0\3\2\2\2\u00d2\u00d1\3\2\2\2\u00d3\37\3\2\2"+
-		"\2\22%\65=HSUWe\u00a6\u00a8\u00ae\u00b4\u00bc\u00c2\u00c9\u00d2";
+		"\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\3\t\7\t\u00b8\n\t\f"+
+		"\t\16\t\u00bb\13\t\3\n\3\n\3\n\5\n\u00c0\n\n\3\n\3\n\5\n\u00c4\n\n\3\n"+
+		"\3\n\3\13\3\13\5\13\u00ca\n\13\3\13\3\13\3\f\3\f\5\f\u00d0\n\f\3\r\3\r"+
+		"\5\r\u00d4\n\r\3\r\3\r\3\16\3\16\5\16\u00da\n\16\3\17\3\17\3\17\7\17\u00df"+
+		"\n\17\f\17\16\17\u00e2\13\17\3\20\3\20\3\20\3\20\3\20\3\20\5\20\u00ea"+
+		"\n\20\3\21\3\21\3\21\2\3\20\22\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36"+
+		" \2\2\u0111\2%\3\2\2\2\4)\3\2\2\2\6\66\3\2\2\2\b8\3\2\2\2\nC\3\2\2\2\f"+
+		"I\3\2\2\2\16P\3\2\2\2\20v\3\2\2\2\22\u00bc\3\2\2\2\24\u00c7\3\2\2\2\26"+
+		"\u00cf\3\2\2\2\30\u00d1\3\2\2\2\32\u00d9\3\2\2\2\34\u00db\3\2\2\2\36\u00e9"+
+		"\3\2\2\2 \u00eb\3\2\2\2\"#\5\32\16\2#$\7\7\2\2$&\3\2\2\2%\"\3\2\2\2&\'"+
+		"\3\2\2\2\'%\3\2\2\2\'(\3\2\2\2(\3\3\2\2\2)*\5\26\f\2*+\7\25\2\2+,\5\32"+
+		"\16\2,\5\3\2\2\2-\67\5\26\f\2.\67\5\22\n\2/\67\5\24\13\2\60\67\5\b\5\2"+
+		"\61\67\5\30\r\2\62\63\7\3\2\2\63\64\5\32\16\2\64\65\7\4\2\2\65\67\3\2"+
+		"\2\2\66-\3\2\2\2\66.\3\2\2\2\66/\3\2\2\2\66\60\3\2\2\2\66\61\3\2\2\2\66"+
+		"\62\3\2\2\2\67\7\3\2\2\289\7\'\2\29>\5\n\6\2:;\7\6\2\2;=\5\n\6\2<:\3\2"+
+		"\2\2=@\3\2\2\2><\3\2\2\2>?\3\2\2\2?A\3\2\2\2@>\3\2\2\2AB\7(\2\2B\t\3\2"+
+		"\2\2CD\5\f\7\2DE\7\b\2\2EF\5\32\16\2F\13\3\2\2\2GJ\7K\2\2HJ\7Q\2\2IG\3"+
+		"\2\2\2IH\3\2\2\2J\r\3\2\2\2KQ\5 \21\2LM\7\3\2\2MN\5\32\16\2NO\7\4\2\2"+
+		"OQ\3\2\2\2PK\3\2\2\2PL\3\2\2\2Qc\3\2\2\2RS\7%\2\2SX\5\32\16\2TU\7\6\2"+
+		"\2UW\5\32\16\2VT\3\2\2\2WZ\3\2\2\2XV\3\2\2\2XY\3\2\2\2Y[\3\2\2\2ZX\3\2"+
+		"\2\2[\\\7&\2\2\\d\3\2\2\2]^\7\5\2\2^`\5\f\7\2_]\3\2\2\2`a\3\2\2\2a_\3"+
+		"\2\2\2ab\3\2\2\2bd\3\2\2\2cR\3\2\2\2c_\3\2\2\2de\3\2\2\2ec\3\2\2\2ef\3"+
+		"\2\2\2f\17\3\2\2\2gh\b\t\1\2hi\7\36\2\2iw\5\20\t\35jk\7\r\2\2kw\5\20\t"+
+		"\34lm\7\34\2\2mw\5\20\t\33no\7\35\2\2ow\5\20\t\32pq\7\24\2\2qw\5\20\t"+
+		"\16ru\5\6\4\2su\5\36\20\2tr\3\2\2\2ts\3\2\2\2uw\3\2\2\2vg\3\2\2\2vj\3"+
+		"\2\2\2vl\3\2\2\2vn\3\2\2\2vp\3\2\2\2vt\3\2\2\2w\u00b9\3\2\2\2xy\f\31\2"+
+		"\2yz\7!\2\2z\u00b8\5\20\t\32{|\f\30\2\2|}\7\37\2\2}\u00b8\5\20\t\31~\177"+
+		"\f\27\2\2\177\u0080\7 \2\2\u0080\u00b8\5\20\t\30\u0081\u0082\f\26\2\2"+
+		"\u0082\u0083\7\36\2\2\u0083\u00b8\5\20\t\27\u0084\u0085\f\25\2\2\u0085"+
+		"\u0086\7\34\2\2\u0086\u00b8\5\20\t\26\u0087\u0088\f\24\2\2\u0088\u0089"+
+		"\7\35\2\2\u0089\u00b8\5\20\t\25\u008a\u008b\f\23\2\2\u008b\u008c\7\20"+
+		"\2\2\u008c\u00b8\5\20\t\24\u008d\u008e\f\22\2\2\u008e\u008f\7\17\2\2\u008f"+
+		"\u00b8\5\20\t\23\u0090\u0091\f\21\2\2\u0091\u0092\7\21\2\2\u0092\u00b8"+
+		"\5\20\t\22\u0093\u0094\f\20\2\2\u0094\u0095\7\22\2\2\u0095\u00b8\5\20"+
+		"\t\21\u0096\u0097\f\17\2\2\u0097\u0098\7\23\2\2\u0098\u00b8\5\20\t\20"+
+		"\u0099\u009a\f\r\2\2\u009a\u009b\7\32\2\2\u009b\u00b8\5\20\t\16\u009c"+
+		"\u009d\f\f\2\2\u009d\u009e\7\30\2\2\u009e\u00b8\5\20\t\r\u009f\u00a0\f"+
+		"\13\2\2\u00a0\u00a1\7\31\2\2\u00a1\u00b8\5\20\t\f\u00a2\u00a3\f\n\2\2"+
+		"\u00a3\u00a4\7\33\2\2\u00a4\u00b8\5\20\t\13\u00a5\u00a6\f\t\2\2\u00a6"+
+		"\u00a7\7\27\2\2\u00a7\u00b8\5\20\t\n\u00a8\u00a9\f\b\2\2\u00a9\u00aa\7"+
+		"\16\2\2\u00aa\u00b8\5\20\t\t\u00ab\u00ac\f\7\2\2\u00ac\u00ad\7\26\2\2"+
+		"\u00ad\u00b8\5\20\t\b\u00ae\u00af\f\6\2\2\u00af\u00b0\7\n\2\2\u00b0\u00b8"+
+		"\5\20\t\7\u00b1\u00b2\f\5\2\2\u00b2\u00b3\7\13\2\2\u00b3\u00b8\5\20\t"+
+		"\6\u00b4\u00b5\f\4\2\2\u00b5\u00b6\7\f\2\2\u00b6\u00b8\5\20\t\5\u00b7"+
+		"x\3\2\2\2\u00b7{\3\2\2\2\u00b7~\3\2\2\2\u00b7\u0081\3\2\2\2\u00b7\u0084"+
+		"\3\2\2\2\u00b7\u0087\3\2\2\2\u00b7\u008a\3\2\2\2\u00b7\u008d\3\2\2\2\u00b7"+
+		"\u0090\3\2\2\2\u00b7\u0093\3\2\2\2\u00b7\u0096\3\2\2\2\u00b7\u0099\3\2"+
+		"\2\2\u00b7\u009c\3\2\2\2\u00b7\u009f\3\2\2\2\u00b7\u00a2\3\2\2\2\u00b7"+
+		"\u00a5\3\2\2\2\u00b7\u00a8\3\2\2\2\u00b7\u00ab\3\2\2\2\u00b7\u00ae\3\2"+
+		"\2\2\u00b7\u00b1\3\2\2\2\u00b7\u00b4\3\2\2\2\u00b8\u00bb\3\2\2\2\u00b9"+
+		"\u00b7\3\2\2\2\u00b9\u00ba\3\2\2\2\u00ba\21\3\2\2\2\u00bb\u00b9\3\2\2"+
+		"\2\u00bc\u00bf\5\26\f\2\u00bd\u00be\7\b\2\2\u00be\u00c0\5\26\f\2\u00bf"+
+		"\u00bd\3\2\2\2\u00bf\u00c0\3\2\2\2\u00c0\u00c1\3\2\2\2\u00c1\u00c3\7\3"+
+		"\2\2\u00c2\u00c4\5\34\17\2\u00c3\u00c2\3\2\2\2\u00c3\u00c4\3\2\2\2\u00c4"+
+		"\u00c5\3\2\2\2\u00c5\u00c6\7\4\2\2\u00c6\23\3\2\2\2\u00c7\u00c9\7%\2\2"+
+		"\u00c8\u00ca\5\34\17\2\u00c9\u00c8\3\2\2\2\u00c9\u00ca\3\2\2\2\u00ca\u00cb"+
+		"\3\2\2\2\u00cb\u00cc\7&\2\2\u00cc\25\3\2\2\2\u00cd\u00d0\5 \21\2\u00ce"+
+		"\u00d0\5\16\b\2\u00cf\u00cd\3\2\2\2\u00cf\u00ce\3\2\2\2\u00d0\27\3\2\2"+
+		"\2\u00d1\u00d3\7\'\2\2\u00d2\u00d4\5\34\17\2\u00d3\u00d2\3\2\2\2\u00d3"+
+		"\u00d4\3\2\2\2\u00d4\u00d5\3\2\2\2\u00d5\u00d6\7(\2\2\u00d6\31\3\2\2\2"+
+		"\u00d7\u00da\5\4\3\2\u00d8\u00da\5\20\t\2\u00d9\u00d7\3\2\2\2\u00d9\u00d8"+
+		"\3\2\2\2\u00da\33\3\2\2\2\u00db\u00e0\5\32\16\2\u00dc\u00dd\7\6\2\2\u00dd"+
+		"\u00df\5\32\16\2\u00de\u00dc\3\2\2\2\u00df\u00e2\3\2\2\2\u00e0\u00de\3"+
+		"\2\2\2\u00e0\u00e1\3\2\2\2\u00e1\35\3\2\2\2\u00e2\u00e0\3\2\2\2\u00e3"+
+		"\u00ea\7K\2\2\u00e4\u00ea\7L\2\2\u00e5\u00ea\7M\2\2\u00e6\u00ea\7N\2\2"+
+		"\u00e7\u00ea\7O\2\2\u00e8\u00ea\7P\2\2\u00e9\u00e3\3\2\2\2\u00e9\u00e4"+
+		"\3\2\2\2\u00e9\u00e5\3\2\2\2\u00e9\u00e6\3\2\2\2\u00e9\u00e7\3\2\2\2\u00e9"+
+		"\u00e8\3\2\2\2\u00ea\37\3\2\2\2\u00eb\u00ec\7Q\2\2\u00ec!\3\2\2\2\27\'"+
+		"\66>IPXacetv\u00b7\u00b9\u00bf\u00c3\u00c9\u00cf\u00d3\u00d9\u00e0\u00e9";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

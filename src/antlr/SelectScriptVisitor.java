@@ -254,11 +254,11 @@ public interface SelectScriptVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitList(SelectScriptParser.ListContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link SelectScriptParser#repo}.
+	 * Visit a parse tree produced by {@link SelectScriptParser#repository}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitRepo(SelectScriptParser.RepoContext ctx);
+	T visitRepository(SelectScriptParser.RepositoryContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link SelectScriptParser#set}.
 	 * @param ctx the parse tree
@@ -283,4 +283,10 @@ public interface SelectScriptVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitValue(SelectScriptParser.ValueContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link SelectScriptParser#variable}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitVariable(SelectScriptParser.VariableContext ctx);
 }

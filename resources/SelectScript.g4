@@ -145,17 +145,16 @@ prog
 ;
 
 assign
-	: repo_ = repo ASSIGN value_ = stmt
+	: repo_ = repository ASSIGN value_ = stmt
 ;
 
 atom
-	: value
-	| repo
+	: repository
 	| function
 	| list
 	| dict
 	| set
-	| '(' stmt ')'
+	| '(' elem_=stmt ')'
 ;
 
 dict
@@ -172,10 +171,13 @@ dict_id
 ;
 
 element
-	: atom (
-		(LIST_BEGIN stmt_list LIST_END)
+	: (     var_  = variable
+	  | '(' stmt_ = stmt ')' )
+
+	(
+		( LIST_BEGIN stmt (SEP stmt)* LIST_END )
 		|
-		(DOT dict_id)+
+		( DOT dict_id )+
 	)+
 ;
 
@@ -206,20 +208,21 @@ expr
 	| e1=expr 	AND		e2=expr		# ex_and
 	| e1=expr 	XOR		e2=expr		# ex_xor
 	| e1=expr 	OR		e2=expr		# ex_or
-	| atom							# ex_else
+	| ( atom
+	  | value )						# ex_else
 ;
 
 function
-	: repo_ = repo '(' (elem_ = stmt_list)? ')'
+	: repo_ = repository (COLON extra_ = repository)? '(' (elem_ = stmt_list)? ')'
 ;
 
 list
 	: LIST_BEGIN (elem_ = stmt_list)? LIST_END
 ;
 
-repo
-	: name_ = IDENTIFIER
-	//| elem_ = element
+repository
+	: variable
+	| element
 ;
 
 set
@@ -229,7 +232,6 @@ set
 stmt
 	: assign
 	| expr
-//	| atom
 ;
 
 stmt_list
@@ -243,4 +245,8 @@ value
 	| true_  = TRUE
 	| false_ = FALSE
 	| none_  = NONE
+;
+
+variable
+	: name_ = IDENTIFIER
 ;
