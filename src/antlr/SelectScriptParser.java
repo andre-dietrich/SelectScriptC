@@ -2097,13 +2097,13 @@ public class SelectScriptParser extends Parser {
 
 	public static class Special2Context extends ParserRuleContext {
 		public RepositoryContext repo_;
-		public Special2Context op_;
+		public SpecialContext op_;
 		public TerminalNode COLON() { return getToken(SelectScriptParser.COLON, 0); }
 		public RepositoryContext repository() {
 			return getRuleContext(RepositoryContext.class,0);
 		}
-		public Special2Context special2() {
-			return getRuleContext(Special2Context.class,0);
+		public SpecialContext special() {
+			return getRuleContext(SpecialContext.class,0);
 		}
 		public Special2Context(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -2127,7 +2127,7 @@ public class SelectScriptParser extends Parser {
 			setState(268);
 			match(COLON);
 			setState(269);
-			((Special2Context)_localctx).op_ = special2();
+			((Special2Context)_localctx).op_ = special();
 			}
 		}
 		catch (RecognitionException re) {
@@ -2605,12 +2605,12 @@ public class SelectScriptParser extends Parser {
 		"\7\'\2\2\u0103\u0105\5&\24\2\u0104\u0103\3\2\2\2\u0104\u0105\3\2\2\2\u0105"+
 		"\u0106\3\2\2\2\u0106\u0107\7(\2\2\u0107\37\3\2\2\2\u0108\u0109\t\2\2\2"+
 		"\u0109\u010a\7\3\2\2\u010a\u010b\5&\24\2\u010b\u010c\7\4\2\2\u010c!\3"+
-		"\2\2\2\u010d\u010e\5\34\17\2\u010e\u010f\7\b\2\2\u010f\u0110\5\"\22\2"+
-		"\u0110#\3\2\2\2\u0111\u0118\5\4\3\2\u0112\u0118\5\20\t\2\u0113\u0114\7"+
-		"\3\2\2\u0114\u0115\5\2\2\2\u0115\u0116\7\4\2\2\u0116\u0118\3\2\2\2\u0117"+
-		"\u0111\3\2\2\2\u0117\u0112\3\2\2\2\u0117\u0113\3\2\2\2\u0118%\3\2\2\2"+
-		"\u0119\u011e\5$\23\2\u011a\u011b\7\6\2\2\u011b\u011d\5$\23\2\u011c\u011a"+
-		"\3\2\2\2\u011d\u0120\3\2\2\2\u011e\u011c\3\2\2\2\u011e\u011f\3\2\2\2\u011f"+
+		"\2\2\2\u010d\u010e\5\34\17\2\u010e\u010f\7\b\2\2\u010f\u0110\5 \21\2\u0110"+
+		"#\3\2\2\2\u0111\u0118\5\4\3\2\u0112\u0118\5\20\t\2\u0113\u0114\7\3\2\2"+
+		"\u0114\u0115\5\2\2\2\u0115\u0116\7\4\2\2\u0116\u0118\3\2\2\2\u0117\u0111"+
+		"\3\2\2\2\u0117\u0112\3\2\2\2\u0117\u0113\3\2\2\2\u0118%\3\2\2\2\u0119"+
+		"\u011e\5$\23\2\u011a\u011b\7\6\2\2\u011b\u011d\5$\23\2\u011c\u011a\3\2"+
+		"\2\2\u011d\u0120\3\2\2\2\u011e\u011c\3\2\2\2\u011e\u011f\3\2\2\2\u011f"+
 		"\'\3\2\2\2\u0120\u011e\3\2\2\2\u0121\u0122\7E\2\2\u0122\u0123\7\3\2\2"+
 		"\u0123\u0126\5$\23\2\u0124\u0125\7\6\2\2\u0125\u0127\5$\23\2\u0126\u0124"+
 		"\3\2\2\2\u0126\u0127\3\2\2\2\u0127\u0128\3\2\2\2\u0128\u0129\7\4\2\2\u0129"+

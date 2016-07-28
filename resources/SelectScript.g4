@@ -261,7 +261,7 @@ special
 ;
 
 special2
-	: repo_ = repository COLON op_=special2
+	: repo_ = repository COLON op_=special
 ;
 
 

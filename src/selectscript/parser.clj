@@ -26,6 +26,7 @@
          -prog
          -set
          -special
+         -special2
          -stmt
          -stmt_list
          -try_expr
@@ -60,6 +61,7 @@
     (visitProg      [ctx] (-prog       ctx))
     (visitSet       [ctx] (-set        ctx))
     (visitSpecial   [ctx] (-special    ctx))
+    (visitSpecial2  [ctx] (-special2   ctx))
     (visitStmt      [ctx] (-stmt       ctx))
     (visitStmt_list [ctx] (-stmt_list  ctx))
     (visitTry_expr  [ctx] (-try_expr   ctx))
@@ -265,6 +267,16 @@
                                         :neg
                                         :pos)}
                 {:params params :op op})))
+
+
+(defn -special2 [ctx]
+    (let [op   (-special (.op_ ctx))
+          repo (visit (.repo_ ctx))]
+          {:params (concat repo (get op :params))
+           :opX    (case (get op :op)
+                       :neg :sub
+                       :pos :add
+                       (get op :op))}))
 
 
 (defn -stmt [ctx]
