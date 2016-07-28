@@ -81,6 +81,13 @@ public interface SelectScriptVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitEx_right(SelectScriptParser.Ex_rightContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code ex_spec}
+	 * labeled alternative in {@link SelectScriptParser#expr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEx_spec(SelectScriptParser.Ex_specContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code ex_inot}
 	 * labeled alternative in {@link SelectScriptParser#expr}.
 	 * @param ctx the parse tree
@@ -283,6 +290,18 @@ public interface SelectScriptVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitSet(SelectScriptParser.SetContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link SelectScriptParser#special}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSpecial(SelectScriptParser.SpecialContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link SelectScriptParser#special2}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSpecial2(SelectScriptParser.Special2Context ctx);
 	/**
 	 * Visit a parse tree produced by {@link SelectScriptParser#stmt}.
 	 * @param ctx the parse tree

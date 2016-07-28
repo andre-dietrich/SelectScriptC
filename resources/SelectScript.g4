@@ -153,7 +153,6 @@ atom
 	| function
 	| if_expr
 	| try_expr
-	| loc
 	| loop
 	| list
 	| dict
@@ -187,7 +186,8 @@ element
 ;
 
 expr
-	:  			MUL 	e1=expr		# ex_ex
+	:   (special | special2)		# ex_spec
+	|  			MUL 	e1=expr		# ex_ex
 	| 			NOT 	e1=expr		# ex_not
 	| 			ADD 	e1=expr		# ex_pos
 	| 			SUB 	e1=expr		# ex_neg
@@ -242,11 +242,29 @@ loop
 repository
 	: variable
 	| element
+	| loc
 ;
 
 set
 	: DICT_BEGIN (elem_=stmt_list)? DICT_END
 ;
+
+special
+	:
+	( EQ  | NE  | LE  | GE  | LT  | GT
+	| AND | OR  | XOR
+	| ADD | SUB | MUL | DIV | MOD | POW
+	| IN
+	| IOR | IAND | IXOR | SHIFTR | SHIFTL )
+
+	'(' elem_=stmt_list ')'
+;
+
+special2
+	: repo_ = repository COLON op_=special2
+;
+
+
 
 stmt
 	: assign
