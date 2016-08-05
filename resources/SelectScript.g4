@@ -145,18 +145,14 @@ prog
 ;
 
 assign
-	: repo_ = repository ASSIGN value_ = stmt
+	: e1 = repository ASSIGN e2 = stmt
 ;
 
 atom
 	: repository
-	| function
 	| if_expr
 	| try_expr
 	| loop
-	| list
-	| dict
-	| set
 	| '(' elem_=stmt ')'
 ;
 
@@ -174,15 +170,19 @@ dict_id
 ;
 
 element
-	: (     var_  = variable
+	: //elem_ = atom
+	(       var_  = variable
 	  |     loc_  = loc
 	  | '(' stmt_ = stmt ')' )
-
 	(
 		( LIST_BEGIN stmt (SEP stmt)* LIST_END )
 		|
 		( DOT dict_id )+
 	)+
+;
+
+exit
+	: EXIT (stmt_ = stmt)?
 ;
 
 expr
@@ -192,13 +192,13 @@ expr
 	| 			ADD 	e1=expr		# ex_pos
 	| 			SUB 	e1=expr		# ex_neg
 	| e1=expr	POW 	e2=expr		# ex_pow
-	| e1=expr	DIV		e2=expr		# ex_div
-	| e1=expr	MOD		e2=expr		# ex_mod
-	| e1=expr	MUL		e2=expr		# ex_mul
-	| e1=expr	ADD		e2=expr		# ex_add
-	| e1=expr	SUB		e2=expr		# ex_sub
-	| e1=expr	SHIFTL	e2=expr		# ex_left
-	| e1=expr	SHIFTR	e2=expr		# ex_right
+	| e1=expr	(DIV
+				|MOD
+				|MUL)	e2=expr		# ex_div_mod_mul
+	| e1=expr	(ADD
+				|SUB)	e2=expr		# ex_add_sub
+	| e1=expr	(SHIFTL
+				|SHIFTR) e2=expr	# ex_shift
 	| e1=expr 	IAND	e2=expr		# ex_iand
 	| e1=expr	IXOR	e2=expr  	# ex_ixor
 	| e1=expr	IOR		e2=expr		# ex_ior
@@ -214,17 +214,22 @@ expr
 	| e1=expr 	XOR		e2=expr		# ex_xor
 	| e1=expr 	OR		e2=expr		# ex_or
 	| ( atom
-	  | value )						# ex_else
+	  | value
+	  | list
+	  | dict
+	  | set
+	  | function)					# ex_else
 ;
 
 function
-	: repo_ = repository (COLON extra_ = repository)? '(' (elem_ = stmt_list)? ')'
+	: repo_ = atom
+	  (AD extra_ = atom)?
+	  '(' (elem_ = stmt_list)? ')'
 ;
 
 if_expr
 	: IF '(' if_=stmt (SEP then_=stmt (SEP else_=stmt)?)? ')'
 ;
-
 
 list
 	: LIST_BEGIN (elem_ = stmt_list)? LIST_END
@@ -234,15 +239,89 @@ loc
 	: (id_=IDENTIFIER DOT)? LOC (DOLLAR '(' extra_=stmt ')')?
 ;
 
-
 loop
 	: LOOP do_=stmt
+;
+
+procedure
+	: PROCEDURE
+	  ('(' ((id_ += IDENTIFIER | loc_ = LOC) (SEP id_ += IDENTIFIER)*)? ')')?
+	  (info_=STRING)?
+	  COLON code_=stmt
 ;
 
 repository
 	: variable
 	| element
 	| loc
+;
+
+selection
+	: (select_= sel_select)?
+	  (from_  = sel_from)
+	  (where_ = sel_where)?
+
+	  (start_ = sel_start)?
+	  (connect_ = sel_connect stop_ = sel_stop)?
+
+	  (order_ = sel_order)?
+	  (group_ = sel_group)? //(h=having_)?)?
+	  (limit_ = sel_limit)?
+	  (as_    = sel_as)?
+;
+
+sel_as
+	: AS   //( AS_LIST | AS_SET | AS_VALUE | AS_DICT | AS_VOID |
+	  IDENTIFIER ('(' params_=stmt_list ')')?
+;
+
+sel_connect
+	: CONNECT BY
+		(NO CYCLE)?
+		(UNIQUE)?
+		(MEMORIZE mem_=stmt)?
+		(COST cost_=stmt)?
+		stmt_list
+;
+
+sel_dir
+	: (ASC | DESC)
+;
+
+sel_from
+	: FROM sel_list
+;
+
+sel_group
+	: GROUP BY stmt_list
+;
+
+sel_limit
+	: LIMIT expr
+;
+
+sel_list
+	: (dict_id | stmt) (SEP (dict_id | stmt))*
+;
+
+sel_order
+	: ORDER BY ( stmt sel_dir? ) ( SEP stmt sel_dir? )*
+;
+
+sel_select
+	: SELECT sel_list
+;
+
+sel_start
+	: START WITH stmt_list
+;
+
+sel_stop
+	: STOP WITH stmt
+;
+
+sel_where
+	: WHERE stmt
 ;
 
 set
@@ -261,14 +340,15 @@ special
 ;
 
 special2
-	: repo_ = repository COLON op_=special
+	: repo_ = repository AD op_=special
 ;
-
-
 
 stmt
 	: assign
 	| expr
+	| procedure
+	| exit
+	| selection
 	| '(' seq_ = prog ')'
 ;
 

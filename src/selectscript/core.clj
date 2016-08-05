@@ -5,10 +5,10 @@
     ;; :main false)
     ;:require '(selectscript.parser)
 
-;    (:use [selectscript.parser] :reload)
+    (:use [selectscript.parser] :reload)
 )
 
-;(parse "2+(3+4);")
+(parse "2+(3+4);")
 
 (defn -main
   "I don't do a whole lot."
