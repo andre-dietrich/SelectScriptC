@@ -6,9 +6,11 @@
     ;:require '(selectscript.parser)
 
     (:use [selectscript.parser] :reload)
-)
+    (:use [selectscript.optimizer] :reload)
+    (:use [selectscript.compiler] :reload))
 
-(parse "2+(3+4);")
+
+;((optimize (parse "2+(3+4);")))
 
 (defn -main
   "I don't do a whole lot."

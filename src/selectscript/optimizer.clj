@@ -4,8 +4,10 @@
 
 
 (declare optimize
-         optimize:op
          optimize:if
+         optimize:dict
+         optimize:op
+         optimize:proc
          opt_op
          opt_ops)
 
@@ -29,39 +31,37 @@
                         (optimize (last ast)))
       (:proc)  (optimize:proc (rest ast))
       (:loc)   ast
-      (:value) ast
+      (:val)   ast
       (:var)   ast
-      (:opX)   ast
+      (:opX)   (ss:opX (second ast) (optimize (last ast)))
       (cons
         (optimize (first ast))
-          (if (second ast)
-            (optimize (rest ast))))
-      ))
+        (if (second ast)
+          (optimize (rest ast))))))
 
-(defn optimize:proc [ast]
-  (let [code (optimize (second ast))]
+
+(defn optimize:proc [[params code info]]
+  (let [code (optimize code)]
     (if (ss:val? code)
       code
-      (ss:proc (first ast)
+      (ss:proc params
                code
-               (last ast)))))
+               info))))
 
-(defn optimize:if [ast]
-  (let [if_expr   (optimize (nth ast 0))
-        then_expr (optimize (nth ast 1))
-        else_expr (optimize (nth ast 2))]
-        (println "sss" ast)
-    (if (ss:val? if_expr)
-      (if (ss:bool? (second if_expr))
-        then_expr
-        else_expr)
-      (ss:if if_expr then_expr else_expr))))
+(defn optimize:if [[if_ then_ else_]]
+  (if (ss:val? if_)
+      (if (ss:bool? if_)
+        then_
+        else_)
+      (ss:if if_ then_ else_)))
 
-(defn optimize:dict [ast]
-  (->> ast
+
+(defn optimize:dict [dict]
+  (->> dict
       (into [])
       (map #(hash-map (first %) (optimize (second %))))
       (ss:dict)))
+
 
 (defn optimize:op [ast]
   (println "op" ast)
@@ -69,8 +69,8 @@
     (case (first ast)
       :pos params
       :neg (opt_op - :neg params)
-      ;:not  (list :value (not (boolean? (second val1))))
-      ;:inot (list :value (bit-not (second val1)))
+      ;:not  (list :val (not (boolean? (second val1))))
+      ;:inot (list :val (bit-not (second val1)))
       :add (opt_ops ss:add :add params)
       :sub (opt_ops ss:sub :sub params)
       :mul (opt_ops ss:mul :mul params)
@@ -81,17 +81,17 @@
       :and (let [op (opt_ops ss:and :and params)]
              (if (ss:val? op)
                op
-               (if (.contains (last op) '(:value false))
+               (if (.contains (last op) '(:val false))
                  (ss:val false)
-                 (if (.contains (last op) '(:value nil))
+                 (if (.contains (last op) '(:val nil))
                    (ss:val nil)
                    op))))
       :or  (let [op (opt_ops ss:or :or params)]
              (if (ss:val? op)
                op
-               (if (.contains (last op) '(:value true))
+               (if (.contains (last op) '(:val true))
                  (ss:val true)
-                 (if (.contains (last op) '(:value nil))
+                 (if (.contains (last op) '(:val nil))
                    (ss:val nil)
                    op)))))))
 

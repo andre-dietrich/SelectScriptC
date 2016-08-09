@@ -10,8 +10,8 @@
                  SelectScriptParser
                  SelectScriptBaseVisitor)))
 
-(use 'clojure.tools.trace)
-(trace-ns 'selectscript.parser)
+;(use 'clojure.tools.trace)
+;(trace-ns 'selectscript.parser)
 
 (declare -atom
          -assign
@@ -126,8 +126,8 @@
     (visitEx_eq       [ctx] (expr :eq    2))
     (visitEx_and      [ctx] (expr :and   2))
     (visitEx_xor      [ctx] (expr :xor   2))
-    (visitEx_or       [ctx] (expr :or    2))
-))
+    (visitEx_or       [ctx] (expr :or    2))))
+
 
 
 (defn visit [ctx]
@@ -156,7 +156,7 @@
       (recur (subs string 1))))
 
   (if (< (count string) 2)
-         (Integer/parseInt string)
+      (Integer/parseInt string)
     (case (subs string 0 2)
       "0b" (Integer/parseInt (del0 (subs string 2)) 2)
       "0o" (Integer/parseInt (del0 (subs string 2)) 8)
@@ -171,19 +171,19 @@
 
 (defn children
   ([ctx start]
-    (children ctx start (.getChildCount ctx)))
+   (children ctx start (.getChildCount ctx)))
   ([ctx i max]
-    (if (< i max)
-      (lazy-seq
-        (cons
-          (let [elem (visit (.getChild ctx i))]
-            (if (string? elem)
-              (ss:val (if (not= (first elem) "\"")
-                        (if (not= (first elem) "'")
-                          elem)
-                        (cutString elem)))
-              elem))
-          (children ctx (inc i) max))))))
+   (if (< i max)
+     (lazy-seq
+       (cons
+         (let [elem (visit (.getChild ctx i))]
+           (if (string? elem)
+             (ss:val (if (not= (first elem) "\"")
+                       (if (not= (first elem) "'")
+                         elem)
+                       (cutString elem)))
+             elem))
+         (children ctx (inc i) max))))))
 
 
 (defn -dict [ctx]
@@ -208,7 +208,7 @@
       (if-let [stmt (.stmt_ ctx)]
         (-stmt stmt)
         (-loc  (.loc_ ctx))))
-      (remove nil? (children ctx 2))))
+    (remove nil? (children ctx 2))))
 
 (defn -exit [ctx]
   (ss:exit (if-let [exit (.stmt ctx)]
@@ -220,7 +220,7 @@
   (ss:fct (visit (.repo_ ctx))
           (if-let [elem (.elem_ ctx)]
             (-stmt_list elem)
-            () )))
+            ())))
 
 
 (defn -if_expr [ctx]
@@ -236,7 +236,7 @@
 (defn -list [ctx]
   (ss:list (if-let [elem (.elem_ ctx)]
              (-stmt_list elem)
-             () )))
+             ())))
 
 
 (defn -loop [ctx]
@@ -270,7 +270,7 @@
 (defn -set [ctx]
   (ss:set (if-let [elem (.elem_ ctx)]
             (-stmt_list elem)
-            (list) )))
+            (list))))
 
 (defn -selection [ctx]
   (let [select  (.select_  ctx)  from  (.from_    ctx)

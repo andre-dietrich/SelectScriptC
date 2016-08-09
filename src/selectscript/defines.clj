@@ -1,7 +1,7 @@
 (ns selectscript.defines)
 
 (defn ss:val [val]
-  (list :value val))
+  (list :val val))
 
 (defn ss:var [var]
   (list :var var))
@@ -47,7 +47,7 @@
   (list :dict (into {} elements)))
 
 (defn ss:val? [op & ops]
-  (if (not (.contains '(:value :list :set :dict) (first op)))
+  (if (not (.contains '(:val :list :set :dict) (first op)))
     false
     (if (empty? ops)
       true
@@ -91,7 +91,7 @@
       [true  false] true
       [false true ] true
       [false false] false
-      nil )))
+      nil)))
 
 (defn ss:add [p1 p2]
   (+ p1 p2))
