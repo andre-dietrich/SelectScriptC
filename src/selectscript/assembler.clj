@@ -1,86 +1,86 @@
-(ns selectscript.interim
+(ns selectscript.assembler
     (:use [selectscript.parser] :reload)
     (:use [selectscript.optimizer] :reload))
 
 
-(declare interim
-         interim:dict
-         interim:if
-         interim:loop
-         interim:op
-         interim:set
-         interim:val
-         int:loop
+(declare assemble
+         assemble:dict
+         assemble:if
+         assemble:loop
+         assemble:op
+         assemble:set
+         assemble:val
+         asm:loop
          pop:add
          pop:rm)
 
 
-(defn interim [ast]
-  (println "interim" ast)
+(defn assemble [ast]
+  (println "assemble" ast)
   (case (first ast)
-    (:dict)   (interim:dict  (second ast))
+    (:dict)   (assemble:dict  (second ast))
 
-    (:if)     (interim:if    (rest ast))
+    (:if)     (assemble:if    (rest ast))
 
-    (:exit)   (concat (interim (second ast))
+    (:exit)   (concat (assemble (second ast))
                       '((:EXIT)))
 
-    (:fct)    (concat (int:loop (last ast))
-                      (interim (second ast))
+    (:fct)    (concat (asm:loop (last ast))
+                      (assemble (second ast))
                       '((:CALL_FCT))
                       (list (count (last ast))))
 
 
-    (:list)   (concat (int:loop (second ast))
+    (:list)   (concat (asm:loop (second ast))
                       (list '(:CST_LST) (count (second ast))))
 
     (:loc)    (list '(:LOC) (second ast))
 
-    (:loop)   (interim:loop  (second ast))
+    (:loop)   (assemble:loop  (second ast))
 
-    (:op)     (interim:op    (rest ast))
+    (:op)     (assemble:op    (rest ast))
 
-    (:ref)    (concat (interim (second ast))
+    (:ref)    (concat (assemble (second ast))
                       '((:REF)))
 
-    (:set)    (concat (int:loop (second ast))
+    (:set)    (concat (asm:loop (second ast))
                       (list '(:CST_SET) (count (second ast))))
 
-    (:val)    (interim:val   (second ast))
+    (:val)    (assemble:val   (second ast))
 
     (:var)    (list '(:LOAD) (second ast))
 
     (concat '((:SP_SAVE))
-            (pop:rm (int:loop ast true))
+            (pop:rm (asm:loop ast true))
             '((:RET)))))
 
 
-(defn interim:dict [dict]
-    (concat (int:loop (vals dict)) (list '(:CST_DCT) (keys dict))))
+(defn assemble:dict [dict]
+    (concat (asm:loop (vals dict)) (list '(:CST_DCT) (keys dict))))
 
 
-(defn interim:if [[if_ then_ else_]]
-  (concat (interim if_  ) '((:IF))
-          (interim then_) '((:THEN_END))
-          (interim else_) '((:ELSE_END))))
+(defn assemble:if [[if_ then_ else_]]
+  (concat (assemble if_  ) '((:IF))
+          (assemble then_) '((:THEN_END))
+          (assemble else_) '((:ELSE_END))))
 
-(defn interim:loop [ast]
+(defn assemble:loop [ast]
   (concat '((:SP_SAVE) (:LOOP_BEGIN))
 
-           (int:loop ast true)
+           (asm:loop ast true)
 
           '((:LOOP_END) (:RET_L))))
 
 
-(defn interim:op [[op params]]
-    (println "interim op" op)
-    (concat (int:loop params)
+(defn assemble:op [[op params]]
+    (println "assemble op" op)
+    (concat (asm:loop params)
             (list '(:CALL_OP)
                   op
                   (dec (count params)))))
 
-(defn interim:val [val]
-    (println "interim:val" val)
+(defn assemble:val [val]
+    (println "assemble:val" val)
   (cond
     (nil?     val)  '((:CST_N))
     (false?   val)  '((:CST_0))
@@ -94,17 +94,17 @@
     (string?  val)  (list '(:CST_STR) val)))
 
 
-(defn int:loop
-  ([ast] (int:loop ast false))
-  ([ast pop] (let [interim_ (if pop
-                              (comp pop:add interim first)
-                              (comp interim first))]
+(defn asm:loop
+  ([ast] (asm:loop ast false))
+  ([ast pop] (let [assemble_ (if pop
+                              (comp pop:add assemble first)
+                              (comp assemble first))]
                (loop [from ast, to '()]
                  (if (empty? from)
                    to
                    (recur (rest from)
                           (concat to
-                                  (interim_ from))))))))
+                                  (assemble_ from))))))))
 
 (defn pop:add [code]
   (loop [i (dec (count code))]
@@ -125,4 +125,4 @@
         (recur (dec i))))))
 
 
-;(interim (parse "f();"))
+;(assemble (parse "f();"))

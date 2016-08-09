@@ -25,7 +25,7 @@
         (do (.setByte buf i (first c))
             (recur (rest c) (inc i)))))))
 
-(S2 :vm_execute Byte env (prog [0 0 3 7 12 0]) 10)
+;(S2 :vm_execute Byte env (prog [0 0 3 7 12 0]) 10)
 
 
 ;(jna/invoke Integer s2/vm_init 10 10 1)
