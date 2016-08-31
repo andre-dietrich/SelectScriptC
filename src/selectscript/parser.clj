@@ -21,6 +21,8 @@
          -element
          -exit
          -function
+         -function_del
+         -function_mem
          -if_expr
          -list
          -loc
@@ -42,91 +44,98 @@
          -value
          -variable
 
+         expr
          parse
          parseInt
          visitor
          visit)
 
-(defmacro expr [op two]
-  (list 'list :op op
-         (let [param1 '(visit (.e1 ctx))]
-           (if (= 2 two)
-             (let [param2 '(visit (.e2 ctx))]
-               (list 'list param1 param2))
-             (list 'list param1)))))
+;(defmacro expr [op two]
+;  (list 'list :op op
+;         (let [param1 '(visit (.e1 ctx))]
+;           (if (= 2 two)
+;             (let [param2 '(visit (.e2 ctx))]
+;               (list 'list param1 param2)
+;             (list 'list param1))
+
+(defn expr [op ctx]
+  (ss:op op (let [p1 (visit (.e1 ctx))
+                  p2 (visit (.e2 ctx))]
+              (if (and (= :op (first p1))
+                       (=  op (second p1)))
+                (concat (last p1) [p2])
+                (concat [p1] [p2])))))
 
 (def visitor
   (proxy [SelectScriptBaseVisitor] []
-    (visitAssign      [ctx] (expr :assign   2))
-    (visitAtom        [ctx] (-atom        ctx))
-    (visitDict        [ctx] (-dict        ctx))
-    (visitDict_elem   [ctx] (-dict_elem   ctx))
-    (visitDict_id     [ctx] (-dict_id     ctx))
-    (visitElement     [ctx] (-element     ctx))
-    (visitExit        [ctx] (-exit        ctx))
-    (visitFunction    [ctx] (-function    ctx))
-    (visitIf_expr     [ctx] (-if_expr     ctx))
-    (visitList        [ctx] (-list        ctx))
-    (visitLoc         [ctx] (-loc         ctx))
-    (visitLoop        [ctx] (-loop        ctx))
-    (visitProcedure   [ctx] (-procedure   ctx))
-    (visitProg        [ctx] (-prog        ctx))
-    (visitSelection   [ctx] (-selection   ctx))
-    (visitSel_as      [ctx] (-sel_as      ctx))
-    (visitSel_connect [ctx] (-sel_connect ctx))
-    (visitSel_dir     [ctx] (-sel_dir     ctx))
-    (visitSel_list    [ctx] (-sel_list    ctx))
-    (visitSel_order   [ctx] (-sel_order   ctx))
-    (visitSet         [ctx] (-set         ctx))
-    (visitSpecial     [ctx] (-special     ctx))
-    (visitSpecial2    [ctx] (-special2    ctx))
-    (visitStmt        [ctx] (-stmt        ctx))
-    (visitStmt_list   [ctx] (-stmt_list   ctx))
-    (visitTry_expr    [ctx] (-try_expr    ctx))
-    (visitValue       [ctx] (-value       ctx))
-    (visitVariable    [ctx] (-variable    ctx))
+    (visitAssign       [ctx] (ss:op :assign [(visit (.e1 ctx))
+                                             (visit (.e2 ctx))]))
+    (visitAtom         [ctx] (-atom         ctx))
+    (visitDict         [ctx] (-dict         ctx))
+    (visitDict_elem    [ctx] (-dict_elem    ctx))
+    (visitDict_id      [ctx] (-dict_id      ctx))
+    (visitElement      [ctx] (-element      ctx))
+    (visitExit         [ctx] (-exit         ctx))
+    (visitFunction     [ctx] (-function     ctx))
+    (visitFunction_del [ctx] (-function_del ctx))
+    (visitFunction_mem [ctx] (-function_mem ctx))
+    (visitIf_expr      [ctx] (-if_expr      ctx))
+    (visitList         [ctx] (-list         ctx))
+    (visitLoc          [ctx] (-loc          ctx))
+    (visitLoop         [ctx] (-loop         ctx))
+    (visitProcedure    [ctx] (-procedure    ctx))
+    (visitProg         [ctx] (-prog         ctx))
+    (visitSelection    [ctx] (-selection    ctx))
+    (visitSel_as       [ctx] (-sel_as       ctx))
+    (visitSel_connect  [ctx] (-sel_connect  ctx))
+    (visitSel_dir      [ctx] (-sel_dir      ctx))
+    (visitSel_list     [ctx] (-sel_list     ctx))
+    (visitSel_order    [ctx] (-sel_order    ctx))
+    (visitSet          [ctx] (-set          ctx))
+    (visitSpecial      [ctx] (-special      ctx))
+    (visitSpecial2     [ctx] (-special2     ctx))
+    (visitStmt         [ctx] (-stmt         ctx))
+    (visitStmt_list    [ctx] (-stmt_list    ctx))
+    (visitTry_expr     [ctx] (-try_expr     ctx))
+    (visitValue        [ctx] (-value        ctx))
+    (visitVariable     [ctx] (-variable     ctx))
 
-    (visitEx_ex       [ctx] (expr :ex    1))
-    (visitEx_not      [ctx] (expr :not   1))
-    (visitEx_pos      [ctx] (expr :pos   1))
-    (visitEx_neg      [ctx] (expr :neg   1))
-    (visitEx_pow      [ctx] (expr :pow   2))
-    (visitEx_div_mod_mul [ctx]
-        (list :op
-              (cond
-                (.DIV ctx) :div
-                (.MOD ctx) :mod
-                (.MUL ctx) :mul)
-              (list (visit (.e1 ctx))
-                    (visit (.e2 ctx)))))
-    (visitEx_add_sub  [ctx]
-        (list :op
-          (if (.ADD ctx)
-            :add
-            :sub)
-          (list (visit (.e1 ctx))
-                (visit (.e2 ctx)))))
-    (visitEx_shift    [ctx]
-        (list :op
-          (if (.SHIFTL ctx)
-            :left
-            :right)
-          (list (visit (.e1 ctx))
-                (visit (.e2 ctx)))))
-    (visitEx_iand     [ctx] (expr :iand  2))
-    (visitEx_ixor     [ctx] (expr :ixor  2))
-    (visitEx_ior      [ctx] (expr :ior   2))
-    (visitEx_inot     [ctx] (expr :inot  1))
-    (visitEx_lt       [ctx] (expr :lt    2))
-    (visitEx_le       [ctx] (expr :le    2))
-    (visitEx_ge       [ctx] (expr :ge    2))
-    (visitEx_gt       [ctx] (expr :gt    2))
-    (visitEx_ne       [ctx] (expr :ne    2))
-    (visitEx_in       [ctx] (expr :in    2))
-    (visitEx_eq       [ctx] (expr :eq    2))
-    (visitEx_and      [ctx] (expr :and   2))
-    (visitEx_xor      [ctx] (expr :xor   2))
-    (visitEx_or       [ctx] (expr :or    2))))
+    (visitEx_ex        [ctx] (ss:op :ex  [(visit (.e1 ctx))]))
+    (visitEx_not       [ctx] (ss:op :not [(visit (.e1 ctx))]))
+    (visitEx_pos       [ctx] (visit (.e1 ctx)))
+    (visitEx_neg       [ctx]
+        (let [ex (visit (.e1 ctx))]
+          (if (ss:val? ex)
+            (ss:val (- (second ex)))
+            (ss:op :neg (list ex)))))
+    (visitEx_pow       [ctx] (expr :pow  ctx))
+    (visitEx_div_mod_mul [ctx] (expr (cond
+                                       (.DIV ctx) :div
+                                       (.MOD ctx) :mod
+                                       (.MUL ctx) :mul)
+                                     ctx))
+    (visitEx_add_sub  [ctx] (expr (if (.ADD ctx)
+                                    :add
+                                    :sub)
+                                  ctx))
+    (visitEx_shift    [ctx] (expr (if (.SHIFTL ctx)
+                                    :left
+                                    :right)
+                                  ctx))
+    (visitEx_iand     [ctx] (expr :iand ctx))
+    (visitEx_ixor     [ctx] (expr :ixor ctx))
+    (visitEx_ior      [ctx] (expr :ior  ctx))
+    (visitEx_inot     [ctx] (ss:op :inot  [(visit (.e1 ctx))]))
+    (visitEx_lt       [ctx] (expr :lt   ctx))
+    (visitEx_le       [ctx] (expr :le   ctx))
+    (visitEx_ge       [ctx] (expr :ge   ctx))
+    (visitEx_gt       [ctx] (expr :gt   ctx))
+    (visitEx_ne       [ctx] (expr :ne   ctx))
+    (visitEx_in       [ctx] (expr :in   ctx))
+    (visitEx_eq       [ctx] (expr :eq   ctx))
+    (visitEx_and      [ctx] (expr :and  ctx))
+    (visitEx_xor      [ctx] (expr :xor  ctx))
+    (visitEx_or       [ctx] (expr :or   ctx))))
 
 
 
@@ -217,11 +226,34 @@
 
 
 (defn -function [ctx]
-  (ss:fct (visit (.repo_ ctx))
-          (if-let [elem (.elem_ ctx)]
-            (-stmt_list elem)
-            ())))
+  (if-let [mem (.mem_ ctx)]
+    (-function_mem mem)
+    (if-let [del (.del_ ctx)]
+      (-function_del del)
+      (ss:fct (visit (.repo_ ctx))
+              (if-let [elem (.elem_ ctx)]
+                (-stmt_list elem)
+                ())))))
 
+
+(defn -function_del [ctx]
+  (ss:fct (ss:var (.getText (.DEL_F ctx)))
+          (let [max (dec (.getChildCount ctx))]
+            (reverse (loop [i 2, params '()]
+                       (if (>= i max)
+                         params
+                         (recur (+ i 2) (let [child (.getText (.getChild ctx i))]
+                                          (conj params (ss:val (if (.contains [\" \'] (first child))
+                                                                 (cutString child)
+                                                                 child)))))))))))
+
+(defn -function_mem [ctx]
+  (ss:fct (ss:var (.getText (.MEM_F ctx)))
+          (if-let [ident (.IDENTIFIER ctx)]
+            (list (ss:val (.getText ident)))
+            (if-let [string (.STRING ctx)]
+              (list (ss:val (cutString (.getText string))))
+              ()))))
 
 (defn -if_expr [ctx]
   (ss:if (-stmt (.if_ ctx))

@@ -1,8 +1,6 @@
 (ns selectscript.compiler
-    (:use [selectscript.parser]     :reload)
-    (:use [selectscript.optimizer]  :reload)
-    (:use [selectscript.interim]    :reload)
-    (:use [selectscript.utils]      :reload))
+    (:use [selectscript.utils] :reload))
+
 
 
 (def op { :not   0,   :neg   1,
@@ -29,92 +27,115 @@
           :IT_STORE 34, :IT_LIMIT 35, :IT_GROUP 36, :IT_ORDER 37, :IT_AS 38,
           :EXIT 39, :TRY 40, :REF 41})
 
-(declare compi
-         compi:cmd
-         compi:data
+(declare cmp
+         cmp:cmd
+         cmp:data
+         cmp:base
          conc)
 
 
-(defn compi:cmd [args]
+(defn cmp:cmd [args]
   (list (first args)
         (if (= 2 (count args))
           true
           false)))
 
-(defn compi:data [repo string]
+(defn cmp:data [repo string]
   (let [pos (.indexOf repo string)]
     (if (< pos 0)
       [(conc repo [string]) (count repo)]
       [repo pos])))
 
-(defn compi
-  ([code] (let [[data asm] (compi code [] [])]
-            (conc (uint16->byte (count data))
-                  (loop [d data bytes []]
-                    (println "data" d)
-                    (if (empty d)
-                      bytes
-                      (recur (rest d)
-                             (conc bytes (string->byte d)))))
-                  asm)))
-  ([code data asm]
-   (println "compi" code data asm)
-   (if (not (empty? code))
-     (let [[cmd pop] (compi:cmd (first code))]
-       (let [asm_ (conc asm [(+ (cmd OP)
-                               (if pop 128 0))])]
-         (println "XXXXXXXXXXXXXXXXXXXxx" asm_)
-         (condp contains? cmd
-           #{:CST_B}    (compi (nthrest code 2)
-                               data
-                               (conc asm_ (int8->byte (second code))))
-           #{:CST_F}    (compi (nthrest code 2)
-                               data
-                               (conc asm_ (float->byte (second code))))
-           #{:CST_I}    (compi (nthrest code 2)
-                               data
-                               (conc asm_ (int32->byte (second code))))
+(defn cmp:base [code data asm fct]
+  (cmp (rest code)
+       data
+       (conc asm (fct (first code)))))
 
+(defn cmp
+  ([code] (let [[data asm] (cmp code [] [])]
+            (map #(if (< 128 %) (- % 256) %)
+                 (conc (uint16->byte (count data))
+                   (loop [d data bytes []]
+                     (if (empty? d)
+                       bytes
+                       (recur (rest d)
+                              (conc bytes (string->byte (first d))))))
+                   asm))))
+
+  ([code data asm]
+   (if (not (empty? code))
+     (let [[cmd pop] (cmp:cmd (first code))]
+       ;(println code data asm)
+       (let [asm_ (if (contains? OP cmd)
+                    (conc asm [(if (contains? OP cmd)
+                                 (+ (cmd OP))
+                                 (if pop 128 0))])
+                    asm)]
+         (condp contains? cmd
+           #{:CST_B}    (cmp:base (rest code) data asm_ int8->byte)
+           #{:CST_F}    (cmp:base (rest code) data asm_ float->byte)
+           #{:CST_I}    (cmp:base (rest code) data asm_ int32->byte)
            #{:CST_LST
-             :CST_SET}  (compi (nthrest code 2)
-                               data
-                               (conc asm_ (uint16->byte (second code))))
-           #{:CST_S}    (compi (nthrest code 2)
-                               data
-                               (conc asm_ (int16->byte (second code))))
-           #{:CST_STR
-             :LOC
-             :STORE
-             :STORE_LOC
-             :LOAD}     (let [[data_ i] (compi:data data (second code))]
-                          (compi (nthrest code 2)
-                                 data_
-                                 (conc asm_ [i])))
+             :CST_SET}  (cmp:base (rest code) data asm_ uint16->byte)
+           #{:CST_S}    (cmp:base (rest code) data asm_ int16->byte)
+           #{:CST_DCT}
+           (let [[data_ ids_] (loop [d data, i [], keys (second code)]
+                                (if (empty? keys)
+                                  [d i]
+                                  (let [[D I] (cmp:data d (first keys))]
+                                    (recur D (conc i [I]) (rest keys)))))]
+             (cmp (nthrest code 2)
+                  data_
+                  (conc asm_ [(count ids_)] ids_)))
+           #{:CST_STR :LOAD :LOC :STORE :STORE_LOC}
+           (let [[data_ i] (cmp:data data (second code))]
+             (cmp:base (conj (nthrest code 2) i) data_ asm_ list))
            #{:CALL_FCTX
-             :CALL_FCT} (compi (nthrest code 2)
-                               data
-                               (conc asm_ (uint8->byte (second code))))
-           #{:CALL_OPX
-             :CALL_OP}  (compi (nthrest code 3)
-                               data
-                               (conc asm_
-                                     [((nth code 1) op)]
-                                     (uint8->byte(nth code 2))))
-           #{:SP_SAVE}  (let [[c d a] (compi (rest code)
-                                             data
-                                             asm_)]
-                          (compi c d a))
-           #{:RET
-             :RET_L
-             :RET_P}      [(rest code) data asm_]
-           (compi (rest code) data asm_))))
+             :CALL_FCT} (cmp:base (rest code) data asm_ uint8->byte)
+           #{:CALL_OP :CALL_OPX}
+           (cmp (nthrest code 3)
+                data
+                (conc asm_
+                      (uint8->byte (nth code 2))
+                      [((nth code 1) op)]))
+           #{:SP_SAVE}
+           (let [[c d a] (cmp (rest code)
+                              data
+                              asm_)]
+             (cmp c d a))
+           #{:RET :RET_L :RET_P
+             :THEN_END :ELSE_END :LOOP_END}
+           [(rest code) data asm_]
+           #{:LOOP_BEGIN}
+           (let [loop_ (cmp (rest code) data [])]
+             (cmp (first loop_)
+                  (second loop_)
+                  (conc asm_
+                        (last loop_)
+                        (:JUMP OP)
+                        (int16->byte (- 1 (count (last loop_)))))))
+           #{:IF}
+           (let [then (cmp (rest code) data [])]
+             (let [else (cmp (first then)
+                             (second then)
+                             [])]
+               (cmp (first else)
+                    (second else)
+                    (conc asm_
+                          (:FJUMP OP) (int16->byte (+ 5 (count (last then))))
+                          (last then)
+                          (:JUMP OP)  (int16->byte (+ 2 (count (last else))))
+                          (last else)))))
+
+           (cmp (rest code) data asm_))))
 
      [data asm])))
 
 (defn conc [a & b]
   (if (empty? b)
     a
-    (recur (into [] (concat a (first b)))
+    (recur (let [element (first b)]
+             (if (integer? element)
+               (conj a element)
+               (into [] (concat a element))))
            (rest b))))
-
-(compi (interim (parse "12;")))

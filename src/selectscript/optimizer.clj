@@ -9,11 +9,11 @@
          optimize:op
          optimize:proc
          opt_op
-         opt_ops)
+         opt_ops
+         opt_opc)
 
 
 (defn optimize [ast]
-    (println "optimize" ast)
     ;(Thread/sleep 1000)
     (case (first ast)
       (:dict)  (optimize:dict (second ast))
@@ -21,7 +21,9 @@
                         (optimize (last ast)))
       (:exit)  (ss:exit (optimize (second ast)))
       (:fct)   (ss:fct  (optimize (second ast))
-                        (optimize (last ast)))
+                        (if (not-empty (last ast))
+                          (optimize (last ast))
+                          ()))
       (:if)    (optimize:if  (rest ast))
       (:list)  (ss:list (optimize (second ast)))
       (:loop)  (ss:loop (optimize (second ast)))
@@ -50,10 +52,10 @@
 
 (defn optimize:if [[if_ then_ else_]]
   (if (ss:val? if_)
-      (if (ss:bool? if_)
-        then_
-        else_)
-      (ss:if if_ then_ else_)))
+    (if (ss:bool? (second if_))
+      then_
+      else_)
+    (ss:if if_ then_ else_)))
 
 
 (defn optimize:dict [dict]
@@ -64,12 +66,12 @@
 
 
 (defn optimize:op [ast]
-  (println "op" ast)
   (let [params (optimize (second ast))]
     (case (first ast)
+      :assign (ss:op :assign params)
       :pos params
-      :neg (opt_op - :neg params)
-      ;:not  (list :val (not (boolean? (second val1))))
+      :neg (opt_op -       :neg params)
+      :not (opt_op ss:not  :not params)
       ;:inot (list :val (bit-not (second val1)))
       :add (opt_ops ss:add :add params)
       :sub (opt_ops ss:sub :sub params)
@@ -77,6 +79,17 @@
       :div (opt_ops ss:div :div params)
       :mod (opt_ops ss:mod :mod params)
       :pow (opt_ops ss:pow :pow params)
+      :lt  (opt_opc ss:lt  :lt  params)
+      :le  (opt_opc ss:le  :le  params)
+      :gt  (opt_opc ss:gt  :gt  params)
+      :ge  (opt_opc ss:ge  :ge  params)
+      :eq  (let [p (distinct params)]
+             (if (= 1 (count p))
+               (ss:val true)
+               (ss:op :eq p)))
+      :ne  (if (= (distinct params) params)
+             (ss:op :ne  params)
+             (ss:val false))
       :xor (opt_ops ss:xor :xor params)
       :and (let [op (opt_ops ss:and :and params)]
              (if (ss:val? op)
@@ -97,22 +110,28 @@
 
 
 (defn opt_op [op sym param]
-  (let [p (optimize param)]
+  (let [p (first param)]
     (if (ss:val? p)
-      (ss:val (sym p))
-      (ss:op :op p))))
+      (ss:val (op (last p)))
+      (ss:op sym p))))
 
+(defn opt_opc [op sym params]
+  (let [p (opt_ops op sym params)]
+    ;(println p)
+    (if (ss:val? p)
+      (if (keyword? (second p))
+        (ss:val false)
+        (ss:val true))
+      (if (.contains (last p) '(:val :false))
+        (ss:val false)
+        p))))
 
 (defn opt_ops [op sym params]
   (let [p1  (first   params)
         p2  (second  params)]
     (if (nil? p2) p1
       (if (not (ss:val? p1 p2))
-        (if (and (= :op (first p1)) (= sym (second p1)))
-          (ss:op sym (concat (last p1) (list p2)))
-          (ss:op sym params))
+          (ss:op sym params)
         (recur op sym
                (cons (ss:val (op (second p1) (second p2)))
                      (nthrest params 2)))))))
-
-;(optimize (parse "2*2*2;"))

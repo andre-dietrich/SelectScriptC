@@ -16,11 +16,19 @@
 
 
 (defn assemble [ast]
-  (println "assemble" ast)
   (case (first ast)
     (:dict)   (assemble:dict  (second ast))
 
     (:if)     (assemble:if    (rest ast))
+
+    (:elem)   (concat (assemble (second ast))
+                      (loop [elems [] code (last ast)]
+                        (if (empty? code)
+                          elems
+                          (recur (concat elems
+                                         (assemble (first code))
+                                         '((:ELEM)))
+                                 (rest code)))))
 
     (:exit)   (concat (assemble (second ast))
                       '((:EXIT)))
@@ -36,9 +44,9 @@
 
     (:loc)    (list '(:LOC) (second ast))
 
-    (:loop)   (assemble:loop  (second ast))
+    (:loop)   (assemble:loop (second ast))
 
-    (:op)     (assemble:op    (rest ast))
+    (:op)     (assemble:op (rest ast))
 
     (:ref)    (concat (assemble (second ast))
                       '((:REF)))
@@ -46,7 +54,7 @@
     (:set)    (concat (asm:loop (second ast))
                       (list '(:CST_SET) (count (second ast))))
 
-    (:val)    (assemble:val   (second ast))
+    (:val)    (assemble:val (second ast))
 
     (:var)    (list '(:LOAD) (second ast))
 
@@ -66,21 +74,26 @@
 
 (defn assemble:loop [ast]
   (concat '((:SP_SAVE) (:LOOP_BEGIN))
-
-           (asm:loop ast true)
-
+          (if (list? (first ast))
+            (asm:loop ast true)
+            (assemble ast))
           '((:LOOP_END) (:RET_L))))
 
 
 (defn assemble:op [[op params]]
-    (println "assemble op" op)
+  (if (= op :assign)
+    (case (first (first params))
+      :var  (concat (asm:loop (rest  params)) '((:STORE))     [(second (first params))])
+      :loc  (concat (asm:loop (rest  params)) '((:STORE_LOC)) [(second (first params))])
+      :elem (concat (assemble (first params))
+                    (asm:loop (rest  params))
+                    '((:STORE_RF))))
     (concat (asm:loop params)
             (list '(:CALL_OP)
                   op
-                  (dec (count params)))))
+                  (dec (count params))))))
 
 (defn assemble:val [val]
-    (println "assemble:val" val)
   (cond
     (nil?     val)  '((:CST_N))
     (false?   val)  '((:CST_0))
@@ -125,4 +138,4 @@
         (recur (dec i))))))
 
 
-;(assemble (parse "f();"))
+;(assemble (parse "f(); f();"))

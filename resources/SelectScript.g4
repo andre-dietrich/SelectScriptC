@@ -222,9 +222,17 @@ expr
 ;
 
 function
-	: repo_ = atom
-	  (AD extra_ = atom)?
-	  '(' (elem_ = stmt_list)? ')'
+	: del_ = function_del
+	| mem_ = function_mem
+	| repo_ = atom (AD extra_ = atom)? '(' (elem_ = stmt_list)? ')'
+;
+
+function_del
+	: DEL_F '(' ((IDENTIFIER | STRING) (SEP (IDENTIFIER | STRING))*)? ')'
+;
+
+function_mem
+	: MEM_F '(' (IDENTIFIER | STRING)? ')'
 ;
 
 if_expr

@@ -109,7 +109,38 @@
   (mod p1 p2))
 
 (defn ss:pow [p1 p2]
-  (Math/pow p1 p2))
+  (let [x (Math/pow p1 p2)]
+    (if (or (float? p1)
+            (float? p2))
+      x
+      (int x))))
+
+(defn ss:not [p]
+  (if (nil? p)
+    nil
+    (not (ss:bool? p))))
+
+(defn ss:lt [p1 p2]
+  (if (< p1 p2)
+    p2
+    :false))
 
 (defn ss:le [p1 p2]
-  (Math/pow p1 p2))
+  (if (<= p1 p2)
+    p2
+    :false))
+
+(defn ss:gt [p1 p2]
+  (if (> p1 p2)
+    p2
+    :false))
+
+(defn ss:ge [p1 p2]
+  (if (>= p1 p2)
+    p2
+    :false))
+
+(defn ss:eq [p1 p2]
+  (if (= p1 p2)
+    p2
+    :false))

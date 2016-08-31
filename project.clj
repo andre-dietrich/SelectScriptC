@@ -20,7 +20,7 @@
 
   ;:native-path "native"
 
-  :jvm-opts ["-Djna.library.path=./"]
+  :jvm-opts ["-Djna.library.path=./runtime"]
 
   ;:jvm-opts ["-Djna.library.path=/home/andre/Workspace/Projects/gitlab/2SOS/runtime"]
   :main selectscript.core)
