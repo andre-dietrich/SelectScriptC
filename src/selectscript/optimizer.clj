@@ -69,6 +69,7 @@
   (let [params (optimize (second ast))]
     (case (first ast)
       :assign (ss:op :assign params)
+      :ex     (ss:op :ex     params)
       :pos params
       :neg (opt_op -       :neg params)
       :not (opt_op ss:not  :not params)
@@ -78,7 +79,21 @@
       :mul (opt_ops ss:mul :mul params)
       :div (opt_ops ss:div :div params)
       :mod (opt_ops ss:mod :mod params)
-      :pow (opt_ops ss:pow :pow params)
+      :pow (let [params_ (loop [p_old (rest params) p_new ()]
+                           (if (empty? p_old)
+                             p_new
+                             (recur (rest p_old)
+                                    (if (= :val (first (first p_old)))
+                                      (concat [(first p_old)] p_new)
+                                      (concat p_new [(first p_old)])))))]
+             (let [rslt (opt_ops ss:pow :pow (concat [(first params)] params_))]
+               (if (and (= :op  (first rslt))
+                        (= :pow (second rslt))
+                        (and (= :val (first (first (last rslt))))
+                             (.contains [0 0.0 1 1.0 true false] (second (first (last rslt))))))
+                 (first (last rslt))
+                 rslt)))
+
       :lt  (opt_opc ss:lt  :lt  params)
       :le  (opt_opc ss:le  :le  params)
       :gt  (opt_opc ss:gt  :gt  params)
@@ -113,7 +128,7 @@
   (let [p (first param)]
     (if (ss:val? p)
       (ss:val (op (last p)))
-      (ss:op sym p))))
+      (ss:op sym param))))
 
 (defn opt_opc [op sym params]
   (let [p (opt_ops op sym params)]

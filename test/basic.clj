@@ -6,7 +6,7 @@
 (defmacro iss [rslt & code]
   (list 'is (list '= rslt (list 'ss:exec 'env (clojure.string/join "\n" code) 'optimize))))
 
-(def optimize false)
+(def optimize true)
 
 (deftest math
   (let [env (vm:init 100 100 -1)]
@@ -156,4 +156,4 @@
 
 ;(ss:exec "a={'a':22, 'b22':'test'};" true)
 
-(run-tests)
+;(run-tests)

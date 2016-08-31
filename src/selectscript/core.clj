@@ -28,14 +28,14 @@
     (cmp input)))
 
 ;0, 0, 3, 3, 25, 255, 255, 1, 0
-;(optimize (parse "sss();"))
+;(optimize (parse "2**1**cc;"))
 ;(int16->byte -1)
 ;(def xxx (vm:prog (ss:compile "-2;" false)))
 ;(def env (vm:init 100 100 1))
 
 ;(vm:exec env  1)
 
-;(ss:execute (ss:compile "-2;" false))
+;(ss:execute (ss:compile "-2.22;" false))
 
 (defn ss:execute [code]
   (let [env (vm:init 100 100 1)  prog (vm:prog code)]
