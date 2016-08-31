@@ -141,7 +141,9 @@
                     (opt:sort params))
       :ixor (opt_ops ss:ixor
                      :ixor
-                     (opt:sort params)))))
+                     (opt:sort params))
+      :left  (opt_ops ss:left  :left  params)
+      :right (opt_ops ss:right :right params))))
 
 
 

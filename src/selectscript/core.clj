@@ -43,7 +43,7 @@
 ;0, 0, 3, 3, 25, 255, 255, 1, 0
 ;(ss:exec "[1,2] < [1,2]; [1,2] < [1,2,3];" false)
 
-(assemble (parse "~11;"))
+;(cmp (assemble (parse "1<<11;")))
 
 ;(int16->byte -1)
 ;(def xxx (vm:prog (ss:compile "-2;" false)))

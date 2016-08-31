@@ -8,7 +8,7 @@
           :lt    8,   :le    9,   :ge   10,   :gt   11,   :ne  12,   :eq  13,
           :and  14,   :xor  15,   :or   16,   :in   17,
           :inot 18,   :iand 19,   :ior  20,   :ixor 21,
-          :ilshift 22, :irshift 23
+          :left 22,   :right 23
           :ex 24})
 
 (def OP { :RET 0, :RET_L 1, :RET_P 2,

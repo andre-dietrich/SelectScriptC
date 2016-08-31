@@ -187,3 +187,11 @@
 
 (defn ss:inot [p]
   (bit-not (ss:num p)))
+
+(defn ss:left [p1 p2]
+  (bit-shift-left (ss:num p1)
+                  (ss:num p2)))
+
+(defn ss:right [p1 p2]
+  (bit-shift-right (ss:num p1)
+                   (ss:num p2)))
