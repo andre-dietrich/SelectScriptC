@@ -8,6 +8,7 @@
 
   :dependencies [[org.clojure/clojure   "1.8.0"]
                  [net.n01se/clojure-jna "1.0.0"]
+                 [org.clojure/tools.trace "0.7.9"]
                  [proto-repl            "0.3.1"]]
                  ;[net.java.dev.jna/jna  "4.1.0"]
   :plugins      [[lein-shell            "0.5.0"]]

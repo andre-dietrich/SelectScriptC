@@ -156,4 +156,4 @@
 
 ;(ss:exec "a={'a':22, 'b22':'test'};" true)
 
-;(run-tests)
+(run-tests)

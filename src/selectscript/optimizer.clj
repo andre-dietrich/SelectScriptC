@@ -8,6 +8,7 @@
          optimize:dict
          optimize:op
          optimize:proc
+         opt:sort
          opt_op
          opt_ops
          opt_opc)
@@ -64,35 +65,40 @@
       (map #(hash-map (first %) (optimize (second %))))
       (ss:dict)))
 
+(defn opt:sort [params]
+  (loop [p_old params p_new ()]
+    (if (empty? p_old)
+      p_new
+      (recur (rest p_old)
+             (if (= :val (first (first p_old)))
+               (concat [(first p_old)] p_new)
+               (concat p_new [(first p_old)]))))))
 
 (defn optimize:op [ast]
   (let [params (optimize (second ast))]
     (case (first ast)
       :assign (ss:op :assign params)
       :ex     (ss:op :ex     params)
+      :in     (ss:op :in     params)
       :pos params
       :neg (opt_op -       :neg params)
       :not (opt_op ss:not  :not params)
-      ;:inot (list :val (bit-not (second val1)))
+      :inot (opt_op ss:inot :inot params)
       :add (opt_ops ss:add :add params)
       :sub (opt_ops ss:sub :sub params)
       :mul (opt_ops ss:mul :mul params)
       :div (opt_ops ss:div :div params)
       :mod (opt_ops ss:mod :mod params)
-      :pow (let [params_ (loop [p_old (rest params) p_new ()]
-                           (if (empty? p_old)
-                             p_new
-                             (recur (rest p_old)
-                                    (if (= :val (first (first p_old)))
-                                      (concat [(first p_old)] p_new)
-                                      (concat p_new [(first p_old)])))))]
-             (let [rslt (opt_ops ss:pow :pow (concat [(first params)] params_))]
-               (if (and (= :op  (first rslt))
-                        (= :pow (second rslt))
-                        (and (= :val (first (first (last rslt))))
-                             (.contains [0 0.0 1 1.0 true false] (second (first (last rslt))))))
-                 (first (last rslt))
-                 rslt)))
+      :pow (let [rslt (opt_ops ss:pow
+                               :pow
+                               (concat [(first params)]
+                                       (opt:sort (rest params))))]
+             (if (and (= :op  (first rslt))
+                      (= :pow (second rslt))
+                      (and (= :val (first (first (last rslt))))
+                           (.contains [0 0.0 1 1.0 true false] (second (first (last rslt))))))
+              (first (last rslt))
+              rslt))
 
       :lt  (opt_opc ss:lt  :lt  params)
       :le  (opt_opc ss:le  :le  params)
@@ -121,7 +127,23 @@
                  (ss:val true)
                  (if (.contains (last op) '(:val nil))
                    (ss:val nil)
-                   op)))))))
+                   op))))
+      :iand (let [rslt (opt_ops ss:iand
+                               :iand
+                               (opt:sort params))]
+              (if (and (= :op   (first rslt))
+                       (= :iand (second rslt))
+                       (.contains (last rslt) '(:val 0)))
+                (ss:val 0)
+                rslt))
+      :ior (opt_ops ss:ior
+                    :ior
+                    (opt:sort params))
+      :ixor (opt_ops ss:ixor
+                     :ixor
+                     (opt:sort params)))))
+
+
 
 
 (defn opt_op [op sym param]
@@ -132,21 +154,27 @@
 
 (defn opt_opc [op sym params]
   (let [p (opt_ops op sym params)]
-    ;(println p)
     (if (ss:val? p)
-      (if (keyword? (second p))
-        (ss:val false)
+      (case (second p)
+        :nil   (ss:val nil)
+        :false (ss:val false)
         (ss:val true))
       (if (.contains (last p) '(:val :false))
         (ss:val false)
-        p))))
+        (if (.contains (last p) '(:val :nil))
+          (ss:val nil)
+          p)))))
 
 (defn opt_ops [op sym params]
   (let [p1  (first   params)
         p2  (second  params)]
     (if (nil? p2) p1
-      (if (not (ss:val? p1 p2))
-          (ss:op sym params)
+      (if (not (ss:valX? p1 p2))
+        (ss:op sym params)
         (recur op sym
                (cons (ss:val (op (second p1) (second p2)))
                      (nthrest params 2)))))))
+
+;(use 'clojure.tools.trace)
+;(trace-ns 'selectscript.optimizer)
+;(optimize (parse "[2]+2;"))

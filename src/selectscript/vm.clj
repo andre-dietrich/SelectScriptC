@@ -9,6 +9,7 @@
          vm:rslt
          vm:size
          vm:status
+         round
          rslt->clj)
 
 ;(System/setProperty "jna.library.path" "/home/andre/Workspace/Projects/gitlab/2SOS/runtime/")
@@ -61,6 +62,9 @@
   (let [f (Function/getFunction "2s" (name func))]
     (.invoke f ret (to-array args))))
 
+(defn round [val len]
+  (let [acc (Math/pow 10 len)]
+    (/ (int (* (double val) acc)) acc)))
 
 (defn rslt->clj [ptr]
   (case (dyn :dyn_type Byte ptr)
@@ -69,7 +73,7 @@
         true
         false)
     3 (dyn :dyn_get_int Integer ptr)
-    4 (dyn :dyn_get_float Float ptr)
+    4 (round (dyn :dyn_get_float Float ptr) 6)
     5 (dyn :dyn_get_string String ptr)
     6 (for [i (range 0 (dyn :dyn_length Integer ptr))]
         (rslt->clj (dyn :dyn_list_get_ref Pointer ptr i)))

@@ -7,7 +7,7 @@
           :add   2,   :sub   3,   :mul   4,   :div   5,   :mod  6,   :pow  7,
           :lt    8,   :le    9,   :ge   10,   :gt   11,   :ne  12,   :eq  13,
           :and  14,   :xor  15,   :or   16,   :in   17,
-          :inv  18,   :iand 19,   :ior  20,   :ixor 21,
+          :inot 18,   :iand 19,   :ior  20,   :ixor 21,
           :ilshift 22, :irshift 23
           :ex 24})
 

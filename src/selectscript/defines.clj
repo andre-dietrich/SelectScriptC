@@ -53,6 +53,14 @@
       true
       (recur (first ops) (rest ops)))))
 
+(defn ss:valX? [op & ops]
+  (if (not (.contains '(:val) (first op)))
+    false
+    (if (empty? ops)
+      true
+      (recur (first ops) (rest ops)))))
+
+
 (defn ss:bool? [val]
   (if (number? val)
     (not (zero? val))
@@ -120,27 +128,62 @@
     nil
     (not (ss:bool? p))))
 
+(defn bool? [x]
+  (or (true? x) (false? x)))
+
+(defn ss:num [x]
+  (if (false? x)
+    0
+    (if (true? x)
+      1
+      x)))
+
+
 (defn ss:lt [p1 p2]
-  (if (< p1 p2)
-    p2
-    :false))
+  (try
+    (if (< (compare (ss:num p1) (ss:num p2)) 0)
+      p2
+      :false)
+    (catch Exception e :nil)))
 
 (defn ss:le [p1 p2]
-  (if (<= p1 p2)
-    p2
-    :false))
+  (try
+    (if (<= (compare (ss:num p1) (ss:num p2)) 0)
+      p2
+      :false)
+    (catch Exception e :nil)))
 
 (defn ss:gt [p1 p2]
-  (if (> p1 p2)
-    p2
-    :false))
+  (try
+    (if (> (compare (ss:num p1) (ss:num p2)) 0)
+      p2
+      :false)
+    (catch Exception e :nil)))
+
 
 (defn ss:ge [p1 p2]
-  (if (>= p1 p2)
-    p2
-    :false))
+  (try
+    (if (>= (compare (ss:num p1) (ss:num p2)) 0)
+      p2
+      :false)
+    (catch Exception e :nil)))
 
 (defn ss:eq [p1 p2]
   (if (= p1 p2)
     p2
     :false))
+
+(defn ss:iand [p1 p2]
+  (bit-and (ss:num p1)
+           (ss:num p2)))
+
+(defn ss:ior [p1 p2]
+  (bit-or (ss:num p1)
+          (ss:num p2)))
+
+(defn ss:ixor [p1 p2]
+  (bit-xor (ss:num p1)
+           (ss:num p2)))
+
+(defn ss:inot [p]
+  (bit-not (ss:num p)))
