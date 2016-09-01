@@ -80,15 +80,15 @@
       :assign (ss:op :assign params)
       :ex     (ss:op :ex     params)
       :in     (ss:op :in     params)
-      :pos params
-      :neg (opt_op -       :neg params)
-      :not (opt_op ss:not  :not params)
-      :inot (opt_op ss:inot :inot params)
-      :add (opt_ops ss:add :add params)
-      :sub (opt_ops ss:sub :sub params)
-      :mul (opt_ops ss:mul :mul params)
-      :div (opt_ops ss:div :div params)
-      :mod (opt_ops ss:mod :mod params)
+      :neg    (opt_op - :neg params)
+      :pos    params
+      :not  (opt_op  ss:not  :not  params)
+      :inot (opt_op  ss:inot :inot params)
+      :add  (opt_ops ss:add  :add  params)
+      :sub  (opt_ops ss:sub  :sub  params)
+      :mul  (opt_ops ss:mul  :mul  params)
+      :div  (opt_ops ss:div  :div  params)
+      :mod  (opt_ops ss:mod  :mod  params)
       :pow (let [rslt (opt_ops ss:pow
                                :pow
                                (concat [(first params)]
@@ -170,7 +170,11 @@
 (defn opt_ops [op sym params]
   (let [p1  (first   params)
         p2  (second  params)]
-    (if (nil? p2) p1
+    (if (nil? p2)
+      (if (and (= :op (first  p1))
+               (= :ex (second p1)))
+        (ss:op sym (list p1))
+        p1)
       (if (not (ss:valX? p1 p2))
         (ss:op sym params)
         (recur op sym

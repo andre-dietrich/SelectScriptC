@@ -137,8 +137,6 @@
     (visitEx_xor      [ctx] (expr :xor  ctx))
     (visitEx_or       [ctx] (expr :or   ctx))))
 
-
-
 (defn visit [ctx]
   (.visit visitor ctx))
 
@@ -375,18 +373,16 @@
              (.SHIFTR   ctx) :right
              (.SHIFTL   ctx) :left)]
 
-    (if (and
-          (= 1 (count params))
-          (or (= op :sub)
-              (= op :add))
-          (not (get params :fct))
-          (not= (get (first params) :op) :ex))
+    (if (and (= 1 (count params))
+             (or (= op :sub) (= op :add))
+             (and (not= :fct (first (first params)))
+                  (and (not= :op  (first (first params)))
+                       (not= :ex  (second (first params))))))
       (ss:op (if (= op :sub)
               :neg
               :pos)
             params)
-      (list :op op params))))
-
+      (ss:op op params))))
 
 (defn -special2 [ctx]
   (let [op   (-special (.op_ ctx))

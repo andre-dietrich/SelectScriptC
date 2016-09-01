@@ -8,6 +8,7 @@
          assemble:if
          assemble:loop
          assemble:op
+         assemble:opX
          assemble:set
          assemble:val
          asm:loop
@@ -47,6 +48,8 @@
     (:loop)   (assemble:loop (second ast))
 
     (:op)     (assemble:op (rest ast))
+
+    (:opX)    (assemble:opX (rest ast))
 
     (:ref)    (concat (assemble (second ast))
                       '((:REF)))
@@ -92,6 +95,13 @@
             (list '(:CALL_OP)
                   op
                   (dec (count params))))))
+
+(defn assemble:opX [[op params]]
+  (concat (asm:loop params)
+          (list '(:CALL_OPX)
+                 op
+                 (dec (count params)))))
+
 
 (defn assemble:val [val]
   (cond
