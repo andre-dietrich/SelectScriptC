@@ -57,6 +57,14 @@
     (:set)    (concat (asm:loop (second ast))
                       (list '(:CST_SET) (count (second ast))))
 
+    (:try)    (concat '((:SP_SAVE))
+                      '((:TRY))
+                      (assemble (nth ast 1))
+                      '((:TRY_END))
+                      (assemble (nth ast 2))
+                      '((:TRY_END))
+                      '((:RET)))
+
     (:val)    (assemble:val (second ast))
 
     (:var)    (list '(:LOAD) (second ast))

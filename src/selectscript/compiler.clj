@@ -104,7 +104,8 @@
                               asm_)]
              (cmp c d a))
            #{:RET :RET_L :RET_P
-             :THEN_END :ELSE_END :LOOP_END}
+             :THEN_END :ELSE_END
+             :LOOP_END :TRY_END}
            [(rest code) data asm_]
            #{:LOOP_BEGIN}
            (let [loop_ (cmp (rest code) data [])]
@@ -126,6 +127,20 @@
                           (last then)
                           (:JUMP OP)  (int16->byte (+ 2 (count (last else))))
                           (last else)))))
+           #{:TRY}
+           (let [try_code (cmp (rest code) data [])]
+             (let [catch_code (cmp (first try_code) (second try_code) [])]
+               (cmp (first  catch_code)
+                    (second catch_code)
+                    (conc  asm_
+                           (uint8->byte 1)
+                           (int16->byte (+ 5 (count (last try_code))))
+                           (last try_code)
+                           (:TRY OP)
+                           (uint8->byte 0)
+                           (:JUMP OP)
+                           (int16->byte (+ 2 (count (last catch_code))))
+                           (last catch_code)))))
 
            (cmp (rest code) data asm_))))
 

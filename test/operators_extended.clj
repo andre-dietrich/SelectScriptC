@@ -6,7 +6,7 @@
 (defmacro iss [rslt & code]
   (list 'is (list '= rslt (list 'ss:exec 'env (clojure.string/join "\n" code) 'optimize))))
 
-(def optimize false)
+(def optimize true)
 
 (run-tests)
 
@@ -48,3 +48,10 @@
     (iss  [1,2,3,4,5,1,2,
            3,4,5,1,2,3,4,
            5,1,2,3,4,5]         "a@*(4);        ")))
+
+(deftest not_equal
+  (let [env (vm:init 100 100 -1)]
+    (iss [1 2 3 4 5]    "a=[1,2,3,4,5]; ")
+    (iss true           "!=(*a);        ")
+    (iss true           "!=(*a,a);      ")
+    (iss false          "!=(*a,a,*a);   ")))
