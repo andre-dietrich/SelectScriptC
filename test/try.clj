@@ -1,12 +1,8 @@
 (ns try
   (:use [clojure.test] :reload)
   (:use [selectscript.vm] :reload)
-  (:use [selectscript.core] :reload))
-
-(defmacro iss [rslt & code]
-  (list 'is (list '= rslt (list 'ss:exec 'env (clojure.string/join "\n" code) 'optimize))))
-
-(def optimize true)
+  (:use [selectscript.core] :reload)
+  (:use [macross] :reload))
 
 ;(run-tests)
 

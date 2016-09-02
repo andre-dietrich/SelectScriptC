@@ -1,14 +1,10 @@
 (ns operators_extended
   (:use [clojure.test] :reload)
   (:use [selectscript.vm] :reload)
-  (:use [selectscript.core] :reload))
+  (:use [selectscript.core] :reload)
+  (:use [macross] :reload))
 
-(defmacro iss [rslt & code]
-  (list 'is (list '= rslt (list 'ss:exec 'env (clojure.string/join "\n" code) 'optimize))))
-
-(def optimize true)
-
-(run-tests)
+;(run-tests)
 
 (deftest positive
   (let [env (vm:init 100 100 -1)]

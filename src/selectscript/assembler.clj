@@ -9,6 +9,7 @@
          assemble:loop
          assemble:op
          assemble:opX
+         assemble:proc
          assemble:set
          assemble:val
          asm:loop
@@ -50,6 +51,8 @@
     (:op)     (assemble:op (rest ast))
 
     (:opX)    (assemble:opX (rest ast))
+
+    (:proc)   (assemble:proc (rest ast))
 
     (:ref)    (concat (assemble (second ast))
                       '((:REF)))
@@ -109,6 +112,12 @@
           (list '(:CALL_OPX)
                  op
                  (dec (count params)))))
+
+(defn assemble:proc [[params code info]]
+  (concat (list '(:PROC) params info)
+          '((:SP_SAVE))
+          (assemble code)
+          '((:RET_P))))
 
 
 (defn assemble:val [val]

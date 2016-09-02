@@ -63,7 +63,8 @@
                    asm))))
 
   ([code data asm]
-   (if (not (empty? code))
+   (if (empty? code)
+     [data asm]
      (let [[cmd pop] (cmp:cmd (first code))]
        ;(println code data asm)
        (let [asm_ (if (contains? OP cmd)
@@ -142,9 +143,8 @@
                            (int16->byte (+ 2 (count (last catch_code))))
                            (last catch_code)))))
 
-           (cmp (rest code) data asm_))))
+           (cmp (rest code) data asm_)))))))
 
-     [data asm])))
 
 (defn conc [a & b]
   (if (empty? b)

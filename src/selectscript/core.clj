@@ -44,7 +44,7 @@
 ;(ss:exec "[1,2] < [1,2]; [1,2] < [1,2,3];" false)
 
 ;0, 0, 3, 3, 40, 1, 7, 0, 7, 1, 40, 0, 25, 4, 0, 7, 2, 0, 0
-(cmp (assemble (optimize (parse "try(1,2);"))))
+;(cmp (assemble (optimize (parse "a;"))))
 
 ;(int16->byte -1)
 ;(def xxx (vm:prog (ss:compile "-2;" false)))
