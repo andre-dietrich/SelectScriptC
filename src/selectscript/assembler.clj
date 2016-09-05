@@ -114,10 +114,12 @@
                  (dec (count params)))))
 
 (defn assemble:proc [[params code info]]
-  (concat (list '(:PROC) params info)
-          '((:SP_SAVE))
-          (assemble code)
-          '((:RET_P))))
+  (list '(:PROC)
+        params
+        info
+        (concat '((:SP_SAVE))
+                (assemble code)
+                '((:RET_P)))))
 
 
 (defn assemble:val [val]

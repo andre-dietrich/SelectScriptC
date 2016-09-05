@@ -31,6 +31,7 @@
          cmp:cmd
          cmp:data
          cmp:base
+         cmp:proc
          conc)
 
 
@@ -142,8 +143,40 @@
                            (:JUMP OP)
                            (int16->byte (+ 2 (count (last catch_code))))
                            (last catch_code)))))
+           #{:PROC}
+           (cmp:proc (rest code) data asm_)
 
            (cmp (rest code) data asm_)))))))
+
+
+;           # number of parameters
+;                       bytecode += b_uint8(len(params))
+;                       # info string
+;                       bytecode.append(find(info))
+;                       # length of the code
+;                       bytecode += b_uint16(len(code))
+;                       bytecode += param_list
+;                       bytecode += code)))))))
+
+(defn cmp:proc [[params info code_proc & code] data asm]
+  (let [[p_data, p_id] (loop [p params, d data, i []]
+                         (if (empty? p)
+                           [d i]
+                           (let [iter (cmp:data d (first p))]
+                             (recur (rest p)
+                                    (first iter)
+                                    (concat i [(second iter)])))))]
+    (let [[i_data, i_id] (cmp:data p_data info)
+          proc_asm (cmp code_proc)]
+      (cmp code
+          i_data
+          (conc asm
+                (uint8->byte (count params))
+                i_id
+                (uint16->byte (count proc_asm))
+                p_id
+                proc_asm)))))
+
 
 
 (defn conc [a & b]
