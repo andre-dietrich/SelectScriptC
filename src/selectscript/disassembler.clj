@@ -8,26 +8,27 @@
          dis:prog)
 
 
-(defn dis [code]
-  (let [[prog addr] (dis:data code 0)]
-    (dis:prog prog addr)))
+(defn dis
+  ([code]           (dis code 0 ""))
+  ([code addr tab]  (let [next (dis:data code addr tab)]
+                      (dis:prog (first next) (second next) tab))))
 
-(defn dis:data [prog address]
-  (println "DATA:" (byte->uint16 (take 2 prog)))
-
+(defn dis:data [prog address tab]
+  (println tab "DATA:" (byte->uint16 (take 2 prog)))
+  (print "" tab)
   (loop [words (byte->uint16 (take 2 prog))
          data  (nthrest prog 2)
-         addr  (+ address 2)]
+         addr  (+ address 1)]
     (if (zero? words)
       [data addr]
-      (let [new_data (loop [d data]
-                       (print (char (first d)))
-                       (if (= 0 (first d))
-                         (do
-                           (print ",")
-                           (rest d))
-                         (recur (rest d))))]
-        (recur (dec words) new_data (inc addr))))))
+      (let [[new_data new_addr] (loop [d data a addr]
+                                  (print (char (first d)))
+                                  (if (= 0 (first d))
+                                    (do
+                                      (print ",")
+                                      [(rest d) a])
+                                    (recur (rest d) (inc a))))]
+        (recur (dec words) new_data (inc new_addr))))))
 
 (defn dis:key [val]
   (loop [[[k v] & elements] (into [] OP)]
@@ -35,18 +36,19 @@
       k
       (recur elements))))
 
-(defn dis:prog [prog address]
-  (println "\nPROGRAM:")
+(defn dis:prog [prog address tab]
+  (println)
+  (println tab "PROGRAM:")
   (with-local-vars [op_code (first prog), code (rest prog), addr (inc address)]
     (while (not= nil @op_code)
       (do
         (if (< @op_code 0)
           (do
-            (var-set op_code (dis:key (+ @op_code 255)))
-            (print (format "%-5d%-12s|P" @addr @op_code)))
+            (var-set op_code (dis:key (+ @op_code 128)))
+            (print tab (format "%-5d%-14s" @addr (str @op_code "|P"))))
           (do
             (var-set op_code (dis:key @op_code))
-            (print (format "%-5d%-14s" @addr (str @op_code)))))
+            (print tab (format "%-5d%-14s" @addr (str @op_code)))))
         (condp contains? @op_code
           #{:CST_LST
             :CST_SET}   (do
@@ -70,9 +72,13 @@
                           (println (byte->int16 (take 2 @code)))
                           (var-set code (nthrest @code 2))
                           (var-set addr (+ @addr 2)))
-          #{:IT_AS
+          #{:CALL_FCT
+            :CALL_FCTX
+            :CST_STR
+            :IT_AS
             :LOAD
-            :LOC}       (do
+            :LOC
+            :STORE}     (do
                           (println (byte->uint8 (first @code)))
                           (var-set code (nthrest @code 1))
                           (var-set addr (inc @addr)))
@@ -80,6 +86,14 @@
                           (println (byte->int8 (first @code)))
                           (var-set code (nthrest @code 1))
                           (var-set addr (inc @addr)))
+          #{:CALL_OP
+            :CALL_OPX}  (do
+                          (println (byte->uint8 (first  @code))
+                                   (byte->uint8 (second @code)))
+                          (var-set code (nthrest @code 2))
+                          (var-set addr (+ 2 @addr)))
+          #{:PROC}      (dis
+                          (println))
           (println))
         (var-set op_code (first @code))
         (var-set code    (rest  @code))
@@ -88,4 +102,9 @@
 (dis [2 0 97 0 0 3 3 15 0 14 1 0 29 30 24 12 0 34 7 4 35 24 5 0 25 -12 -1 12 0 0 33 24 9 0 27 1 38 2 25 -9 -1 0 0])
 
 (dis [1 0 97 0 3 7 12 14 1 0 0])
+
+(dis [0 0 3 -121 12 7 23 0])
+
+(dis [5 0 112 114 111 100 117 99 116 0 99 111 117 110 116 101 114 0 120 0 100 101 108 0 102 97 99 0 3 7 1 17 0 -111 1 3 15 1 27 2 21 1 13 24 14 0 11 1 11 0 15 3 23 2 39 25 11 0 15 1 7 1 21 1 2 -111 1 15 0 15 1 21 1 4 -111 0 25 -41 -1 -127 7 5 15 4 23 1 0])
+;(dis [3 0 120 0 67 97 108 99 117 108 97 116 101 32 102 97 99 116 111 114 105 97 108 32 102 111 114 32 97 32 103 105 118 101 110 32 120 32 98 121 32 108 111 111 112 105 110 103 46 0 102 97 99 0 3 26 1 1 79 0 0 4 0 112 114 111 100 117 99 116 0 99 111 117 110 116 101 114 0 120 0 100 101 108 0 3 3 7 1 17 0 17 1 3 15 1 27 2 21 1 13 24 14 0 11 1 11 0 15 3 23 2 39 25 11 0 15 1 7 1 21 1 2 17 1 15 0 15 1 21 1 4 17 0 25 -39 -1 1 0 2 17 2 7 5 15 2 23 1 0])
 ;(byte->uint16 [2 0])

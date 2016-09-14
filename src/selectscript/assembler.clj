@@ -1,6 +1,7 @@
 (ns selectscript.assembler
-    (:use [selectscript.parser] :reload)
-    (:use [selectscript.optimizer] :reload))
+    ;(:use [selectscript.parser] :reload)
+    (:use [selectscript.optimizer] :reload)
+    (:use [selectscript.compiler]  :reload))
 
 
 (declare assemble
@@ -303,8 +304,8 @@
 (defn asm:loop
   ([ast] (asm:loop ast false))
   ([ast pop] (let [assemble_ (if pop
-                              (comp pop:add assemble first)
-                              (comp assemble first))]
+                               (comp pop:add assemble first)
+                               (comp assemble first))]
                (loop [from ast, to '()]
                  (if (empty? from)
                    to
@@ -315,7 +316,8 @@
 (defn pop:add [code]
   (loop [i (dec (count code))]
     (let [elem (nth code i)]
-      (if (list? elem)
+      (if (and (list? elem)
+               (.contains (keys OP) (first elem)))
         (let [[left right] (split-at i code)]
           (concat left
                   (list (list (first elem) :POP))

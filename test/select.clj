@@ -5,7 +5,7 @@
   (:use [macross] :reload))
 
 
-(run-tests)
+;(run-tests)
 
 (deftest simple_select
   (let [env (vm:init 100 100 -1)]
@@ -99,16 +99,24 @@
 
 
 (deftest nesting
-    (let [env (vm:init 100 100 -1)]
-      (iss [["red" "green" "green" "red"] ["green" "red" "red" "green"]]
-           "colors = ['red', 'green'];                                          "
-           "neighbours = [[PROC:a.loc, PROC:b.loc], [PROC:a.loc, PROC:c.loc],   "
-           "              [PROC:b.loc, PROC:d.loc], [PROC:c.loc, PROC:d.loc]];  "
-           "                                                                    "
-           "SELECT [a.loc, b.loc, c.loc, d.loc]                                 "
-           "  FROM a:colors, b:colors, c:colors, d:colors                       "
-           " WHERE not (SELECT loc                                              "
-           "              FROM neighbours                                       "
-           "             WHERE loc[0]() == loc[1]()                             "
-           "                AS list)                                            "
-           "    AS list;                                                        ")))
+  (let [env (vm:init 100 100 -1)]
+    (iss [["red" "green" "green" "red"] ["green" "red" "red" "green"]]
+         "colors = ['red', 'green'];                                          "
+         "neighbours = [[PROC:a.loc, PROC:b.loc], [PROC:a.loc, PROC:c.loc],   "
+         "              [PROC:b.loc, PROC:d.loc], [PROC:c.loc, PROC:d.loc]];  "
+         "                                                                    "
+         "SELECT [a.loc, b.loc, c.loc, d.loc]                                 "
+         "  FROM a:colors, b:colors, c:colors, d:colors                       "
+         " WHERE not (SELECT loc                                              "
+         "              FROM neighbours                                       "
+         "             WHERE loc[0]() == loc[1]()                             "
+         "                AS list)                                            "
+         "    AS list;                                                        ")))
+
+
+(deftest select_val
+  (let [env (vm:init 100 100 -1)]
+    (iss [0 1 2]    "a = [0,1,2];                           ")
+    (iss 0          "SELECT loc FROM a AS val;              ")
+    (iss 1          "SELECT loc FROM a WHERE loc==1 AS val; ")
+    (iss nil        "SELECT loc FROM a WHERE loc==9 AS val; ")))

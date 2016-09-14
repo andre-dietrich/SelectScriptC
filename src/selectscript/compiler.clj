@@ -64,15 +64,14 @@
                    asm))))
 
   ([code data asm]
-   (println "->>>>>" code data asm)
+   ;(println "->>>>>" code data asm)
    (if (empty? code)
      [data asm]
      (let [[cmd pop] (cmp:cmd (first code))]
-       ;(println code data asm)
        (let [asm_ (if (contains? OP cmd)
                     (conc asm [(if (contains? OP cmd)
-                                 (+ (cmd OP))
-                                 (if pop 128 0))])
+                                 (+ (cmd OP)
+                                    (if pop 128 0)))])
                     asm)]
          (condp contains? cmd
            #{:IT_GROUP} (cmp:base (rest code) data asm_ uint8->byte)
@@ -119,7 +118,8 @@
                   (conc asm_
                         (last loop_)
                         (:JUMP OP)
-                        (int16->byte (- 1 (count (last loop_)))))))
+                        (int16->byte (- -1 (count (last loop_)))))))
+                       
            #{:IF}
            (let [then (cmp (rest code) data [])]
              (let [else (cmp (first then)
