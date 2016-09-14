@@ -86,7 +86,8 @@
 (defn byte->uint16 [bytes]
     (let [val (byte->int16 bytes)]
       (if (> val 32768)
-        (- val 2))))
+        (- val 2)
+        val)))
 
 (defn int8->byte [val]
   (let [buf (new Memory 1)]
@@ -104,4 +105,7 @@
     (.getByte buf 0)))
 
 (defn byte->uint8 [byte]
-  (+ 127 (byte->int8 byte)))
+  (let [val (byte->int8 byte)]
+    (if (< val 0)
+      (+ 255 val)
+      val)))

@@ -1,11 +1,28 @@
 (ns selectscript.defines)
 
-(defn ss:val [val]
-  (list :val val))
+(defn ss:dict [elements]
+  (list :dict (into {} elements)))
 
-(defn ss:var [var]
-  (list :var var))
+(defn ss:elem [var elems]
+  (list :elem var elems))
 
+(defn ss:exit [expr]
+  (list :exit expr))
+
+(defn ss:fct [fct params]
+  (list :fct fct params))
+
+(defn ss:if [if_ then else]
+  (list :if if_ then else))
+
+(defn ss:list [elements]
+  (list :list elements))
+
+(defn ss:loc [loc extra]
+  (list :loc loc extra))
+
+(defn ss:loop [elements]
+  (list :loop elements))
 
 (defn ss:op [op params]
   (list :op op params))
@@ -13,38 +30,43 @@
 (defn ss:opX [op params]
   (list :opX op params))
 
-(defn ss:list [elements]
-  (list :list elements))
-
-(defn ss:exit [expr]
-  (list :exit expr))
-
-(defn ss:try [try catch]
-  (list :try try catch))
-
-(defn ss:loc [loc extra]
-  (list :loc loc extra))
-
 (defn ss:proc [params code info]
   (list :proc params code info))
 
-(defn ss:if [if then else]
-  (list :if if then else))
-
-(defn ss:elem [var elems]
-  (list :elem var elems))
+(defn ss:select [from select where start connect stop group order limit as]
+  (list :select from
+                select
+                where
+                start
+                connect
+                stop
+                group
+                order
+                limit
+                as))
 
 (defn ss:set [elements]
   (list :set (distinct elements)))
 
-(defn ss:fct [fct params]
-  (list :fct fct params))
+(defn ss:try [t c]
+  (list :try t c))
 
-(defn ss:loop [elements]
-  (list :loop elements))
+(defn ss:val [val]
+  (list :val val))
 
-(defn ss:dict [elements]
-  (list :dict (into {} elements)))
+(defn ss:var [var]
+  (list :var var))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn ss:bool? [val]
+  (if (number? val)
+    (not (zero? val))
+    (if (or (string? val)
+            (list?   val)
+            (map?    val))
+      (not  (empty? val))
+      val)))
 
 (defn ss:val? [op & ops]
   (if (not (.contains '(:val :list :set :dict) (first op)))
@@ -60,15 +82,7 @@
       true
       (recur (first ops) (rest ops)))))
 
-
-(defn ss:bool? [val]
-  (if (number? val)
-    (not (zero? val))
-    (if (or (string? val)
-            (list?   val)
-            (map?    val))
-      (not  (empty? val))
-      val)))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn ss:and [p1 p2]
   (let [p [(ss:bool? p1) (ss:bool? p2)]]

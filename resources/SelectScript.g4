@@ -309,7 +309,7 @@ sel_limit
 ;
 
 sel_list
-	: (dict_id | stmt) (SEP (dict_id | stmt))*
+	: (dict_elem | stmt) (SEP (dict_elem | stmt))*
 ;
 
 sel_order

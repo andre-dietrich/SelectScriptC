@@ -308,44 +308,64 @@
         connect (.connect_ ctx)  stop  (.stop_    ctx)
         group   (.group_   ctx)  order (.order_   ctx)
         limit   (.limit_   ctx)  as    (.as_      ctx)]
-    (merge
-      {:from (visit from)}
-      (if select
-        {:select  (visit select)})
-      (if where
-        {:where   (visit where)})
-      (if start
-        {:start   (visit start)})
-      (if connect
-        {:connect (-sel_connect connect)})
-      (if stop
-        {:stop    (visit stop)})
-      (if group
-        {:group   (visit  group)})
-      (if order
-        {:order   (-sel_order   order)})
-      (if limit
-        {:limit   (visit  limit)})
-      (if as
-        (-sel_as as)
-        {:as :list}))))
+    (ss:select
+      (visit from)
+      (if select    (visit select)          (list "" (ss:loc "" ())))
+      (if where     (visit where)           ())
+      (if start     (visit start)           ())
+      (if connect   (-sel_connect connect)  ())
+      (if stop      (visit stop)            ())
+      (if group     (visit group)           ())
+      (if order     (-sel_order order)      ())
+      (if limit     (visit limit)           ())
+      (if as        (-sel_as as)            '(:list)))))
 
 (defn -sel_as [ctx]
-    {:as (let [as (.getText (.IDENTIFIER ctx))]
-           (case (clojure.string/lower-case as)
-             "dict"         :dict
-             "dictionary"   :dict
-             "list"         :list
-             "val"          :val
-             "value"        :val
-             "void"         :void
-             (as)))})
+  (let [as (.getText (.IDENTIFIER ctx))]
+    (case (clojure.string/lower-case as)
+      "dict"         :dict
+      "dictionary"   :dict
+      "list"         :list
+      "set"          :set
+      "val"          :val
+      "value"        :val
+      "void"         :void
+      (as))))
+
+(defn -sel_order [ctx]
+  (with-local-vars [ast ()]
+    (let [end (.getChildCount ctx)]
+      (loop [i 0]
+        (if (= end i)
+          @ast
+          (let [child (.getChild ctx i)]
+            (if (= (type child) S2.SelectScriptParser$StmtContext)
+              (var-set ast (concat @ast
+                                   [(list (visit child) :asc)]))
+              (if (and (= (type child) S2.SelectScriptParser$Sel_dirContext)
+                       (= :desc (-sel_dir child)))
+                (var-set ast (concat (butlast @ast)
+                                     [(list (first (last @ast)) :desc)]))))
+            (recur (inc i))))))))
 
 (defn -sel_dir [ctx]
-    (if (.ASC ctx) 0 1))
+    (if (.ASC ctx) :asc :desc))
 
 (defn -sel_list [ctx]
-    (remove nil? (children ctx 0)))
+  (let [lst (remove nil? (children ctx 0))]
+    (loop [l lst d []]
+      (if (empty? l)
+        d
+        (recur (rest l)
+               (concat d
+                       (let [elem (first l)]
+                         (if (map? elem)
+                           (first elem)
+                           (case (first elem)
+                             :var [(second elem) elem]
+                             :loc [(second elem) elem]
+                             :fct [(second (second elem)) elem]
+                             ["" elem])))))))))
 
 (defn -special [ctx]
   (let [params (-stmt_list (.elem_ ctx))

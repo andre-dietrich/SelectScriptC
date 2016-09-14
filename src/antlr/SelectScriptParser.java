@@ -2680,11 +2680,11 @@ public class SelectScriptParser extends Parser {
 	}
 
 	public static class Sel_listContext extends ParserRuleContext {
-		public List<Dict_idContext> dict_id() {
-			return getRuleContexts(Dict_idContext.class);
+		public List<Dict_elemContext> dict_elem() {
+			return getRuleContexts(Dict_elemContext.class);
 		}
-		public Dict_idContext dict_id(int i) {
-			return getRuleContext(Dict_idContext.class,i);
+		public Dict_elemContext dict_elem(int i) {
+			return getRuleContext(Dict_elemContext.class,i);
 		}
 		public List<StmtContext> stmt() {
 			return getRuleContexts(StmtContext.class);
@@ -2720,7 +2720,7 @@ public class SelectScriptParser extends Parser {
 			case 1:
 				{
 				setState(397);
-				dict_id();
+				dict_elem();
 				}
 				break;
 			case 2:
@@ -2745,7 +2745,7 @@ public class SelectScriptParser extends Parser {
 					case 1:
 						{
 						setState(402);
-						dict_id();
+						dict_elem();
 						}
 						break;
 					case 2:
@@ -3744,9 +3744,9 @@ public class SelectScriptParser extends Parser {
 		"%\2\u0182+\3\2\2\2\u0183\u0184\t\6\2\2\u0184-\3\2\2\2\u0185\u0186\7,\2"+
 		"\2\u0186\u0187\5\64\33\2\u0187/\3\2\2\2\u0188\u0189\7/\2\2\u0189\u018a"+
 		"\7\61\2\2\u018a\u018b\5H%\2\u018b\61\3\2\2\2\u018c\u018d\7\62\2\2\u018d"+
-		"\u018e\5\22\n\2\u018e\63\3\2\2\2\u018f\u0192\5\f\7\2\u0190\u0192\5F$\2"+
+		"\u018e\5\22\n\2\u018e\63\3\2\2\2\u018f\u0192\5\n\6\2\u0190\u0192\5F$\2"+
 		"\u0191\u018f\3\2\2\2\u0191\u0190\3\2\2\2\u0192\u019a\3\2\2\2\u0193\u0196"+
-		"\7\6\2\2\u0194\u0197\5\f\7\2\u0195\u0197\5F$\2\u0196\u0194\3\2\2\2\u0196"+
+		"\7\6\2\2\u0194\u0197\5\n\6\2\u0195\u0197\5F$\2\u0196\u0194\3\2\2\2\u0196"+
 		"\u0195\3\2\2\2\u0197\u0199\3\2\2\2\u0198\u0193\3\2\2\2\u0199\u019c\3\2"+
 		"\2\2\u019a\u0198\3\2\2\2\u019a\u019b\3\2\2\2\u019b\65\3\2\2\2\u019c\u019a"+
 		"\3\2\2\2\u019d\u019e\7.\2\2\u019e\u019f\7\61\2\2\u019f\u01a1\5F$\2\u01a0"+

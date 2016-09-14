@@ -8,6 +8,8 @@
          optimize:dict
          optimize:op
          optimize:proc
+         optimize:sel
+         optimize:order
          opt:sort
          opt_op
          opt_ops
@@ -16,6 +18,8 @@
 
 (defn optimize [ast]
     ;(Thread/sleep 1000)
+  (if (empty? ast)
+    ()
     (case (first ast)
       (:dict)  (optimize:dict (second ast))
       (:elem)  (ss:elem (optimize (second ast))
@@ -29,6 +33,16 @@
       (:list)  (ss:list (optimize (second ast)))
       (:loop)  (ss:loop (optimize (second ast)))
       (:op)    (optimize:op (rest ast))
+      (:select) (ss:select  (optimize:sel (nth ast 1))
+                            (optimize:sel (nth ast 2))
+                            (optimize (nth ast 3))
+                            (optimize (nth ast 4))
+                            (optimize (nth ast 5))
+                            (optimize (nth ast 6))
+                            (optimize (nth ast 7))
+                            (optimize:order (nth ast 8))
+                            (optimize (nth ast 9))
+                            (nth ast 10))
       (:set)   (ss:set  (optimize (second ast)))
       (:try)   (ss:try  (optimize (second ast))
                         (optimize (last ast)))
@@ -40,7 +54,7 @@
       (cons
         (optimize (first ast))
         (if (second ast)
-          (optimize (rest ast))))))
+          (optimize (rest ast)))))))
 
 
 (defn optimize:proc [[params code info]]
@@ -50,6 +64,24 @@
       (ss:proc params
                code
                info))))
+
+(defn optimize:order [ast]
+  (loop [elem ast, rslt ()]
+    (if (empty? elem)
+      rslt
+      (let [[expr dir] (first elem)]
+        (recur (rest elem)
+               (concat rslt [(list (optimize expr) dir)]))))))
+
+
+(defn optimize:sel [params]
+  (loop [p params o ()]
+    (if (empty? p)
+      o
+      (recur (nthrest p 2)
+             (concat o
+                     [(first p)]
+                     (list (optimize (second p))))))))
 
 (defn optimize:if [[if_ then_ else_]]
   (if (ss:val? if_)
@@ -108,9 +140,9 @@
              (if (= 1 (count p))
                (ss:val true)
                (ss:op :eq p)))
-      :ne  (if (= (distinct params) params)
-             (ss:op :ne  params)
-             (ss:val false))
+      :ne  (if (not= (distinct params) params)
+             (ss:val false)
+             (ss:op :ne  params))
       :xor (opt_ops ss:xor :xor params)
       :and (let [op (opt_ops ss:and :and params)]
              (if (ss:val? op)
