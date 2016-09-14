@@ -33,6 +33,7 @@
       (:list)  (ss:list (optimize (second ast)))
       (:loop)  (ss:loop (optimize (second ast)))
       (:op)    (optimize:op (rest ast))
+      (:ref)   (ss:ref (optimize (second ast))) 
       (:select) (ss:select  (optimize:sel (nth ast 1))
                             (optimize:sel (nth ast 2))
                             (optimize (nth ast 3))
@@ -47,7 +48,7 @@
       (:try)   (ss:try  (optimize (second ast))
                         (optimize (last ast)))
       (:proc)  (optimize:proc (rest ast))
-      (:loc)   ast
+      (:loc)   (ss:loc (second ast) (optimize (last ast)))
       (:val)   ast
       (:var)   ast
       (:opX)   (ss:opX (second ast) (optimize (last ast)))

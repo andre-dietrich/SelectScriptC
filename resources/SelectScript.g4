@@ -95,7 +95,7 @@ EXIT: E X I T;
 
 TRY : T R Y;
 
-REF : 'ref';
+REF : R E F;
 
 NEWLINE	: ('\r'? '\n') -> skip ; // {self.skip()};
 WS		: (' '|'\t'|'\n'|'\r')+ -> skip ; //{self.skip()} ;
@@ -153,6 +153,7 @@ atom
 	| if_expr
 	| try_expr
 	| loop
+	| reference
 	| '(' elem_=stmt ')'
 ;
 
@@ -257,6 +258,9 @@ procedure
 	  (info_=STRING)?
 	  COLON code_=stmt
 ;
+
+reference
+	: REF elem=atom;
 
 repository
 	: variable

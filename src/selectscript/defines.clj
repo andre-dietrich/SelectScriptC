@@ -33,6 +33,9 @@
 (defn ss:proc [params code info]
   (list :proc params code info))
 
+(defn ss:ref [elem]
+  (list :ref elem))
+
 (defn ss:select [from select where start connect stop group order limit as]
   (list :select from
                 select

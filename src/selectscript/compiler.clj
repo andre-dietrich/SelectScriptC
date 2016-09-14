@@ -90,7 +90,7 @@
              (cmp (nthrest code 2)
                   data_
                   (conc asm_ [(count ids_)] ids_)))
-           #{:CST_STR :LOAD :LOC :STORE :STORE_LOC}
+           #{:CST_STR :LOAD :LOC :LOCX :STORE :STORE_LOC}
            (let [[data_ i] (cmp:data data (second code))]
              (cmp:base (conj (nthrest code 2) i) data_ asm_ list))
            #{:CALL_FCTX
@@ -119,7 +119,7 @@
                         (last loop_)
                         (:JUMP OP)
                         (int16->byte (- -1 (count (last loop_)))))))
-                       
+
            #{:IF}
            (let [then (cmp (rest code) data [])]
              (let [else (cmp (first then)

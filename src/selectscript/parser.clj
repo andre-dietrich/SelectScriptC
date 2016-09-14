@@ -29,6 +29,7 @@
          -loop
          -procedure
          -prog
+         -reference
          -selection
          -sel_as
          -sel_connect
@@ -85,6 +86,7 @@
     (visitLoop         [ctx] (-loop         ctx))
     (visitProcedure    [ctx] (-procedure    ctx))
     (visitProg         [ctx] (-prog         ctx))
+    (visitReference    [ctx] (-reference    ctx))
     (visitSelection    [ctx] (-selection    ctx))
     (visitSel_as       [ctx] (-sel_as       ctx))
     (visitSel_connect  [ctx] (-sel_connect  ctx))
@@ -295,6 +297,10 @@
 
 (defn -prog [ctx]
   (map visit (.elem_ ctx)))
+
+
+(defn -reference [ctx]
+  (ss:ref (visit (.elem ctx))))
 
 
 (defn -set [ctx]

@@ -55,7 +55,10 @@
     (:list)   (concat (asm:loop (second ast))
                       (list '(:CST_LST) (count (second ast))))
 
-    (:loc)    (list '(:LOC) (second ast))
+    (:loc)    (if (empty? (last ast))
+                (list '(:LOC) (second ast))
+                (concat (assemble (last ast))
+                        (list '(:LOCX) (second ast))))
 
     (:loop)   (assemble:loop (second ast))
 

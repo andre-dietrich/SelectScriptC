@@ -14,7 +14,7 @@
 ;    (:use [selectscript.disassembler]   :reload))
 
 ;1, 0, 0, 3, 26, 0, 0, 13, 0, 1, 0, 98, 0, 3, 15, 0, 7, 2, 21, 1, 2, 2, 0
-(assemble (optimize (parse "loc$(-1);")))
+(cmp (assemble (optimize (parse "ref a; "))))
 ;(cmp (assemble (optimize (parse "{a:12};"))))
 ;(optimize (parse "[1,2,3];"))
 

@@ -98,16 +98,43 @@
     (iss    [10.1 11.3 10.899999 11.199999 15.399999 11.5 10.6 12.699999 12.8]
             "dist = [10.1,11.3,10.9,11.2,15.4,11.5,10.6,12.7,12.8];     ")
     (iss    [15.399999 12.699999 12.8]
-            "Filter = FROM dist WHERE loc > 12;                         ")))
-;    (iss    [10 11 10 11 15 11 10 12 12]
-;            "Map = SELECT int(loc) FROM dist;                           ")
-;    (iss    [nil 10.766667366027832 11.133334159851074 12.5
-;                 12.699999809265137 12.5 11.59999942779541
-;                 12.033332824707031 nil
-;            "MapEx = SELECT try( (loc$(-1) + loc + loc$(1)) / 3.0,      "
-;            "                    None )                                 "
-;            "          FROM dist;                                       ")
-;    (iss    11.833333015441895
-;            "Reduce = (SELECT sum.loc:+(loc) FROM dist                  "
-;            "      START WITH sum.loc=0                                 "
-;            "              AS void) / len(dist);                        ")))
+            "Filter = FROM dist WHERE loc > 12;                         ")
+    (iss    [10 11 10 11 15 11 10 12 12]
+            "Map = SELECT int(loc) FROM dist;                           ")
+    (iss    [nil 10.766667 11.133334 12.5 12.699999 12.5 11.599999 12.033332 nil]
+            "MapEx = SELECT try( (loc$(-1) + loc + loc$(1)) / 3.0,      "
+            "                    None )                                 "
+            "          FROM dist;                                       ")
+    (iss    11.833333
+            "Reduce = (SELECT sum.loc@+(loc) FROM dist                  "
+            "      START WITH sum.loc=0                                 "
+            "              AS void) / len(dist);                        ")))
+
+
+(deftest listing_7
+  (let [env (vm:init 100 100 -1)]
+    (iss    [0 2046 4092 6138 8184]
+            "analogRead = PROC(pin, res) : pin.loc * res.loc;                   "
+            "                                                                   "
+            "ir0 = {                                                            "
+            "       pin:  0,                                                    "
+            "       res:  1023,                                                 "
+            "       init: PROC(loc, Pin, Res)                                   "
+            "             'Set basic sensor parameters Pin and Resolution.'     "
+            "             : (loc.pin = Pin.loc; loc.res = Res.loc;),            "
+            "       read: PROC(loc)                                             "
+            "             'Read measurement'                                    "
+            "             : loc.dist = loc.lin(analogRead(loc.pin, loc.res)),   "
+            "       lin:  PROC(loc, volt)                                       "
+            "             'Linearize measurement to cm...'                      "
+            "             : cm.loc = volt.loc * 2                               "
+            "      };                                                           "
+            "                                                                   "
+            "ir1 = ir0; ir1.init(1, 1023);                                      "
+            "ir2 = ir0; ir2.init(2, 1023);                                      "
+            "ir3 = ir0; ir3.init(3, 1023);                                      "
+            "ir4 = ir0; ir4.init(4, 1023);                                      "
+            "                                                                   "
+            "ir_array = [ref ir0, ref ir1, ref ir2, ref ir3, ref ir4];          "
+            "                                                                   "
+            "dist = select loc.read() from ir_array;                            ")))
