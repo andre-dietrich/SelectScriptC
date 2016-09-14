@@ -73,132 +73,126 @@
                                  (+ (cmd OP)
                                     (if pop 128 0)))])
                     asm)]
-         (condp contains? cmd
-           #{:IT_GROUP} (cmp:base (rest code) data asm_ uint8->byte)
-           #{:CST_B}    (cmp:base (rest code) data asm_ int8->byte)
-           #{:CST_F}    (cmp:base (rest code) data asm_ float->byte)
-           #{:CST_I}    (cmp:base (rest code) data asm_ int32->byte)
-           #{:CST_LST
-             :CST_SET}  (cmp:base (rest code) data asm_ uint16->byte)
-           #{:CST_S}    (cmp:base (rest code) data asm_ int16->byte)
-           #{:CST_DCT}
-           (let [[data_ ids_] (loop [d data, i [], keys (second code)]
-                                (if (empty? keys)
-                                  [d i]
-                                  (let [[D I] (cmp:data d (first keys))]
-                                    (recur D (conc i [I]) (rest keys)))))]
-             (cmp (nthrest code 2)
-                  data_
-                  (conc asm_ [(count ids_)] ids_)))
-           #{:CST_STR :LOAD :LOC :LOCX :STORE :STORE_LOC}
-           (let [[data_ i] (cmp:data data (second code))]
-             (cmp:base (conj (nthrest code 2) i) data_ asm_ list))
-           #{:CALL_FCTX
-             :CALL_FCT} (cmp:base (rest code) data asm_ uint8->byte)
-           #{:CALL_OP :CALL_OPX}
-           (cmp (nthrest code 3)
-                data
-                (conc asm_
-                      (uint8->byte (nth code 2))
-                      [((nth code 1) op)]))
-           #{:SP_SAVE}
-           (let [[c d a] (cmp (rest code)
-                              data
-                              asm_)]
-             (cmp c d a))
-           #{:RET :RET_L :RET_P
-             :THEN_END :ELSE_END
-             :LOOP_END :TRY_END
-             :JUMP_END}
-           [(rest code) data asm_]
-           #{:LOOP_BEGIN}
-           (let [loop_ (cmp (rest code) data [])]
-             (cmp (first loop_)
-                  (second loop_)
-                  (conc asm_
-                        (last loop_)
-                        (:JUMP OP)
-                        (int16->byte (- -1 (count (last loop_)))))))
-
-           #{:IF}
-           (let [then (cmp (rest code) data [])]
-             (let [else (cmp (first then)
-                             (second then)
-                             [])]
-               (cmp (first else)
-                    (second else)
+         (if (and pop (.contains [:CST_N :CST_0 :CST_1] cmd))
+           (cmp (rest code) data asm)
+           (if (and pop (.contains [:CST_B :CST_S :CST_I :CST_F] cmd))
+             (cmp (nthrest code 2) data asm)
+             (condp contains? cmd
+               #{:IT_GROUP} (cmp:base (rest code) data asm_ uint8->byte)
+               #{:CST_B}    (cmp:base (rest code) data asm_ int8->byte)
+               #{:CST_F}    (cmp:base (rest code) data asm_ float->byte)
+               #{:CST_I}    (cmp:base (rest code) data asm_ int32->byte)
+               #{:CST_LST
+                 :CST_SET}  (cmp:base (rest code) data asm_ uint16->byte)
+               #{:CST_S}    (cmp:base (rest code) data asm_ int16->byte)
+               #{:CST_DCT}
+               (let [[data_ ids_] (loop [d data, i [], keys (second code)]
+                                    (if (empty? keys)
+                                      [d i]
+                                      (let [[D I] (cmp:data d (first keys))]
+                                        (recur D (conc i [I]) (rest keys)))))]
+                 (cmp (nthrest code 2)
+                      data_
+                      (conc asm_ [(count ids_)] ids_)))
+               #{:CST_STR :LOAD :LOC :LOCX :STORE :STORE_LOC}
+               (let [[data_ i] (cmp:data data (second code))]
+                 (cmp:base (conj (nthrest code 2) i) data_ asm_ list))
+               #{:CALL_FCTX
+                 :CALL_FCT} (cmp:base (rest code) data asm_ uint8->byte)
+               #{:CALL_OP :CALL_OPX}
+               (cmp (nthrest code 3)
+                    data
                     (conc asm_
-                          (:FJUMP OP) (int16->byte (+ 5 (count (last then))))
-                          (last then)
-                          (:JUMP OP)  (int16->byte (+ 2 (count (last else))))
-                          (last else)))))
-           #{:TRY}
-           (let [try_code (cmp (rest code) data [])]
-             (let [catch_code (cmp (first try_code) (second try_code) [])]
-               (cmp (first  catch_code)
-                    (second catch_code)
-                    (conc  asm_
-                           (uint8->byte 1)
-                           (int16->byte (+ 5 (count (last try_code))))
-                           (last try_code)
-                           (:TRY OP)
-                           (uint8->byte 0)
-                           (:JUMP OP)
-                           (int16->byte (+ 2 (count (last catch_code))))
-                           (last catch_code)))))
-           #{:PROC}
-           (cmp:proc (rest code) data asm_)
+                          (uint8->byte (nth code 2))
+                          [((nth code 1) op)]))
+               #{:SP_SAVE}
+               (let [[c d a] (cmp (rest code)
+                                  data
+                                  asm_)]
+                 (cmp c d a))
+               #{:RET :RET_L :RET_P
+                 :THEN_END :ELSE_END
+                 :LOOP_END :TRY_END
+                 :JUMP_END}
+               [(rest code) data asm_]
+               #{:LOOP_BEGIN}
+               (let [loop_ (cmp (rest code) data [])]
+                 (cmp (first loop_)
+                      (second loop_)
+                      (conc asm_
+                            (last loop_)
+                            (:JUMP OP)
+                            (int16->byte (- -1 (count (last loop_)))))))
 
-           #{:IT_AS}
-           (cmp (nthrest code 2) data (conc asm_ (second code)))
+               #{:IF}
+               (let [then (cmp (rest code) data [])]
+                 (let [else (cmp (first then)
+                                 (second then)
+                                 [])]
+                   (cmp (first else)
+                        (second else)
+                        (conc asm_
+                              (:FJUMP OP) (int16->byte (+ 5 (count (last then))))
+                              (last then)
+                              (:JUMP OP)  (int16->byte (+ 2 (count (last else))))
+                              (last else)))))
+               #{:TRY}
+               (let [try_code (cmp (rest code) data [])]
+                 (let [catch_code (cmp (first try_code) (second try_code) [])]
+                   (cmp (first  catch_code)
+                        (second catch_code)
+                        (conc  asm_
+                               (uint8->byte 1)
+                               (int16->byte (+ 5 (count (last try_code))))
+                               (last try_code)
+                               (:TRY OP)
+                               (uint8->byte 0)
+                               (:JUMP OP)
+                               (int16->byte (+ 2 (count (last catch_code))))
+                               (last catch_code)))))
+               #{:PROC}
+               (cmp:proc (rest code) data asm_)
 
-           #{:IT_LIMIT}
-           (cmp (rest code) data (conc asm_ (:FJUMP OP) (int16->byte 5)))
+               #{:IT_AS}
+               (cmp (nthrest code 2) data (conc asm_ (second code)))
 
-           #{:FJUMP_FW_X}
-           (let [overhead (second code)
-                 new (cmp (nthrest code 2) data ())]
-             ;(println new)
-             (cmp (first new)
-                  (second new)
-                  (concat asm_
-                          [(:FJUMP OP)]
-                          (int16->byte (+ (count (last new)) overhead))
-                          (last new))))
+               #{:IT_LIMIT}
+               (cmp (rest code) data (conc asm_ (:FJUMP OP) (int16->byte 5)))
 
-           #{:FJUMP_WHERE}
-           (let [new (cmp (rest code) data [])]
-             (cmp (first new)
-                  (second new)
-                  (concat asm_
-                          (last new)
-                          [(:FJUMP OP)]
-                          (int16->byte (- (- (count (last new))) 5)))))
+               #{:FJUMP_FW_X}
+               (let [overhead (second code)
+                     new (cmp (nthrest code 2) data ())]
+                 (cmp (first new)
+                      (second new)
+                      (concat asm_
+                              [(:FJUMP OP)]
+                              (int16->byte (+ (count (last new)) overhead))
+                              (last new))))
 
-           #{:FJUMP_BK_X}
-           (let [overhead1 (nth code 1)
-                 overhead2 (nth code 2)
-                 new (cmp (nthrest code 3) data [])]
-             (cmp (first new)
-                  (second new)
-                  (concat asm_
-                          [(:FJUMP OP)]
-                          (int16->byte (+ overhead1 (count (last new))))
-                          (last new)
-                          [(:JUMP OP)]
-                          (int16->byte (- overhead2 (count (last new)))))))
+               #{:FJUMP_WHERE}
+               (let [new (cmp (rest code) data [])]
+                 (cmp (first new)
+                      (second new)
+                      (concat asm_
+                              (last new)
+                              [(:FJUMP OP)]
+                              (int16->byte (- (- (count (last new))) 5)))))
 
-           (cmp (rest code) data asm_)))))))
+               #{:FJUMP_BK_X}
+               (let [overhead1 (nth code 1)
+                     overhead2 (nth code 2)
+                     new (cmp (nthrest code 3) data [])]
+                 (cmp (first new)
+                      (second new)
+                      (concat asm_
+                              [(:FJUMP OP)]
+                              (int16->byte (+ overhead1 (count (last new))))
+                              (last new)
+                              [(:JUMP OP)]
+                              (int16->byte (- overhead2 (count (last new)))))))
 
+               (cmp (rest code) data asm_)))))))))
 
-;           # number of parameters
-;                       bytecode += b_uint8(len(params))
-;                       # info string
-;                       bytecode.append(find(info))
-;                       # length of the code
-;                       bytecode += b_uint16(len(code))
-;                       bytecode += param_list
-;                       bytecode += code)))))))
 
 (defn cmp:proc [[params info code_proc & code] data asm]
   (let [[p_data, p_id] (loop [p params, d data, i []]

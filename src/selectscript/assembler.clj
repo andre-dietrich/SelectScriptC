@@ -202,15 +202,6 @@
 
         (var-set asm (concat @asm '((:RET))))
         @asm))))
-        ;SELECT
-        ;WHERE
-        ;START
-        ;CONNECT
-        ;STOP
-        ;GROUP
-        ;ORDER
-        ;LIMIT
-        ;AS
 
 (defn assemble:sel_as [type ids]
   (case type
@@ -330,7 +321,8 @@
 (defn pop:rm [code]
   (loop [i (dec (count code))]
     (let [elem (nth code i)]
-      (if (list? elem)
+      (if (and (list? elem)
+               (= :POP (second elem)))
         (let [[left right] (split-at i code)]
           (concat left (list (list(first elem))) (rest right)))
         (recur (dec i))))))

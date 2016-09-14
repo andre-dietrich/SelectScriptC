@@ -119,7 +119,9 @@
       nil)))
 
 (defn ss:add [p1 p2]
-  (+ p1 p2))
+  (cond
+    (or (string? p1) (string? p2))  (str p1 p2)
+    :else                           (+ p1 p2)))
 
 (defn ss:sub [p1 p2]
   (- p1 p2))

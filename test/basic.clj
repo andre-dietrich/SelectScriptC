@@ -4,7 +4,7 @@
   (:use [selectscript.core] :reload)
   (:use [macross] :reload))
 
-;(run-tests)
+(run-tests)
 
 (deftest math
   (let [env (vm:init 100 100 -1)]

@@ -1,41 +1,17 @@
 (ns selectscript.core
-    ;;(:use selectscript.parser)
-    ;;(:gen-class
-    ;; :extends selectscript.antlr.Test
-    ;; :main false)
-    ;:require '(selectscript.parser)
-
     (:use [selectscript.parser]         :reload)
     (:use [selectscript.optimizer]      :reload)
     (:use [selectscript.assembler]      :reload)
     (:use [selectscript.utils]          :reload)
     (:use [selectscript.compiler]       :reload)
-    (:use [selectscript.vm]             :reload))
-;    (:use [selectscript.disassembler]   :reload))
+    (:use [selectscript.vm]             :reload)
+    (:use [selectscript.disassembler]   :reload))
 
 ;1, 0, 0, 3, 26, 0, 0, 13, 0, 1, 0, 98, 0, 3, 15, 0, 7, 2, 21, 1, 2, 2, 0
-(cmp (assemble (optimize (parse "ref a; "))))
+(assemble (parse "IF( False, False, True);"))
 ;(cmp (assemble (optimize (parse "{a:12};"))))
 ;(optimize (parse "[1,2,3];"))
 
-(def code
-    ["#fac = PROC(x)                                                         "
-     "#'Calculate factorial for a given x by looping.'                       "
-     "#:(                                                                    "
-     "      counter = product = 1;                # var = LOOP (            "
-     "      LOOP (                                #         IF (..,         "
-     "          IF ( counter == x.loc,            #             EXIT ..,    "
-     "      /*then*/ EXIT del(counter, product),  #             ..);        "
-     "      /*else*/ counter = counter + 1 );     #       );                "
-     "                                            #                         "
-     "          product = product * counter;      # var = IF (..,..,..);    "
-     "      );                                    #                         "
-     " # );                                        # var = SELECT .. ;       "
-     "fac(5); "])
-
-(def code2 (clojure.string/join "\n" code))
-
-(println (cmp (assemble (optimize (parse code2)))))
 
 (defn -main
   "I don't do a whole lot."

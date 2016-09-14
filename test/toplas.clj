@@ -74,7 +74,8 @@
           "   ORDER BY func.loc[0] # ASC(ENDING) is default, or DESC(ENDING)"
           "   GROUP BY db_user.loc['name']                                  "
           "      LIMIT 7                                                    "
-          "         AS list;    # or AS void, value, list, set, dict        ")))
+          "         AS list;    # or AS void, value, list, set, dict        "
+          "                                                                 ")))
 
 (deftest listing_5
   (let [env (vm:init 100 100 -1)]

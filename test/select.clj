@@ -39,7 +39,7 @@
           "b" [0 0 0 0 0 1 1 1 1 1 2 2 2 2 2 3 3 3 3 3 4 4 4 4 4]}
          "c = SELECT a.loc, b.loc FROM a, b:a AS dict;")
     (iss [[0 0] [1 1] [2 2] [3 3] [4 4]]
-         "SELECT [loc['a'], loc['b']    "
+         "SELECT [loc['a'], loc['b']]   "
          "  FROM c                      "
          " WHERE loc['a']==loc['b']     "
          "    AS list;                  ")))
@@ -53,9 +53,9 @@
 (deftest simple_order
   (let [env (vm:init 100 100 -1)]
     (iss [0 1 2 3 4]  "a = [0,1,2,3,4];")
-    (iss [0 1 2 3 4]  "SELECT loc FROM a ORDER BY loc+1 AS list;")
-    (iss [0 1 2 3 4]  "SELECT loc FROM a ORDER BY loc+1 ASC AS list;")
-    (iss [4 3 2 1 0]  "SELECT loc FROM a ORDER BY loc+1 DESC AS list;")
+    (iss [0 1 2 3 4]  "SELECT loc FROM a ORDER BY loc AS list;")
+    (iss [0 1 2 3 4]  "SELECT loc FROM a ORDER BY loc ASC AS list;")
+    (iss [4 3 2 1 0]  "SELECT loc FROM a ORDER BY loc DESC AS list;")
     (iss [[4 0 4] [0 4 4] [3 0 3]
           [0 3 3] [2 0 2] [0 2 2]
           [1 0 1] [0 1 1] [0 0 0]]

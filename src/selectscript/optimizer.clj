@@ -33,7 +33,7 @@
       (:list)  (ss:list (optimize (second ast)))
       (:loop)  (ss:loop (optimize (second ast)))
       (:op)    (optimize:op (rest ast))
-      (:ref)   (ss:ref (optimize (second ast))) 
+      (:ref)   (ss:ref (optimize (second ast)))
       (:select) (ss:select  (optimize:sel (nth ast 1))
                             (optimize:sel (nth ast 2))
                             (optimize (nth ast 3))
@@ -210,9 +210,13 @@
         p1)
       (if (not (ss:valX? p1 p2))
         (ss:op sym params)
-        (recur op sym
-               (cons (ss:val (op (second p1) (second p2)))
-                     (nthrest params 2)))))))
+        (let [val (try
+                    (ss:val (op (second p1) (second p2)))
+                    (catch Exception e :error))]
+          (if (= :error val)
+            (ss:op sym params)
+            (recur op sym
+                   (cons val (nthrest params 2)))))))))
 
 ;(use 'clojure.tools.trace)
 ;(trace-ns 'selectscript.optimizer)
