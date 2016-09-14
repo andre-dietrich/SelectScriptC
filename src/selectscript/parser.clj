@@ -318,7 +318,7 @@
       (if group     (visit group)           ())
       (if order     (-sel_order order)      ())
       (if limit     (visit limit)           ())
-      (if as        (-sel_as as)            '(:list)))))
+      (if as        (-sel_as as)            :list))))
 
 (defn -sel_as [ctx]
   (let [as (.getText (.IDENTIFIER ctx))]
