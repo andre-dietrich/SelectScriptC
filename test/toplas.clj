@@ -5,7 +5,7 @@
   (:use [macross] :reload))
 
 
-(run-tests)
+;(run-tests)
 
 (deftest listing_1
   (let [env (vm:init 100 100 -1)]

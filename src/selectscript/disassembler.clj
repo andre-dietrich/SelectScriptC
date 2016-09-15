@@ -1,6 +1,6 @@
 (ns selectscript.disassembler
-    (:use [selectscript.utils] :reload)
-    (:use [selectscript.compiler] :reload))
+    (:use [selectscript.utils])
+    (:use [selectscript.compiler :only (OP op)]))
 
 (declare dis
          dis:key

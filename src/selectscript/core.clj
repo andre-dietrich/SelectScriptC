@@ -1,14 +1,13 @@
 (ns selectscript.core
-    (:use [selectscript.parser]         :reload)
-    (:use [selectscript.optimizer]      :reload)
-    (:use [selectscript.assembler]      :reload)
-    (:use [selectscript.utils]          :reload)
-    (:use [selectscript.compiler]       :reload)
+    (:use [selectscript.parser          :only (parse)])
+    (:use [selectscript.optimizer       :only (optimize)])
+    (:use [selectscript.assembler       :only (assemble)])
+    (:use [selectscript.compiler        :only (cmp)])
     (:use [selectscript.vm]             :reload)
-    (:use [selectscript.disassembler]   :reload))
+    (:use [selectscript.disassembler    :only (dis)]))
 
 ;1, 0, 0, 3, 26, 0, 0, 13, 0, 1, 0, 98, 0, 3, 15, 0, 7, 2, 21, 1, 2, 2, 0
-(assemble (parse "IF( False, False, True);"))
+;(cmp (assemble (parse "IF( 2!=2, 1, (False; 0;));")))
 ;(cmp (assemble (optimize (parse "{a:12};"))))
 ;(optimize (parse "[1,2,3];"))
 
@@ -51,5 +50,3 @@
 ;(def env (vm:init 100 100 1))
 
 ;(vm:exec env  1)
-
-;(ss:execute (ss:compile "-2.22;" false))

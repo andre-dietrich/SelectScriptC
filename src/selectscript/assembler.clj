@@ -1,8 +1,5 @@
 (ns selectscript.assembler
-    ;(:use [selectscript.parser] :reload)
-    (:use [selectscript.optimizer] :reload)
-    (:use [selectscript.compiler]  :reload))
-
+  (:use [selectscript.compiler :only (OP op)]))
 
 (declare assemble
          assemble:dict

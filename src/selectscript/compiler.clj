@@ -1,5 +1,5 @@
 (ns selectscript.compiler
-    (:use [selectscript.utils] :reload))
+  (:use [selectscript.utils]))
 
 
 

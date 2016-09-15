@@ -1,7 +1,5 @@
 (ns selectscript.optimizer
-    (:use [selectscript.parser] :reload)
-    (:use [selectscript.defines] :reload))
-
+    (:use [selectscript.defines]))
 
 (declare optimize
          optimize:if

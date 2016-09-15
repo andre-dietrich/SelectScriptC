@@ -13,7 +13,7 @@
                  ;[net.java.dev.jna/jna  "4.1.0"]
   :plugins      [[lein-shell            "0.5.0"]]
 
-  :prep-tasks [["shell" "make"] "javac" "compile"]
+;  :prep-tasks [["shell" "make"] "javac" "compile"]
 
   :resource-paths ["resources/antlr-4.5.3-complete.jar"]
 

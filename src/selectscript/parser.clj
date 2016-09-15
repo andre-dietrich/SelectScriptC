@@ -1,17 +1,23 @@
 (ns selectscript.parser
-    (:use [selectscript.defines] :reload)
-    (:import (org.antlr.v4.runtime CommonTokenStream
-                                   ANTLRInputStream)
-             (org.antlr.v4.runtime.tree Tree
-                                        ParseTree
-                                        ParseTreeWalker
-                                        ParseTreeVisitor)
-             (S2 SelectScriptLexer
-                 SelectScriptParser
-                 SelectScriptBaseVisitor)))
+  (:import (org.antlr.v4.runtime CommonTokenStream
+                                 ANTLRInputStream)
+           (org.antlr.v4.runtime.tree Tree
+                                      ParseTree
+                                      ParseTreeWalker
+                                      ParseTreeVisitor)
+           (S2 SelectScriptLexer
+               SelectScriptParser
+               SelectScriptBaseVisitor))
 
-;(use 'clojure.tools.trace)
-;(trace-ns 'selectscript.parser)
+  (:use [selectscript.defines :only (ss:dict    ss:elem
+                                     ss:exit    ss:fct
+                                     ss:if      ss:list
+                                     ss:loc     ss:loop
+                                     ss:op      ss:opX
+                                     ss:proc    ss:ref
+                                     ss:select  ss:set
+                                     ss:try     ss:val
+                                     ss:val?    ss:var)]))
 
 (declare -atom
          -assign
