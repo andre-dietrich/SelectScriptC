@@ -1,12 +1,14 @@
 (ns selectscript.core
-    (:use [selectscript.parser          :only (parse)])
-    (:use [selectscript.optimizer       :only (optimize)])
-    (:use [selectscript.assembler       :only (assemble)])
-    (:use [selectscript.compiler        :only (cmp)])
-    (:use [selectscript.vm]             :reload)
-    (:use [selectscript.disassembler    :only (dis)])
+  (:use [selectscript.parser          :only (parse)])
+  (:use [selectscript.optimizer       :only (optimize)])
+  (:use [selectscript.assembler       :only (assemble)])
+  (:use [selectscript.compiler        :only (cmp)])
+  (:use [selectscript.vm]             :reload)
+  (:use [selectscript.disassembler    :only (dis)])
 
-    (:require [clojure.tools.cli :refer [parse-opts]]))
+  (:require [clojure.tools.cli :refer [parse-opts]])
+
+  (:gen-class :main true))
 
 (declare cli-options
          ss:execute
@@ -57,8 +59,10 @@
   (println "  ███████║███████╗███████╗███████╗╚██████╗   ██║   ███████║╚██████╗██║  ██║██║██║        ██║   ")
   (println "  ╚══════╝╚══════╝╚══════╝╚══════╝ ╚═════╝   ╚═╝   ╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝╚═╝        ╚═╝   ")
   (println)
+
   (let [{:keys [options arguments errors summary]} (parse-opts args cli-options)]
-    (println options arguments errors summary)
+    (if (:help options)
+      (println summary))
     (with-local-vars [code (slurp (first arguments))]
       (var-set code (parse @code))
       (if (:optimize options)

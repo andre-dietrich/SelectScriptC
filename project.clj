@@ -10,6 +10,8 @@
                  [net.n01se/clojure-jna     "1.0.0"]
                  [org.clojure/tools.trace   "0.7.9"]
                  [org.clojure/tools.cli     "0.3.5"]
+                 [org.antlr/antlr4-runtime  "4.5.3"]
+                 [org.antlr/antlr4          "4.5.3"]
                  [proto-repl                "0.3.1"]]
                  ;[net.java.dev.jna/jna  "4.1.0"]
 
@@ -17,7 +19,11 @@
 
 ;  :prep-tasks [["shell" "make"] "javac" "compile"]
 
-  :resource-paths ["resources/antlr-4.5.3-complete.jar"]
+  ;:resource-paths ["resources/antlr-4.5.3-complete.jar"]
+  :resource-paths ["native"]
+  :native-path "runtime"
+  :native-prefix "runtime"
+
 
   :java-source-paths ["src/antlr"]
 
@@ -26,4 +32,7 @@
   :jvm-opts ["-Djna.library.path=./runtime"]
 
   ;:jvm-opts ["-Djna.library.path=/home/andre/Workspace/Projects/gitlab/2SOS/runtime"]
+  :profiles {:uberjar {:aot :all}}
+  ;:keep-non-project-classes true
+  :aot  [selectscript.core]
   :main selectscript.core)
