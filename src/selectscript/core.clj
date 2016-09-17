@@ -12,7 +12,8 @@
 
 (declare cli-options
          ss:execute
-         ss:compile)
+         ss:compile
+         ss:repl)
 
 
 (def cli-options
@@ -63,28 +64,42 @@
   (let [{:keys [options arguments errors summary]} (parse-opts args cli-options)]
     (if (:help options)
       (println summary))
-    (with-local-vars [code (slurp (first arguments))]
-      (var-set code (parse @code))
-      (if (:optimize options)
-        (var-set code (optimize @code)))
-      (if (:parse-tree options)
-        (println @code))
-      (var-set code (assemble @code))
-      (if (:interim options)
-        (println @code))
-      (var-set code (cmp @code))
-      (if (:assembly options)
-        (dis @code))
-      (if (:bytecode options)
-        (println @code))
-      (if (:debug options)
-        (ss:execute @code true))
-      (if (:execute options)
-        (ss:execute @code false))
-      (if (:repl options)
-        (println "repl")))))
+
+    (if (empty? arguments)
+      (ss:repl (:optimize options))
+      (with-local-vars [code (slurp (first arguments))]
+        (var-set code (parse @code))
+        (if (:optimize options)
+          (var-set code (optimize @code)))
+        (if (:parse-tree options)
+          (println @code))
+        (var-set code (assemble @code))
+        (if (:interim options)
+          (println @code))
+        (var-set code (cmp @code))
+        (if (:assembly options)
+          (dis @code))
+        (if (:bytecode options)
+          (println @code))
+        (if (:debug options)
+          (ss:execute @code true))
+        (if (:execute options)
+          (ss:execute @code false))))
+    (if (:repl options)
+      (ss:repl (:optimize options)))))
 
 ;(-main "-o" "test.bS2" "-d" "test.S2")
+
+(defn ss:repl [opt]
+  (let [env (vm:init 100 100 -1)]
+    (print ">>> ")
+    (flush)
+    (loop [code (read-line)]
+      ;(println)
+      (vm:exec env (vm:prog (ss:compile code opt)) 0)
+      (print (vm:rslt env) "\n>>> ")
+      (flush)
+      (recur (read-line)))))
 
 (defn ss:compile [string opt]
   (as-> string input
