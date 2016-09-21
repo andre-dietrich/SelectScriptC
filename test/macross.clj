@@ -4,4 +4,4 @@
 (defmacro iss [rslt & code]
   (list 'is (list '= rslt (list 'ss:exec 'env (clojure.string/join "\n" code) 'optimize))))
 
-(def optimize true)
+(def optimize false)
