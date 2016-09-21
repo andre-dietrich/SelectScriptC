@@ -1,6 +1,6 @@
 (ns selectscript.disassembler
-    (:use [selectscript.utils])
-    (:use [selectscript.compiler :only (OP op)]))
+    (:use [selectscript.utils]  :reload)
+    (:use [selectscript.compiler :only (OP op)] :reload))
 
 (declare dis
          dis:key
@@ -9,13 +9,12 @@
 
 
 (defn dis
-  ([code]           (dis code 0 ""))
-  ([code addr tab]  (let [next (dis:data code addr tab)]
-                      (dis:prog (first next) (second next) tab))))
+  ([code]       (dis code 0))
+  ([code addr]  (let [next (dis:data code addr)]
+                  (dis:prog (first next) (second next)))))
 
-(defn dis:data [prog address tab]
-  (println tab "DATA:" (byte->uint16 (take 2 prog)))
-  (print "" tab)
+(defn dis:data [prog address]
+  (println "//DATA:\n" (byte->uint16 (take 2 prog)))
   (loop [words (byte->uint16 (take 2 prog))
          data  (nthrest prog 2)
          addr  (+ address 1)]
@@ -36,19 +35,18 @@
       k
       (recur elements))))
 
-(defn dis:prog [prog address tab]
-  (println)
-  (println tab "PROGRAM:")
+(defn dis:prog [prog address]
+  (println "\nPROGRAM:")
   (with-local-vars [op_code (first prog), code (rest prog), addr (inc address)]
     (while (not= nil @op_code)
       (do
         (if (< @op_code 0)
           (do
             (var-set op_code (dis:key (+ @op_code 128)))
-            (print tab (format "%-5d%-14s" @addr (str @op_code "|P"))))
+            (print (format "%-5d%-14s" @addr (str @op_code "|P"))))
           (do
             (var-set op_code (dis:key @op_code))
-            (print tab (format "%-5d%-14s" @addr (str @op_code)))))
+            (print (format "%-5d%-14s" @addr (str @op_code)))))
         (condp contains? @op_code
           #{:CST_LST
             :CST_SET}   (do

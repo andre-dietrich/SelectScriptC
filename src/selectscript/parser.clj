@@ -17,7 +17,7 @@
                                      ss:proc    ss:ref
                                      ss:select  ss:set
                                      ss:try     ss:val
-                                     ss:val?    ss:var)]))
+                                     ss:val?    ss:var)]    :reload))
 
 (declare -atom
          -assign
@@ -34,6 +34,7 @@
          -loc
          -loop
          -procedure
+         -procedure_params
          -prog
          -reference
          -selection
@@ -91,6 +92,7 @@
     (visitLoc          [ctx] (-loc          ctx))
     (visitLoop         [ctx] (-loop         ctx))
     (visitProcedure    [ctx] (-procedure    ctx))
+    (visitProcedure_params [ctx] (-procedure_params    ctx))
     (visitProg         [ctx] (-prog         ctx))
     (visitReference    [ctx] (-reference    ctx))
     (visitSelection    [ctx] (-selection    ctx))
@@ -206,8 +208,8 @@
 
 
 (defn -dict_elem [ctx]
-  {(-dict_id (.id_ ctx)),
-   (visit (.value_ ctx))})
+  [(-dict_id (.id_ ctx)),
+   (visit (.value_ ctx))])
 
 
 (defn -dict_id [ctx]
@@ -289,16 +291,29 @@
             (-stmt extra)
             ())))
 
-
 (defn -procedure [ctx]
-  (ss:proc (let [params (map #(.getText %) (.id_ ctx))]
-             (if (.loc_ ctx)
-               (cons "" params)
-               params))
+  (ss:proc (if (.params_ ctx)
+             (-procedure_params (.params_ ctx))
+             (ss:val nil))
            (-stmt (.code_ ctx))
            (if (.info_ ctx)
              (cutString (.getText (.info_ ctx)))
              "")))
+
+(defn -procedure_params [ctx]
+  (let [end (.getChildCount ctx)]
+    (ss:dict (loop [i 0 elems []]
+               (if (< end i)
+                 elems
+                 (recur (+ i 2)
+                        (concat elems
+                                (let [e (.getChild ctx i)]
+                                  (if (= (type e)
+                                         S2.SelectScriptParser$Dict_elemContext)
+                                    [(visit e)]
+                                    (let [id (.getText e)]
+                                      [[(if (= "loc" id) "" id)
+                                        (ss:val nil)]]))))))))))
 
 
 (defn -prog [ctx]
@@ -371,8 +386,8 @@
         (recur (rest l)
                (concat d
                        (let [elem (first l)]
-                         (if (map? elem)
-                           (first elem)
+                         (if (string? (first elem))
+                           elem
                            (case (first elem)
                              :var [(second elem) elem]
                              :loc [(second elem) elem]

@@ -1,5 +1,5 @@
 (ns selectscript.optimizer
-    (:use [selectscript.defines]))
+    (:use [selectscript.defines]    :reload))
 
 (declare optimize
          optimize:if
@@ -60,7 +60,7 @@
   (let [code (optimize code)]
     (if (ss:val? code)
       code
-      (ss:proc params
+      (ss:proc (optimize params)
                code
                info))))
 
@@ -92,8 +92,8 @@
 
 (defn optimize:dict [dict]
   (->> dict
-      (into [])
-      (map #(hash-map (first %) (optimize (second %))))
+      ;(into [])
+      (map #(list (first %) (optimize (second %))))
       (ss:dict)))
 
 (defn opt:sort [params]

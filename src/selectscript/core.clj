@@ -1,10 +1,13 @@
 (ns selectscript.core
-  (:use [selectscript.parser          :only (parse)])
-  (:use [selectscript.optimizer       :only (optimize)])
-  (:use [selectscript.assembler       :only (assemble)])
-  (:use [selectscript.compiler        :only (cmp)])
-  (:use [selectscript.vm]             :reload)
-  (:use [selectscript.disassembler    :only (dis)])
+  (:use [selectscript.parser          :only (parse)]    :reload)
+  (:use [selectscript.optimizer       :only (optimize)] :reload)
+  (:use [selectscript.assembler       :only (assemble)] :reload)
+  (:use [selectscript.compiler        :only (cmp)]      :reload)
+  (:use [selectscript.vm              :only (vm:init
+                                             vm:exec
+                                             vm:prog
+                                             vm:rslt)]  :reload)
+  (:use [selectscript.disassembler    :only (dis)]      :reload)
 
   (:require [clojure.tools.cli :refer [parse-opts]])
 
@@ -51,8 +54,6 @@
     :assoc-fn (fn [m k _] (update-in m [k] not))]
    ;; A boolean option defaulting to nil
    ["-h" "--help"]])
-
-
 
 ;     _          _                    _                _
 ;    | |        | |           _      | |              (_)      _
@@ -106,15 +107,33 @@
         (if (:assembly options)
           (dis @code))
         (if (:bytecode options)
-          (println @code))
+          (do
+            (print "{")
+            (loop [b @code]
+              (if (not-empty b)
+               (do
+                 (print (format "%d, " (first b)))
+                 (recur (rest b)))))
+            (println "}")))
+          ;(println @code))
         (if (:debug options)
-          (ss:execute @code true))
+        ;  (ss:execute @code true))
+          (let [env (vm:init 100 100 1) prog (vm:prog @code)]
+            (loop [status 0]
+              (if (zero? status)
+                (do
+                  (read-line)
+                  (recur (vm:exec env prog 1)))))
+            (println "RESULT:" (vm:rslt env))))
+
         (if (:execute options)
           (ss:execute @code false))))
     (if (:repl options)
       (ss:repl (:optimize options)))))
 
 ;(-main "-o" "test.bS2" "-d" "test.S2")
+;(optimize (parse "select k:1+2+c, b from a, b as dict;"))
+;(parse "{a:1, b:2};")
 
 (defn ss:repl [opt]
   (let [env (vm:init 100 100 -1)]

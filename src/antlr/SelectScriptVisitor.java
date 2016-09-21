@@ -275,6 +275,12 @@ public interface SelectScriptVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitProcedure(SelectScriptParser.ProcedureContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link SelectScriptParser#procedure_params}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitProcedure_params(SelectScriptParser.Procedure_paramsContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link SelectScriptParser#reference}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

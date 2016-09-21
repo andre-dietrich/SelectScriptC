@@ -1,6 +1,6 @@
 (ns selectscript.vm
-    (:import (com.sun.jna Function Pointer Memory))
-    (:import (com.sun.jna.ptr PointerByReference)))
+  (:import (com.sun.jna Function Pointer Memory))
+  (:import (com.sun.jna.ptr PointerByReference)))
 
 (declare vm:s2
          vm:init

@@ -254,9 +254,13 @@ loop
 
 procedure
 	: PROCEDURE
-	  ('(' ((id_ += IDENTIFIER | loc_ = LOC) (SEP id_ += IDENTIFIER)*)? ')')?
+	  ( '(' params_ = procedure_params ')' )?
 	  (info_=STRING)?
 	  COLON code_=stmt
+;
+
+procedure_params
+	: ((IDENTIFIER | LOC | dict_elem) (SEP (IDENTIFIER | dict_elem))*)?
 ;
 
 reference

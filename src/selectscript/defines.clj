@@ -1,7 +1,7 @@
 (ns selectscript.defines)
 
 (defn ss:dict [elements]
-  (list :dict (into {} elements)))
+  (list :dict elements))
 
 (defn ss:elem [var elems]
   (list :elem var elems))

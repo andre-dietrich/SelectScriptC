@@ -1,5 +1,5 @@
 (ns selectscript.assembler
-  (:use [selectscript.compiler :only (OP op)]))
+  (:use [selectscript.compiler :only (OP op)]  :reload))
 
 (declare assemble
          assemble:dict
@@ -91,7 +91,8 @@
 
 
 (defn assemble:dict [dict]
-    (concat (asm:loop (vals dict)) (list '(:CST_DCT) (keys dict))))
+    (concat (asm:loop (map second dict))
+            (list '(:CST_DCT) (map first dict))))
 
 
 (defn assemble:if [[if_ then_ else_]]
@@ -127,12 +128,12 @@
                  (dec (count params)))))
 
 (defn assemble:proc [[params code info]]
-  (list '(:PROC)
-        params
-        info
-        (concat '((:SP_SAVE))
-                (assemble code)
-                '((:RET_P)))))
+  (concat (assemble params)
+          '((:PROC))
+          [info]
+          [(concat '((:SP_SAVE))
+                  (assemble code)
+                  '((:RET_P)))]))
 
 (defn assemble:selection [[from select where start connect stop group order limit as]]
   (with-local-vars [asm '((:SP_SAVE))]
