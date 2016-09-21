@@ -8,3 +8,14 @@ pom.xml.asc
 /.nrepl-port
 .hgignore
 .hg/
+runtime/vm.o
+runtime/vm_op.o
+runtime/vm_trace.o
+runtime/dynamic/dynamic_dict.o
+runtime/dynamic/dynamic_function.o
+runtime/dynamic/dynamic_list.o
+runtime/dynamic/dynamic.o
+runtime/dynamic/dynamic_op.o
+runtime/dynamic/dynamic_set.o
+runtime/dynamic/ss_string.o
+runtime/lib2s.so
