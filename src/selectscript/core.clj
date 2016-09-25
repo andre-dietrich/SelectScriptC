@@ -79,14 +79,15 @@
 
 
 (defn -main [& args]
-  (println " o-o      o           o   o-o                   o ")
-  (println "|         |           |  |              o       | ")
-  (println " o-o  o-o | o-o  o-o -o-  o-o   o-o o-o   o-o  -o-")
-  (println "    | |-' | |-' |     |      | |    |   | |  |  | ")
-  (println "o--o  o-o o o-o  o-o  o  o--o   o-o o   | O-o   o ")
-  (println "                                          |       ")
-  (println "                                          o       ")
-  (println)
+  (binding [*out* *err*]
+    (println " o-o      o           o   o-o                   o ")
+    (println "|         |           |  |              o       | ")
+    (println " o-o  o-o | o-o  o-o -o-  o-o   o-o o-o   o-o  -o-")
+    (println "    | |-' | |-' |     |      | |    |   | |  |  | ")
+    (println "o--o  o-o o o-o  o-o  o  o--o   o-o o   | O-o   o ")
+    (println "                                          |       ")
+    (println "                                          o       ")
+    (println))
 
   (let [{:keys [options arguments errors summary]} (parse-opts args cli-options)]
     (if (:help options)
@@ -132,7 +133,7 @@
       (ss:repl (:optimize options)))))
 
 ;(-main "-o" "test.bS2" "-d" "test.S2")
-;(println (cmp (assemble (optimize (parse "a=proc:a.loc * 33.33;")))))
+;(println (cmp (assemble (parse "a@-(1);"))))
 ;(parse "{a:1, b:2};")
 
 (defn ss:repl [opt]
