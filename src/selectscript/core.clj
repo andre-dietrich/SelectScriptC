@@ -132,7 +132,7 @@
       (ss:repl (:optimize options)))))
 
 ;(-main "-o" "test.bS2" "-d" "test.S2")
-;(optimize (parse "select k:1+2+c, b from a, b as dict;"))
+;(println (cmp (assemble (optimize (parse "a=proc:a.loc * 33.33;")))))
 ;(parse "{a:1, b:2};")
 
 (defn ss:repl [opt]

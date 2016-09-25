@@ -1,8 +1,8 @@
 (ns basic
   (:use [clojure.test]      :reload)
-  (:use [selectscript.vm]   :reload)
-  (:use [selectscript.core] :reload)
-  (:use [macross]           :reload))
+  (:use [selectscript.core] :reload-all)
+  (:use [macross]           :reload-all)
+  (:use [selectscript.vm]   :reload-all))
 
 ;(run-tests)
 

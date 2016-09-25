@@ -14,89 +14,109 @@
                   (dis:prog (first next) (second next)))))
 
 (defn dis:data [prog address]
-  (println "//DATA:\n" (byte->uint16 (take 2 prog)))
+  (println "/// DATA:" (byte->uint16 (take 2 prog)))
+  (println (format "%d, %d," (first prog) (second prog)))
   (loop [words (byte->uint16 (take 2 prog))
          data  (nthrest prog 2)
          addr  (+ address 1)]
     (if (zero? words)
       [data addr]
       (let [[new_data new_addr] (loop [d data a addr]
-                                  (print (char (first d)))
+                                  (let [c (first d)]
+                                    ;(println "ssss" (type (char c)) c (str (char c)))
+                                    (print (if (<= 32 c 126)
+                                             (format "'%s', " (char c))
+                                             (format "%d, " c))))
                                   (if (= 0 (first d))
                                     (do
-                                      (print ",")
+                                      (println)
                                       [(rest d) a])
                                     (recur (rest d) (inc a))))]
         (recur (dec words) new_data (inc new_addr))))))
 
-(defn dis:key [val]
-  (loop [[[k v] & elements] (into [] OP)]
-    (if (= v val)
-      k
-      (recur elements))))
+;(dis (list 2 0 97 0 0 3 3 40 1 12 0 15 0 27 1 21 1 4 40 0 25 5 0 8 -82 8 0 0))
+
+(defn dis:key
+  ([val]
+   (dis:key val OP))
+  ([val base]
+   (loop [[[k v] & elements] (into [] base)]
+     (if (= v val)
+       k
+       (recur elements)))))
 
 (defn dis:prog [prog address]
-  (println "\nPROGRAM:")
+  (println "/// PROGRAM:")
   (with-local-vars [op_code (first prog), code (rest prog), addr (inc address)]
     (while (not= nil @op_code)
       (do
         (if (< @op_code 0)
           (do
             (var-set op_code (dis:key (+ @op_code 128)))
-            (print (format "%-5d%-14s" @addr (str @op_code "|P"))))
+            (print (format "%-10s " (str (name @op_code) "|P,"))))
           (do
             (var-set op_code (dis:key @op_code))
-            (print (format "%-5d%-14s" @addr (str @op_code)))))
+            (print (format "%-10s " (str (name @op_code) ",")))))
         (condp contains? @op_code
           #{:CST_LST
             :CST_SET}   (do
-                          (println (byte->uint16 (take 2 @code)))
+                          (println (format "%d, %d, // %d"
+                                           (nth @code 0)
+                                           (nth @code 1)
+                                           (byte->uint16 (take 2 @code))))
                           (var-set code (nthrest @code 2))
                           (var-set addr (+ @addr 2)))
 
           #{:CST_F}     (do
-                          (println (byte->float (take 4 @code)))
+                          (println (format "%d, %d, %d, %d, // %f"
+                                           (nth @code 0)
+                                           (nth @code 1)
+                                           (nth @code 2)
+                                           (nth @code 3)
+                                           (byte->float (take 4 @code))))
                           (var-set code (nthrest @code 4))
                           (var-set addr (+ @addr 4)))
 
           #{:CST_S}     (do
-                          (println (byte->int16 (take 2 @code)))
+                          (println (format "%d, %d, // %d"
+                                           (nth @code 0)
+                                           (nth @code 1)
+                                           (byte->int16 (take 2 @code))))
                           (var-set code (nthrest @code 2))
                           (var-set addr (+ @addr 2)))
 
           #{:CST_I}     (do
-                          (println (byte->int16 (take 4 @code)))
+                          (println (format "%d, %d, %d, %d, // %d"
+                                           (nth @code 0)
+                                           (nth @code 1)
+                                           (nth @code 2)
+                                           (nth @code 3)
+                                           (byte->int32 (take 4 @code))))
                           (var-set code (nthrest @code 4))
                           (var-set addr (+ @addr 4)))
 
           #{:CST_DCT}   (let [len (byte->uint8 (first @code))]
+                          (println (str (first @code) ", // " len))
+                          (print "           ")
                           (var-set code (rest @code))
                           (var-set addr (+ 1 len @addr))
-                          (print len)
                           (loop [i len]
                             (if (> i 0)
                               (do
-                                (print "" (byte->uint8 (first @code)))
+                                (print (str "" (first @code) ", "))
                                 (var-set code (rest @code))
                                 (recur (dec i)))))
                           (println))
 
-          #{:FJUMP
+          #{:TRY_1
+            :FJUMP
             :JUMP}      (do
-                          (println (byte->int16 (take 2 @code)))
+                          (println (format "%d, %d, // %d"
+                                           (nth @code 0)
+                                           (nth @code 1)
+                                           (byte->int16 (take 2 @code))))
                           (var-set code (nthrest @code 2))
                           (var-set addr (+ @addr 2)))
-
-          #{:TRY}       (let [val (byte->int8 (first @code))]
-                          (var-set code (rest @code))
-                          (if (= 0 val)
-                            (do
-                              (println 0)
-                              (var-set addr (inc @addr)))
-                            (do
-                              (println 1 (byte->int16 (take 2 @code)))
-                              (var-set code (nthrest @code 2))
-                              (var-set addr (+ 3 @addr)))))
 
           #{:CALL_FCT
             :CALL_FCTX
@@ -106,24 +126,39 @@
             :LOC
             :LOCX
             :STORE}     (do
-                          (println (byte->uint8 (first @code)))
+                          (println (str (first @code)
+                                        ", // "
+                                        (byte->uint8 (first @code))))
                           (var-set code (nthrest @code 1))
                           (var-set addr (inc @addr)))
 
           #{:CST_B}     (do
-                          (println (byte->int8 (first @code)))
+                          (println (str (first @code) ", "))
                           (var-set code (nthrest @code 1))
                           (var-set addr (inc @addr)))
 
           #{:CALL_OP
             :CALL_OPX}  (do
-                          (println (byte->uint8 (first  @code))
-                                   (byte->uint8 (second @code)))
+                          (println (format "%s, %d, // %d, %d"
+                                           (name (dis:key (nth @code 0) op))
+                                           (nth @code 1)
+                                           (byte->uint8 (first  @code))
+                                           (byte->uint8 (second @code))))
                           (var-set code (nthrest @code 2))
                           (var-set addr (+ 2 @addr)))
 
-          #{:PROC}      (dis
-                          (println))
+          #{:PROC}      (do
+                          (println (format "%d, %d, %d // %d, %d"
+                                           (nth @code 0)
+                                           (nth @code 1)
+                                           (nth @code 2)
+                                           (byte->uint8  (first @code))
+                                           (byte->uint16 (list (nth @code 1)
+                                                               (nth @code 2)))))
+                          (let [[new_code new_addr] (dis:data (nthrest @code 3)
+                                                              (+ 3 @addr))]
+                            (var-set code new_code)
+                            (var-set addr new_addr)))
           (println))
 
         (var-set op_code (first @code))

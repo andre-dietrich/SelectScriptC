@@ -110,42 +110,42 @@
     (visitValue        [ctx] (-value        ctx))
     (visitVariable     [ctx] (-variable     ctx))
 
-    (visitEx_ex        [ctx] (ss:op :ex  [(visit (.e1 ctx))]))
-    (visitEx_not       [ctx] (ss:op :not [(visit (.e1 ctx))]))
+    (visitEx_ex        [ctx] (ss:op :EX  [(visit (.e1 ctx))]))
+    (visitEx_not       [ctx] (ss:op :NOT [(visit (.e1 ctx))]))
     (visitEx_pos       [ctx] (visit (.e1 ctx)))
     (visitEx_neg       [ctx]
         (let [ex (visit (.e1 ctx))]
           (if (ss:val? ex)
             (ss:val (- (second ex)))
-            (ss:op :neg (list ex)))))
-    (visitEx_pow       [ctx] (expr :pow  ctx))
+            (ss:op :NEG (list ex)))))
+    (visitEx_pow       [ctx] (expr :POW  ctx))
     (visitEx_div_mod_mul [ctx] (expr (cond
-                                       (.DIV ctx) :div
-                                       (.MOD ctx) :mod
-                                       (.MUL ctx) :mul)
+                                       (.DIV ctx) :DIV
+                                       (.MOD ctx) :MOD
+                                       (.MUL ctx) :MUL)
                                      ctx))
     (visitEx_add_sub  [ctx] (expr (if (.ADD ctx)
-                                    :add
-                                    :sub)
+                                    :ADD
+                                    :SUB)
                                   ctx))
     (visitEx_shift    [ctx] (expr (if (.SHIFTL ctx)
-                                    :left
-                                    :right)
+                                    :LEFT
+                                    :RIGHT)
                                   ctx))
-    (visitEx_iand     [ctx] (expr :iand ctx))
-    (visitEx_ixor     [ctx] (expr :ixor ctx))
-    (visitEx_ior      [ctx] (expr :ior  ctx))
-    (visitEx_inot     [ctx] (ss:op :inot  [(visit (.e1 ctx))]))
-    (visitEx_lt       [ctx] (expr :lt   ctx))
-    (visitEx_le       [ctx] (expr :le   ctx))
-    (visitEx_ge       [ctx] (expr :ge   ctx))
-    (visitEx_gt       [ctx] (expr :gt   ctx))
-    (visitEx_ne       [ctx] (expr :ne   ctx))
-    (visitEx_in       [ctx] (expr :in   ctx))
-    (visitEx_eq       [ctx] (expr :eq   ctx))
-    (visitEx_and      [ctx] (expr :and  ctx))
-    (visitEx_xor      [ctx] (expr :xor  ctx))
-    (visitEx_or       [ctx] (expr :or   ctx))))
+    (visitEx_iand     [ctx] (expr :B_AND ctx))
+    (visitEx_ixor     [ctx] (expr :B_XOR ctx))
+    (visitEx_ior      [ctx] (expr :B_OR  ctx))
+    (visitEx_inot     [ctx] (ss:op :B_NOT  [(visit (.e1 ctx))]))
+    (visitEx_lt       [ctx] (expr :LT   ctx))
+    (visitEx_le       [ctx] (expr :LE   ctx))
+    (visitEx_ge       [ctx] (expr :GE   ctx))
+    (visitEx_gt       [ctx] (expr :GT   ctx))
+    (visitEx_ne       [ctx] (expr :NE   ctx))
+    (visitEx_in       [ctx] (expr :IN   ctx))
+    (visitEx_eq       [ctx] (expr :EQ   ctx))
+    (visitEx_and      [ctx] (expr :AND  ctx))
+    (visitEx_xor      [ctx] (expr :XOR  ctx))
+    (visitEx_or       [ctx] (expr :OR   ctx))))
 
 (defn visit [ctx]
   (.visit visitor ctx))
@@ -397,37 +397,37 @@
 (defn -special [ctx]
   (let [params (-stmt_list (.elem_ ctx))
         op (cond
-             (.EQ       ctx) :eq
-             (.NE       ctx) :ne
-             (.LE       ctx) :le
-             (.GE       ctx) :ge
-             (.LT       ctx) :lt
-             (.GT       ctx) :gt
-             (.ADD      ctx) :add
-             (.SUB      ctx) :sub
-             (.MUL      ctx) :mul
-             (.DIV      ctx) :div
-             (.MOD      ctx) :mod
-             (.POW      ctx) :pow
-             (.IN       ctx) :in
-             (.AND      ctx) :and
-             (.OR       ctx) :or
-             (.XOR      ctx) :xor
-             (.IAND     ctx) :iand
-             (.IXOR     ctx) :ixor
-             (.IOR      ctx) :ior
-             (.INV      ctx) :inv
-             (.SHIFTR   ctx) :right
-             (.SHIFTL   ctx) :left)]
+             (.EQ       ctx) :EQ
+             (.NE       ctx) :NE
+             (.LE       ctx) :LE
+             (.GE       ctx) :GE
+             (.LT       ctx) :LT
+             (.GT       ctx) :GT
+             (.ADD      ctx) :ADD
+             (.SUB      ctx) :SUB
+             (.MUL      ctx) :MUL
+             (.DIV      ctx) :DIV
+             (.MOD      ctx) :MOD
+             (.POW      ctx) :POW
+             (.IN       ctx) :IN
+             (.AND      ctx) :AND
+             (.OR       ctx) :OR
+             (.XOR      ctx) :XOR
+             (.IAND     ctx) :B_AND
+             (.IXOR     ctx) :B_XOR
+             (.IOR      ctx) :B_OR
+             (.INV      ctx) :B_NOT
+             (.SHIFTR   ctx) :RIGHT
+             (.SHIFTL   ctx) :LEFT)]
 
     (if (and (= 1 (count params))
-             (or (= op :sub) (= op :add))
+             (or (= op :SUB) (= op :ADD))
              (and (not= :fct (first (first params)))
                   (and (not= :op  (first (first params)))
-                       (not= :ex  (second (first params))))))
-      (ss:op (if (= op :sub)
-              :neg
-              :pos)
+                       (not= :EX  (second (first params))))))
+      (ss:op (if (= op :SUB)
+               :NEG
+               :POS)
             params)
       (ss:op op params))))
 
@@ -435,8 +435,8 @@
   (let [op   (-special (.op_ ctx))
         repo (visit (.repo_ ctx))]
     (ss:opX (case (second op)
-              :neg :sub
-              :pos :add
+              :NEG :SUB
+              :POS :ADD
               (second op))
             (cons repo (last op)))))
 

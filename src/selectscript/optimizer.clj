@@ -109,41 +109,41 @@
   (let [params (optimize (second ast))]
     (case (first ast)
       :assign (ss:op :assign params)
-      :ex     (ss:op :ex     params)
-      :in     (ss:op :in     params)
-      :neg    (opt_op - :neg params)
-      :pos    params
-      :not  (opt_op  ss:not  :not  params)
-      :inot (opt_op  ss:inot :inot params)
-      :add  (opt_ops ss:add  :add  params)
-      :sub  (opt_ops ss:sub  :sub  params)
-      :mul  (opt_ops ss:mul  :mul  params)
-      :div  (opt_ops ss:div  :div  params)
-      :mod  (opt_ops ss:mod  :mod  params)
-      :pow (let [rslt (opt_ops ss:pow
-                               :pow
+      :EX     (ss:op :EX     params)
+      :IN     (ss:op :IN     params)
+      :NEG    (opt_op - :NEG params)
+      :POS    params
+      :NOT  (opt_op  ss:not  :NOT  params)
+      :B_NOT (opt_op  ss:inot :B_NOT params)
+      :ADD  (opt_ops ss:add  :ADD  params)
+      :SUB  (opt_ops ss:sub  :SUB  params)
+      :MUL  (opt_ops ss:mul  :MUL  params)
+      :DIV  (opt_ops ss:div  :DIV  params)
+      :MOD  (opt_ops ss:mod  :MOD  params)
+      :POW (let [rslt (opt_ops ss:pow
+                               :POW
                                (concat [(first params)]
                                        (opt:sort (rest params))))]
              (if (and (= :op  (first rslt))
-                      (= :pow (second rslt))
+                      (= :POW (second rslt))
                       (and (= :val (first (first (last rslt))))
                            (.contains [0 0.0 1 1.0 true false] (second (first (last rslt))))))
               (first (last rslt))
               rslt))
 
-      :lt  (opt_opc ss:lt  :lt  params)
-      :le  (opt_opc ss:le  :le  params)
-      :gt  (opt_opc ss:gt  :gt  params)
-      :ge  (opt_opc ss:ge  :ge  params)
-      :eq  (let [p (distinct params)]
+      :LT  (opt_opc ss:lt  :LT  params)
+      :LE  (opt_opc ss:le  :LE  params)
+      :GT  (opt_opc ss:gt  :GT  params)
+      :GE  (opt_opc ss:ge  :GE  params)
+      :EQ  (let [p (distinct params)]
              (if (= 1 (count p))
                (ss:val true)
-               (ss:op :eq p)))
-      :ne  (if (not= (distinct params) params)
+               (ss:op :EQ p)))
+      :NE  (if (not= (distinct params) params)
              (ss:val false)
-             (ss:op :ne  params))
-      :xor (opt_ops ss:xor :xor params)
-      :and (let [op (opt_ops ss:and :and params)]
+             (ss:op :NE  params))
+      :XOR (opt_ops ss:xor :XOR params)
+      :AND (let [op (opt_ops ss:and :AND params)]
              (if (ss:val? op)
                op
                (if (.contains (last op) '(:val false))
@@ -151,7 +151,7 @@
                  (if (.contains (last op) '(:val nil))
                    (ss:val nil)
                    op))))
-      :or  (let [op (opt_ops ss:or :or params)]
+      :OR  (let [op (opt_ops ss:or :OR params)]
              (if (ss:val? op)
                op
                (if (.contains (last op) '(:val true))
@@ -159,22 +159,22 @@
                  (if (.contains (last op) '(:val nil))
                    (ss:val nil)
                    op))))
-      :iand (let [rslt (opt_ops ss:iand
-                               :iand
-                               (opt:sort params))]
-              (if (and (= :op   (first rslt))
-                       (= :iand (second rslt))
-                       (.contains (last rslt) '(:val 0)))
-                (ss:val 0)
-                rslt))
-      :ior (opt_ops ss:ior
-                    :ior
-                    (opt:sort params))
-      :ixor (opt_ops ss:ixor
-                     :ixor
+      :B_AND (let [rslt (opt_ops ss:iand
+                                :B_AND
+                                (opt:sort params))]
+               (if (and (= :op    (first rslt))
+                        (= :B_AND (second rslt))
+                        (.contains (last rslt) '(:val 0)))
+                 (ss:val 0)
+                 rslt))
+      :B_OR (opt_ops ss:ior
+                     :B_OR
                      (opt:sort params))
-      :left  (opt_ops ss:left  :left  params)
-      :right (opt_ops ss:right :right params))))
+      :B_XOR (opt_ops ss:ixor
+                      :B_XOR
+                      (opt:sort params))
+      :LEFT  (opt_ops ss:left  :LEFT  params)
+      :RIGHT (opt_ops ss:right :RIGHT params))))
 
 
 
@@ -203,7 +203,7 @@
         p2  (second  params)]
     (if (nil? p2)
       (if (and (= :op (first  p1))
-               (= :ex (second p1)))
+               (= :EX (second p1)))
         (ss:op sym (list p1))
         p1)
       (if (not (ss:valX? p1 p2))

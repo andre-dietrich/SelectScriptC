@@ -3,13 +3,17 @@
 
 
 
-(def op { :not   0,   :neg   1,
-          :add   2,   :sub   3,   :mul   4,   :div   5,   :mod  6,   :pow  7,
-          :lt    8,   :le    9,   :ge   10,   :gt   11,   :ne  12,   :eq  13,
-          :and  14,   :xor  15,   :or   16,   :in   17,
-          :inot 18,   :iand 19,   :ior  20,   :ixor 21,
-          :left 22,   :right 23
-          :ex 24})
+(def op { :NOT    0, :NEG    1,
+          :ADD    2, :SUB    3, :MUL    4,
+          :DIV    5, :MOD    6, :POW    7,
+          :LT     8, :LE     9, :GE    10,
+          :GT    11, :NE    12, :EQ    13,
+          :AND   14, :XOR   15, :OR    16,
+          :IN    17,
+          :B_NOT 18, :B_AND 19,
+          :B_OR  20, :B_XOR 21,
+          :LEFT  22, :RIGHT 23,
+          :EX    24})
 
 (def OP { :RET 0, :RET_L 1, :RET_P 2,
           :SP_SAVE 3,
@@ -25,7 +29,7 @@
           :IT_INIT 29,
           :IT_NEXT0 30, :IT_NEXT1 31, :IT_NEXT2 32, :IT_NEXT3 33,
           :IT_STORE 34, :IT_LIMIT 35, :IT_GROUP 36, :IT_ORDER 37, :IT_AS 38,
-          :EXIT 39, :TRY 40, :REF 41})
+          :EXIT 39, :TRY_1 40, :TRY_0 41, :REF 42})
 
 (declare cmp
          cmp:cmd
@@ -136,17 +140,15 @@
                               (last then)
                               (:JUMP OP)  (int16->byte (+ 2 (count (last else))))
                               (last else)))))
-               #{:TRY}
+               #{:TRY_1}
                (let [try_code (cmp (rest code) data [])]
                  (let [catch_code (cmp (first try_code) (second try_code) [])]
                    (cmp (first  catch_code)
                         (second catch_code)
                         (conc  asm_
-                               (uint8->byte 1)
-                               (int16->byte (+ 5 (count (last try_code))))
+                               (int16->byte (+ 4 (count (last try_code))))
                                (last try_code)
-                               (:TRY OP)
-                               (uint8->byte 0)
+                               (:TRY_0 OP)
                                (:JUMP OP)
                                (int16->byte (+ 2 (count (last catch_code))))
                                (last catch_code)))))
@@ -200,7 +202,7 @@
     (cmp code
          i_data
          (conc asm
-               i_id
+               (uint8->byte i_id)
                (uint16->byte (count proc_asm))
                proc_asm))))
 

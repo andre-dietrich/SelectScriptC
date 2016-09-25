@@ -74,7 +74,7 @@
                       (list '(:CST_SET) (count (second ast))))
 
     (:try)    (concat '((:SP_SAVE))
-                      '((:TRY))
+                      '((:TRY_1))
                       (assemble (nth ast 1))
                       '((:TRY_END))
                       (assemble (nth ast 2))
@@ -274,8 +274,8 @@
                 asm_expr
                 '((:CALL_OP))
                 (if (= dir :asc)
-                  '(:lt 1)
-                  '(:gt 1))
+                  '(:LT 1)
+                  '(:GT 1))
                 '((:JUMP_END)))))))
 
 
