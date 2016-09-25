@@ -23,7 +23,6 @@
       [data addr]
       (let [[new_data new_addr] (loop [d data a addr]
                                   (let [c (first d)]
-                                    ;(println "ssss" (type (char c)) c (str (char c)))
                                     (print (if (<= 32 c 126)
                                              (format "'%s', " (char c))
                                              (format "%d, " c))))
@@ -33,8 +32,6 @@
                                       [(rest d) a])
                                     (recur (rest d) (inc a))))]
         (recur (dec words) new_data (inc new_addr))))))
-
-;(dis (list 2 0 97 0 0 3 3 40 1 12 0 15 0 27 1 21 1 4 40 0 25 5 0 8 -82 8 0 0))
 
 (defn dis:key
   ([val]
@@ -53,7 +50,7 @@
         (if (< @op_code 0)
           (do
             (var-set op_code (dis:key (+ @op_code 128)))
-            (print (format "%-10s " (str (name @op_code) "|P,"))))
+            (print (format "%-10s " (str (name @op_code) "|POP,"))))
           (do
             (var-set op_code (dis:key @op_code))
             (print (format "%-10s " (str (name @op_code) ",")))))
