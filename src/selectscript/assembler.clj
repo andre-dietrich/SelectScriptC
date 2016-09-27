@@ -104,7 +104,7 @@
   (concat '((:SP_SAVE) (:LOOP_BEGIN))
           (if (list? (first ast))
             (asm:loop ast true)
-            (assemble ast))
+            (pop:add (assemble ast)))
           '((:LOOP_END) (:RET_L))))
 
 

@@ -58,7 +58,7 @@
 
 (defn cmp
   ([code] (let [[data asm] (cmp code [] [])]
-            (map #(if (< 128 %) (- % 256) %)
+            (map #(if (< 127 %) (- % 256) %)
                  (conc (uint16->byte (count data))
                    (loop [d data bytes []]
                      (if (empty? d)
@@ -73,9 +73,8 @@
      [data asm]
      (let [[cmd pop] (cmp:cmd (first code))]
        (let [asm_ (if (contains? OP cmd)
-                    (conc asm [(if (contains? OP cmd)
-                                 (+ (cmd OP)
-                                    (if pop 128 0)))])
+                    (conc asm [(+ (cmd OP)
+                                  (if pop 128 0))])
                     asm)]
          (if (and pop (.contains [:CST_N :CST_0 :CST_1] cmd))
            (cmp (rest code) data asm)
@@ -98,7 +97,10 @@
                  (cmp (nthrest code 2)
                       data_
                       (conc asm_ [(count ids_)] ids_)))
-               #{:CST_STR :LOAD :LOC :LOCX :STORE :STORE_LOC}
+               #{:LOAD}
+               (let [[data_ i] (cmp:data data (second code))]
+                 (cmp:base (conj (nthrest code 2) i) data_ asm_ list))
+               #{:CST_STR :LOC :LOCX :STORE :STORE_LOC}
                (let [[data_ i] (cmp:data data (second code))]
                  (cmp:base (conj (nthrest code 2) i) data_ asm_ list))
                #{:CALL_FCTX
