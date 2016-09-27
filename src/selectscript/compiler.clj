@@ -99,8 +99,23 @@
                       (conc asm_ [(count ids_)] ids_)))
                #{:LOAD}
                (let [[data_ i] (cmp:data data (second code))]
-                 (cmp:base (conj (nthrest code 2) i) data_ asm_ list))
-               #{:CST_STR :LOC :LOCX :STORE :STORE_LOC}
+                 (if (= [(+ 128 (:STORE OP)) i]
+                        (take-last 2 asm))
+                   (cmp (nthrest code 2)
+                        data
+                        (conc (drop-last 2 asm)
+                              [(:STORE OP) i]))
+                   (cmp:base (conj (nthrest code 2) i) data_ asm_ list)))
+               #{:LOC}
+               (let [[data_ i] (cmp:data data (second code))]
+                 (if (= [(+ 128 (:STORE_LOC OP)) i]
+                        (take-last 2 asm))
+                   (cmp (nthrest code 2)
+                        data
+                        (conc (drop-last 2 asm)
+                              [(:STORE_LOC OP) i]))
+                   (cmp:base (conj (nthrest code 2) i) data_ asm_ list)))
+               #{:CST_STR :LOCX :STORE :STORE_LOC}
                (let [[data_ i] (cmp:data data (second code))]
                  (cmp:base (conj (nthrest code 2) i) data_ asm_ list))
                #{:CALL_FCTX
