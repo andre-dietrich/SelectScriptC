@@ -136,9 +136,9 @@
 
           #{:CALL_OP
             :CALL_OPX}  (do
-                          (println (format "%s, %d, // %d, %d"
-                                           (name (dis:key (nth @code 0) op))
-                                           (nth @code 1)
+                          (println (format "%d, %s, // %d, %d"
+                                           (first @code)
+                                           (name (dis:key (second @code) op))
                                            (byte->uint8 (first  @code))
                                            (byte->uint8 (second @code))))
                           (var-set code (nthrest @code 2))

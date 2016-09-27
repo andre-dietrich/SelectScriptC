@@ -350,13 +350,18 @@ special
 	| AND | OR  | XOR
 	| ADD | SUB | MUL | DIV | MOD | POW
 	| IN
-	| IOR | IAND | IXOR | SHIFTR | SHIFTL )
+	| IOR | IAND | IXOR
+	| SHIFTR | SHIFTL )
 
 	'(' elem_=stmt_list ')'
 ;
 
 special2
-	: repo_ = repository AD op_=special
+	: repo_ = repository AD ( (NOT '(' ')') |
+	                          (INV '(' ')') |
+							  (ADD '(' ')') |
+							  (SUB '(' ')') |
+							  (op_=special) )
 ;
 
 stmt

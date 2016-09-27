@@ -416,7 +416,6 @@
              (.IAND     ctx) :B_AND
              (.IXOR     ctx) :B_XOR
              (.IOR      ctx) :B_OR
-             (.INV      ctx) :B_NOT
              (.SHIFTR   ctx) :RIGHT
              (.SHIFTL   ctx) :LEFT)]
 
@@ -431,14 +430,20 @@
             params)
       (ss:op op params))))
 
+
 (defn -special2 [ctx]
-  (let [op   (-special (.op_ ctx))
-        repo (visit (.repo_ ctx))]
-    (ss:opX (case (second op)
-              :NEG :SUB
-              :POS :ADD
-              (second op))
-            (cons repo (last op)))))
+    (cond
+      (.NOT ctx) (ss:opX :NOT   (list (visit (.repo_ ctx))))
+      (.INV ctx) (ss:opX :B_NOT (list (visit (.repo_ ctx))))
+      (.ADD ctx) (ss:opX :POS   (list (visit (.repo_ ctx))))
+      (.SUB ctx) (ss:opX :NEG   (list (visit (.repo_ ctx))))
+      :else      (let [op   (-special (.op_ ctx))
+                       repo (visit (.repo_ ctx))]
+                   (ss:opX (case (second op)
+                             :NEG :SUB
+                             :POS :ADD
+                             (second op))
+                           (cons repo (last op))))))
 
 
 (defn -stmt [ctx]
