@@ -122,7 +122,8 @@
             :LOAD
             :LOC
             :LOCX
-            :STORE}     (do
+            :STORE
+            :STORE_LOC} (do
                           (println (str (first @code)
                                         ", // "
                                         (byte->uint8 (first @code))))
