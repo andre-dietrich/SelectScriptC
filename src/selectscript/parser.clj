@@ -312,7 +312,7 @@
                                          S2.SelectScriptParser$Dict_elemContext)
                                     [(visit e)]
                                     (let [id (.getText e)]
-                                      [[(if (= "loc" id) "" id)
+                                      [[(if (= "$" id) "" id)
                                         (ss:val nil)]]))))))))))
 
 

@@ -24,30 +24,30 @@
 
 (deftest listing_2
   (let [env (vm:init 100 100 -1)]
-    (iss 714                "rslt = ( a=12; b=33; b*22-a; );                    ")
-    (iss ["a" "b" "rslt"]   "print('variables in memory: ', mem());             ")
+    (iss 714                "rslt = ( a=12; b=33; b*22-a; );                ")
+    (iss ["a" "b" "rslt"]   "print('variables in memory: ', mem());         ")
     (iss 120
-         "fac = PROC(x)                                                         "
-         "'Calculate factorial for a given x by looping.'                       "
-         ":(                                                                    "
-         "      counter = product = 1;                # var = LOOP (            "
-         "      LOOP (                                #         IF (..,         "
-         "          IF ( counter == x.loc,            #             EXIT ..,    "
-         "      /*then*/ EXIT del(counter, product),  #             ..);        "
-         "      /*else*/ counter = counter + 1 );     #       );                "
-         "                                            #                         "
-         "          product = product * counter;      # var = IF (..,..,..);    "
-         "      );                                    #                         "
-         "  );                                        # var = SELECT .. ;       "
-         "fac(5);                                                               ")))
+         "fac = PROC(x)                                                     "
+         "'Calculate factorial for a given x by looping.'                   "
+         ":(                                                                "
+         "      counter = product = 1;                # var = LOOP (        "
+         "      LOOP (                                #         IF (..,     "
+         "          IF ( counter == x$,               #             EXIT ..,"
+         "      /*then*/ EXIT del(counter, product),  #             ..);    "
+         "      /*else*/ counter = counter + 1 );     #       );            "
+         "                                            #                     "
+         "          product = product * counter;      # var = IF (..,..,..);"
+         "      );                                    #                     "
+         "  );                                        # var = SELECT .. ;   "
+         "fac(5);                                                           ")))
 
 (deftest listing_3
   (let [env (vm:init 100 100 -1)]
-    (iss 714        "rslt = ( a.loc=12; b.loc=33; b.loc*22-a.loc; );    ")
+    (iss 714        "rslt = ( a$=12; b$=33; b$*22-a$; );                ")
     (iss ["rslt"]   "print('variables in memory: ', mem());             ")
     (iss 120        "fac2 = PROC(x)                                     "
                     "'Calculate factorial for given x with recursion.'  "
-                    ": IF ( x.loc, x.loc * fac2(x.loc - 1), 1);         "
+                    ": IF ( x$, x$ * fac2(x$ - 1), 1);                  "
                     "fac2(5); ")))
 
 
@@ -64,15 +64,15 @@
           "db_func = [['analogRead', [3, 1, 2]], ['pinWrite', [1, 7, 9]],   "
           "           ['pinRead',    [1, 3, 2]], ['serial',   [2, 1, 5]]];  "
           "                                                                 "
-          "db = SELECT func.loc[0]                                          "
+          "db = SELECT func$[0]                                             "
           "       FROM db_user, func:db_func                                "
-          "    # WHERE db_user.loc['id'] IN func.loc[1]                     "
-          "      WHERE ( SELECT loc                                         "
-          "                FROM func.loc[1]                                 "
-          "               WHERE db_user.loc['id'] == loc                    "
+          "    # WHERE db_user$['id'] IN func$[1]                           "
+          "      WHERE ( SELECT $                                           "
+          "                FROM func$[1]                                    "
+          "               WHERE db_user$['id'] == $                         "
           "                  AS list ) != []                                "
-          "   ORDER BY func.loc[0] # ASC(ENDING) is default, or DESC(ENDING)"
-          "   GROUP BY db_user.loc['name']                                  "
+          "   ORDER BY func$[0] # ASC(ENDING) is default, or DESC(ENDING)   "
+          "   GROUP BY db_user$['name']                                     "
           "      LIMIT 7                                                    "
           "         AS list;    # or AS void, value, list, set, dict        "
           "                                                                 ")))
@@ -99,43 +99,43 @@
     (iss    [10.1 11.3 10.899999 11.199999 15.399999 11.5 10.6 12.699999 12.8]
             "dist = [10.1,11.3,10.9,11.2,15.4,11.5,10.6,12.7,12.8];     ")
     (iss    [15.399999 12.699999 12.8]
-            "Filter = FROM dist WHERE loc > 12;                         ")
+            "Filter = FROM dist WHERE $ > 12;                           ")
     (iss    [10 11 10 11 15 11 10 12 12]
-            "Map = SELECT int(loc) FROM dist;                           ")
+            "Map = SELECT int($) FROM dist;                             ")
     (iss    [nil 10.766667 11.133334 12.5 12.699999 12.5 11.599999 12.033332 nil]
-            "MapEx = SELECT try( (loc$(-1) + loc + loc$(1)) / 3.0,      "
+            "MapEx = SELECT try( ($$(-1) + $ + $$(1)) / 3.0,            "
             "                    None )                                 "
             "          FROM dist;                                       ")
     (iss    11.833333
-            "Reduce = (SELECT sum.loc@+(loc) FROM dist                  "
-            "      START WITH sum.loc=0                                 "
+            "Reduce = (SELECT sum$@+($) FROM dist                       "
+            "      START WITH sum$=0                                    "
             "              AS void) / len(dist);                        ")))
 
 
 (deftest listing_7
   (let [env (vm:init 100 100 -1)]
     (iss    [0 2046 4092 6138 8184]
-            "analogRead = PROC(pin, res) : pin.loc * res.loc;                   "
-            "                                                                   "
-            "ir0 = {                                                            "
-            "       pin:  0,                                                    "
-            "       res:  1023,                                                 "
-            "       init: PROC(loc, Pin, Res)                                   "
-            "             'Set basic sensor parameters Pin and Resolution.'     "
-            "             : (loc.pin = Pin.loc; loc.res = Res.loc;),            "
-            "       read: PROC(loc)                                             "
-            "             'Read measurement'                                    "
-            "             : loc.dist = loc.lin(analogRead(loc.pin, loc.res)),   "
-            "       lin:  PROC(loc, volt)                                       "
-            "             'Linearize measurement to cm...'                      "
-            "             : cm.loc = volt.loc * 2                               "
-            "      };                                                           "
-            "                                                                   "
-            "ir1 = ir0; ir1.init(1, 1023);                                      "
-            "ir2 = ir0; ir2.init(2, 1023);                                      "
-            "ir3 = ir0; ir3.init(3, 1023);                                      "
-            "ir4 = ir0; ir4.init(4, 1023);                                      "
-            "                                                                   "
-            "ir_array = [ref ir0, ref ir1, ref ir2, ref ir3, ref ir4];          "
-            "                                                                   "
-            "dist = select loc.read() from ir_array;                            ")))
+            "analogRead = PROC(pin, res) : pin$ * res$;                    "
+            "                                                              "
+            "ir0 = {                                                       "
+            "       pin:  0,                                               "
+            "       res:  1023,                                            "
+            "       init: PROC($, Pin, Res)                                "
+            "             'Set basic sensor parameters Pin and Resolution.'"
+            "             : ($.pin = Pin$; $.res = Res$;),                 "
+            "       read: PROC($)                                          "
+            "             'Read measurement'                               "
+            "             : $.dist = $.lin(analogRead($.pin, $.res)),      "
+            "       lin:  PROC($, volt)                                    "
+            "             'Linearize measurement to cm...'                 "
+            "             : cm$ = volt$ * 2                                "
+            "      };                                                      "
+            "                                                              "
+            "ir1 = ir0; ir1.init(1, 1023);                                 "
+            "ir2 = ir0; ir2.init(2, 1023);                                 "
+            "ir3 = ir0; ir3.init(3, 1023);                                 "
+            "ir4 = ir0; ir4.init(4, 1023);                                 "
+            "                                                              "
+            "ir_array = [ref ir0, ref ir1, ref ir2, ref ir3, ref ir4];     "
+            "                                                              "
+            "dist = select $.read() from ir_array;                         ")))

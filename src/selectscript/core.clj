@@ -133,7 +133,7 @@
       (ss:repl (:optimize options)))))
 
 ;(-main "-o" "test.bS2" "-d" "test.S2")
-;(println (cmp (assemble (parse "a@-(1);"))))
+;(parse "a$$(-2) -1;")
 ;(parse "{a:1, b:2};")
 
 (defn ss:repl [opt]

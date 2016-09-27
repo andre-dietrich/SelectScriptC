@@ -50,7 +50,7 @@ LIST_END   : ']' ;
 DICT_BEGIN : '{' ;
 DICT_END   : '}' ;
 
-DOLLAR : '$';
+//DOLLAR : '$';
 
 PROCEDURE:  P R O C (E D U R E)? ;
 
@@ -64,7 +64,7 @@ BY     : B Y ;
 LIMIT  : L I M I T ;
 AS     : A S ;
 
-LOC   : L O C ;
+LOC   : '$' ;
 
 CONNECT: C O N N E C T ;
 START  : S T A R T ;
@@ -245,7 +245,7 @@ list
 ;
 
 loc
-	: (id_=IDENTIFIER DOT)? LOC (DOLLAR '(' extra_=stmt ')')?
+	: (id_=IDENTIFIER)? LOC (LOC '(' extra_=stmt ')')?
 ;
 
 loop
