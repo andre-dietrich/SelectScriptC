@@ -190,7 +190,7 @@
     (iss false "[1,2] > [1,2];  ")
     (iss true  "[1,2,3] > [1,2];")
     (iss false "[1,2] > [2,1];  ")
-    (iss false "[2,2] > [1,2];  ")
+    (iss true  "[2,2] > [1,2];  ")
     (iss true  "[1,2] > None;   ")
 
     (iss false  "{1,3} > {1,2};  ")
