@@ -22,12 +22,13 @@
 (deftest comments
   (let [env (vm:init 100 100 0)]
     (iss  1  "# line comments      "
-             "1; # 2;              "
-             "                     ")))
+             "1; # 2;              ")))
+;             "                     ")
 ;    (iss  2  "# multiline comments "
 ;             "1;       /*          "
 ;             "2;                   "
-;             "*/                   ")))
+;             "*/                   "
+;             "                     ")))
 
 (deftest logical
   (let [env (vm:init 100 100 0)]

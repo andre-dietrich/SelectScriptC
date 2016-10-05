@@ -101,7 +101,7 @@ NEWLINE	: ('\r'? '\n') -> skip ; // {self.skip()};
 WS		: (' '|'\t'|'\n'|'\r')+ -> skip ; //{self.skip()} ;
 
 COMMENT : '/*' .*? '*/' -> skip ;
-LINE_COMMENT : '#' ~('\n'|'\r')* '\r'? '\n' -> skip ;
+LINE_COMMENT : '#' ~('\n'|'\r')* '\r'? '\n'? -> skip ;
 
 STRING	: DQ .*? DQ | SQ .*? SQ ;
 FLOAT	: DIGIT* DOT DIGIT* ;
