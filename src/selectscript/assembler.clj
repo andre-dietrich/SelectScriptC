@@ -167,7 +167,7 @@
   (concat (asm params)
           '((:PROC))
           [info]
-          [(concat '((:SP_SAVE))
+          [(concat '((:SP_SAVEX))
                   (asm code)
                   '((:RET_P)))]))
 

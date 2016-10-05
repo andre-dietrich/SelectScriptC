@@ -15,7 +15,7 @@
           :LEFT  22, :RIGHT 23,
           :EX    24})
 
-(def OP { :RET 0, :RET_L 1, :RET_P 2,
+(def OP { :RET 0, :SP_SAVEX 1, :RET_P 2,
           :SP_SAVE 3,
           :CST_N 4, :CST_0 5, :CST_1 6, :CST_B 7, :CST_S 8, :CST_I 9, :CST_F 10,
           :CST_STR 11, :CST_LST 12, :CST_SET 13, :CST_DCT 14,
@@ -119,7 +119,8 @@
          #{:TRY_1}        (cmp:try        (rest code) data asm_ sp)
          #{:PROC}         (cmp:proc       (rest code) data asm_ sp)
          #{:CST_DCT}      (cmp:dict       (rest code) data asm_ sp)
-         #{:SP_SAVE}      (cmp:sp_save    (rest code) data asm_ sp)
+         #{:SP_SAVE
+           :SP_SAVEX}     (cmp:sp_save    (rest code) data asm_ sp)
          #{:FJUMP_FW_X}   (cmp:jump_fwd   (rest code) data asm_ sp)
          #{:FJUMP_WHERE}  (cmp:jump_where (rest code) data asm_ sp)
          #{:FJUMP_BK_X}   (cmp:jump_back  (rest code) data asm_ sp)
