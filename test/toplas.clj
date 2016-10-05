@@ -8,7 +8,7 @@
 ;(run-tests)
 
 (deftest listing_1
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss true
          "True OR False AND None;               ")
     (iss "2016 SelectScript"
@@ -23,7 +23,7 @@
          "dict_['a_3', 1, 1] = 99; dict_;")))
 
 (deftest listing_2
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss 714                "rslt = ( a=12; b=33; b*22-a; );                ")
     (iss ["a" "b" "rslt"]   "print('variables in memory: ', mem());         ")
     (iss 120
@@ -42,7 +42,7 @@
          "fac(5);                                                           ")))
 
 (deftest listing_3
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss 714        "rslt = ( a$=12; b$=33; b$*22-a$; );                ")
     (iss ["rslt"]   "print('variables in memory: ', mem());             ")
     (iss 120        "fac2 = PROC(x)                                     "
@@ -52,7 +52,7 @@
 
 
 (deftest listing_4
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss   {"dietrich" ["analogRead" "pinRead" "pinWrite"]
             "nardi"    ["analogRead" "pinRead"]
             "zug"      ["analogRead" "pinRead"]}
@@ -78,7 +78,7 @@
           "                                                                 ")))
 
 (deftest listing_5
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss    [1 2 3 4 5 6 7 8 9]
             "a = [1,2,3,4,5,6,7,8,9];   ")
     (iss    [1 2 4]
@@ -95,7 +95,7 @@
             "!=(1, *a);")))
 
 (deftest listing_6
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss    [10.1 11.3 10.899999 11.199999 15.399999 11.5 10.6 12.699999 12.8]
             "dist = [10.1,11.3,10.9,11.2,15.4,11.5,10.6,12.7,12.8];     ")
     (iss    [15.399999 12.699999 12.8]
@@ -113,7 +113,7 @@
 
 
 (deftest listing_7
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss    [0 2046 4092 6138 8184]
             "analogRead = PROC(pin, res) : pin$ * res$;                    "
             "                                                              "

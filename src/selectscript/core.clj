@@ -161,13 +161,13 @@
   ([code]
    (ss:execute code false))
   ([code debug]
-   (let [env (vm:init 100 100 (if debug 1 -1)) prog (vm:prog code)]
+   (let [env (vm:init 100 100 (if debug 1 0)) prog (vm:prog code)]
      (loop [status 0]
        (if (zero? status)
          (recur (vm:exec env prog (if debug 1 0)))))
      (println "RESULT:" (vm:rslt env)))))
 
 (defn ss:exec
-  ([code op] (ss:exec (vm:init 100 10 -1) code op))
+  ([code op] (ss:exec (vm:init 100 10 0) code op))
   ([env code op] (do (vm:exec env (vm:prog (ss:compile code op)) 0)
                      (vm:rslt env))))

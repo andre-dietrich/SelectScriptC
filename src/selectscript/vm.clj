@@ -23,7 +23,7 @@
 
 
 (defn vm:init
-  ([] (vm:init 100 100 1))
+  ([] (vm:init 100 100 0))
   ([mem fct steps]
    (.invoke init_ Pointer (to-array [mem fct steps]))))
 

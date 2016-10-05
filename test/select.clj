@@ -8,13 +8,13 @@
 ;(run-tests)
 
 (deftest simple_select
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss [0 1 2]        "SELECT $     FROM [0,1,2] AS list;")
     (iss 0              "SELECT $     FROM [0,1,2] AS val; ")
     (iss {"r" [0 1 2]}  "SELECT r:$   FROM [0,1,2] AS dict;")))
 
 (deftest simple_select2
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss [0 1 2 3 4 5 6 7 8 9]
          "a = [0,1,2,3,4,5,6,7,8,9];")
     (iss [4 5 6 7 8 9]
@@ -32,7 +32,7 @@
          "    AS list;        ")))
 
 (deftest simple_dict
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss [0 1 2 3 4]
          "a = [0,1,2,3,4];")
     (iss {"a" [0 1 2 3 4 0 1 2 3 4 0 1 2 3 4 0 1 2 3 4 0 1 2 3 4]
@@ -45,13 +45,13 @@
          "    AS list;              ")))
 
 (deftest simple_void
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss 0  "a = 0;")
     (iss 5  "SELECT a=a+1 FROM [1,2,3,4,5,6,7,8,9] WHERE $>4 AS void;")
     (iss 5  "a;")))
 
 (deftest simple_order
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss [0 1 2 3 4]  "a = [0,1,2,3,4];")
     (iss [0 1 2 3 4]  "SELECT $ FROM a ORDER BY $ AS list;")
     (iss [0 1 2 3 4]  "SELECT $ FROM a ORDER BY $ ASC AS list;")
@@ -66,7 +66,7 @@
          "      AS list;               ")))
 
 (deftest simple_order2
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss [0,1,2,3,4]    "a = [0,1,2,3,4];")
     (iss { "0" [[0 0 0]]
            "1" [[1 0 1] [0 1 1]]
@@ -81,7 +81,7 @@
          "       AS list;                  ")))
 
 (deftest simple_limit
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss (range 0 50)
          "a = [ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  "
          "     10, 11, 12, 13, 14, 15, 16, 17, 18, 19,  "
@@ -99,7 +99,7 @@
 
 
 (deftest nesting
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss [["red" "green" "green" "red"] ["green" "red" "red" "green"]]
          "colors = ['red', 'green'];                                          "
          "neighbours = [[PROC:a$, PROC:b$], [PROC:a$, PROC:c$],   "
@@ -115,7 +115,7 @@
 
 
 (deftest select_val
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss [0 1 2]    "a = [0,1,2];                       ")
     (iss 0          "SELECT $ FROM a AS val;            ")
     (iss 1          "SELECT $ FROM a WHERE $==1 AS val; ")

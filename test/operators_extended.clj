@@ -7,7 +7,7 @@
 ;(run-tests)
 
 (deftest positive
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss  [1,2,3,4,5]           "a=[1,2,3,4,5]; ")
     (iss  15                    "+(*a);         ")
     (iss  16                    "+(*a,1);       ")
@@ -21,7 +21,7 @@
     (iss  [1,2,3,4,5,6,"str"]   "a@+('str');    ")))
 
 (deftest negative
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss  [1,2,3,4,5]           "a=[1,2,3,4,5]; ")
     (iss  -13                   "-(*a);         ")
     (iss   85                   "-(100,*a);     ")
@@ -32,7 +32,7 @@
     (iss  #{2 3 4 5}            "a@-(1);        ")))
 
 (deftest star
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss  [1 2 3 4 5]           "a=[1,2,3,4,5]; ")
     (iss  120                   "*(*a);         ")
     (iss  1200                  "*(10,*a);      ")
@@ -46,7 +46,7 @@
            5,1,2,3,4,5]         "a@*(4);        ")))
 
 (deftest not_equal
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss [1 2 3 4 5]    "a=[1,2,3,4,5]; ")
     (iss true           "!=(*a);        ")
     (iss true           "!=(*a,a);      ")))

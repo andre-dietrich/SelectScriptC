@@ -7,7 +7,7 @@
 ;(run-tests)
 
 (deftest math
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss  22  "22;")
     (iss  -2  "-2;")
     (iss   4  "2+2;")
@@ -20,7 +20,7 @@
     (iss   1  "3%2;")))
 
 (deftest comments
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss  1  "# line comments      "
              "1; # 2;              "
              "                     ")))
@@ -30,7 +30,7 @@
 ;             "*/                   ")))
 
 (deftest logical
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss  true   "true;          ")
     (iss  false  "false;         ")
     (iss  nil    "None;          ")
@@ -44,7 +44,7 @@
     (iss  false  "True XOR True; ")))
 
 (deftest comparison
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss  false  "1 > 2; ")
     (iss  true   "1 < 2; ")
     (iss  true   "2 >= 2;")
@@ -52,14 +52,14 @@
     (iss  false  "2 == 3;")))
 
 (deftest precedence
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss  14    "2+3*4;  ")
     (iss  20    "(2+3)*4;")
     (iss  83    "2+3**4; ")
     (iss  true  "True OR False AND True;")))
 
 (deftest array
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss '(11 22 33 44 55 66 77)
          "a=[11,22,33,44,55,66,77];")
     (iss 11 "a[0];")
@@ -72,7 +72,7 @@
     (iss "abc" "b[2];")))
 
 (deftest array2
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss '(1 2 3 (4 5 6 7))
          "a=[1,2,3,[4,5,6,7]];")
     (iss '(11 2 3 (4 5 6 7))
@@ -83,14 +83,14 @@
          "a[3,0]=99; a;")))
 
 (deftest dict
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss {"a" 22, "b22" "test"}
          "a={'a':22, 'b22':'test'};")
     (iss    22  "a['a'];")
     (iss "test" "a['b22'];")))
 
 (deftest dict2
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss {"a" 22, "b22" "test"}
          "a={'a':22, 'b22':'test'};")
    (iss {"a" 999, "b22" "test"}
@@ -99,7 +99,7 @@
         "a['b22']=[1,2,3,4]; a;")))
 
 (deftest dict3
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss {"a" 22, "b22" "test"}
          "a={'a':22, 'b22':'test'};")
     (iss {"a" 999, "b22" "test"}
@@ -108,7 +108,7 @@
          "a.b22=[1,2,3,4]; a;")))
 
 (deftest SEQUENCE
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss 3  "a=(b=1; c=2; b+c;);")
     (iss 1  "b;")
     (iss 2  "c;")
@@ -118,7 +118,7 @@
 
 
 (deftest IF
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss 0      "IF( 2==2, 0, 1);          ")
     (iss false  "IF( 2!=2, (0; 1;), False);")
     (iss 0      "IF( 2!=2, 1, (False; 0;));")
@@ -128,7 +128,7 @@
     (iss true   "IF( False, False, True);  ")))
 
 (deftest LOOP
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss  0 "i=0;")
     (iss 10 "LOOP( IF(i==10, EXIT i, i=i+1) );")
     (iss  1 "i = a = 1;")
@@ -136,13 +136,13 @@
 
 
 (deftest PRINT
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss 4   "print(2+2);             ")
     (iss "x" "print(2+2, True, \"x\");")))
 
 
 (deftest DEL_MEM
-  (let [env (vm:init 100 100 -1)]
+  (let [env (vm:init 100 100 0)]
     (iss 3               "a=1; b=2; c=3;")
     (iss ["a" "b" "c"]   "mem();        ")
     (iss 1               "del(a);       ")
