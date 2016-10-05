@@ -55,6 +55,11 @@
             (var-set op_code (dis:key @op_code))
             (print (format "%-10s " (str (name @op_code) ",")))))
         (condp contains? @op_code
+          #{:EXIT}      (do
+                          (println (format "%d," (nth @code 0)))
+                          (var-set code (rest @code))
+                          (var-set addr (inc  @addr)))
+
           #{:CST_LST
             :CST_SET}   (do
                           (println (format "%d, %d, // %d"
@@ -146,7 +151,7 @@
                           (var-set addr (+ 2 @addr)))
 
           #{:PROC}      (do
-                          (println (format "%d, %d, %d // %d, %d"
+                          (println (format "%d, %d, %d, // %d, %d"
                                            (nth @code 0)
                                            (nth @code 1)
                                            (nth @code 2)

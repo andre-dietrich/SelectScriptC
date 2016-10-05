@@ -155,6 +155,7 @@ atom
 	| loop
 	| reference
 	| '(' elem_=stmt ')'
+	| '(' prog_=prog ')'
 ;
 
 dict

@@ -36,17 +36,17 @@
 (defn ss:ref [elem]
   (list :ref elem))
 
-(defn ss:select [from select where start connect stop group order limit as]
-  (list :select from
-                select
-                where
-                start
-                connect
-                stop
-                group
-                order
-                limit
-                as))
+(defn ss:sql [from select where start connect stop group order limit as]
+  (list :sql from
+             select
+             where
+             start
+             connect
+             stop
+             group
+             order
+             limit
+             as))
 
 (defn ss:set [elements]
   (list :set (distinct elements)))

@@ -9,15 +9,15 @@
                SelectScriptParser
                SelectScriptBaseVisitor))
 
-  (:use [selectscript.defines :only (ss:dict    ss:elem
-                                     ss:exit    ss:fct
-                                     ss:if      ss:list
-                                     ss:loc     ss:loop
-                                     ss:op      ss:opX
-                                     ss:proc    ss:ref
-                                     ss:select  ss:set
-                                     ss:try     ss:val
-                                     ss:val?    ss:var)]    :reload))
+  (:use [selectscript.defines :only (ss:dict  ss:elem
+                                     ss:exit  ss:fct
+                                     ss:if    ss:list
+                                     ss:loc   ss:loop
+                                     ss:op    ss:opX
+                                     ss:proc  ss:ref
+                                     ss:sql   ss:set
+                                     ss:try   ss:val
+                                     ss:val?  ss:var)]    :reload))
 
 (declare -atom
          -assign
@@ -184,7 +184,9 @@
 (defn -atom [ctx]
   (if-let [elem (.elem_ ctx)]
     (visit elem)
-    (.visitChildren visitor ctx)))
+    (if-let [prog (.prog_ ctx)]
+      (visit prog)
+      (.visitChildren visitor ctx))))
 
 (defn children
   ([ctx start]
@@ -335,7 +337,7 @@
         connect (.connect_ ctx)  stop  (.stop_    ctx)
         group   (.group_   ctx)  order (.order_   ctx)
         limit   (.limit_   ctx)  as    (.as_      ctx)]
-    (ss:select
+    (ss:sql
       (visit from)
       (if select    (visit select)          (list "" (ss:loc "" ())))
       (if where     (visit where)           ())
