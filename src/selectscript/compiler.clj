@@ -82,13 +82,14 @@
 (defn cmp
   ([code] (let [[data asm] (cmp code [] [] -1)]
             (map #(if (< 127 %) (- % 256) %)
-                 (conc (uint16->byte (count data))
+                 (conc [(:SP_SAVEX OP)]
+                       (uint16->byte (count data))
                    (loop [d data bytes []]
                      (if (empty? d)
                        bytes
                        (recur (rest d)
                               (conc bytes (string->byte (first d))))))
-                   (cmp:exit2 asm -1)))))
+                   (cmp:exit2 (rest asm) -1)))))
 
   ([code data asm sp]
    ;(println "->>>>>" code data asm)
@@ -121,8 +122,7 @@
          #{:PROC}         (cmp:proc       (rest code) data asm_ sp)
          #{:CST_DCT}      (cmp:dict       (rest code) data asm_ sp)
          #{:RECUR}        (cmp:recur      (rest code) data asm_ sp)
-         #{:SP_SAVE
-           :SP_SAVEX}     (cmp:sp_save    (rest code) data asm_ sp)
+         #{:SP_SAVE}      (cmp:sp_save    (rest code) data asm_ sp)
          #{:FJUMP_FW_X}   (cmp:jump_fwd   (rest code) data asm_ sp)
          #{:FJUMP_WHERE}  (cmp:jump_where (rest code) data asm_ sp)
          #{:FJUMP_BK_X}   (cmp:jump_back  (rest code) data asm_ sp)
@@ -217,7 +217,7 @@
                           (if (= :JUMP_BACK (first asm))
                             (conc [(:JUMP OP)] (int16->byte (- (count asm)
                                                                (count a)
-                                                               1
+                                                               2
                                                                x)))
                             (first asm))))))))
 
