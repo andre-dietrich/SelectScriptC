@@ -14,6 +14,7 @@
          asm:op
          asm:opX
          asm:proc
+         asm:recur
          asm:ref
          asm:sql
          asm:sql_as
@@ -73,23 +74,24 @@
 
 (defn asm [ast]
   (case (first ast)
-    :dict   (asm:dict (second ast))
-    :elem   (asm:elem (rest ast))
-    :exit   (asm:exit (second ast))
-    :fct    (asm:fct  (rest ast))
-    :if     (asm:if   (rest ast))
-    :list   (asm:list (second ast))
-    :loc    (asm:loc  (rest ast))
-    :loop   (asm:loop (second ast))
-    :op     (asm:op   (rest ast))
-    :opX    (asm:opX  (rest ast))
-    :proc   (asm:proc (rest ast))
-    :ref    (asm:ref  (second ast))
-    :set    (asm:set  (second ast))
-    :sql    (asm:sql  (rest ast))
-    :try    (asm:try  (rest ast))
-    :val    (asm:val  (second ast))
-    :var    (asm:var  (second ast))
+    :dict   (asm:dict  (second ast))
+    :elem   (asm:elem  (rest ast))
+    :exit   (asm:exit  (second ast))
+    :fct    (asm:fct   (rest ast))
+    :if     (asm:if    (rest ast))
+    :list   (asm:list  (second ast))
+    :loc    (asm:loc   (rest ast))
+    :loop   (asm:loop  (second ast))
+    :op     (asm:op    (rest ast))
+    :opX    (asm:opX   (rest ast))
+    :proc   (asm:proc  (rest ast))
+    :recur  (asm:recur (second ast))
+    :ref    (asm:ref   (second ast))
+    :set    (asm:set   (second ast))
+    :sql    (asm:sql   (rest ast))
+    :try    (asm:try   (rest ast))
+    :val    (asm:val   (second ast))
+    :var    (asm:var   (second ast))
 
     (concat '((:SP_SAVE))
             (pop:rm (seq:loop ast true))
@@ -170,6 +172,11 @@
           [(concat '((:SP_SAVEX))
                   (asm code)
                   '((:RET_P)))]))
+
+(defn asm:recur [ast]
+  (concat (seq:loop ast)
+          ['(:CST_LST) (count ast)]
+          '((:RECUR))))
 
 (defn asm:ref [ast]
   (concat (asm ast)

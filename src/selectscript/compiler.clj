@@ -29,7 +29,7 @@
           :IT_INIT 29,
           :IT_NEXT0 30, :IT_NEXT1 31, :IT_NEXT2 32, :IT_NEXT3 33,
           :IT_STORE 34, :IT_LIMIT 35, :IT_GROUP 36, :IT_ORDER 37, :IT_AS 38,
-          :EXIT 39, :TRY_1 40, :TRY_0 41, :REF 42})
+          :EXIT 39, :TRY_1 40, :TRY_0 41, :REF 42, :REC_SET 43})
 
 (declare cmp
          cmp:cmd
@@ -40,6 +40,7 @@
          cmp:dict
          cmp:exit
          cmp:exit2
+         cmp:recur
          cmp:str
          cmp:op
          cmp:loop
@@ -119,6 +120,7 @@
          #{:TRY_1}        (cmp:try        (rest code) data asm_ sp)
          #{:PROC}         (cmp:proc       (rest code) data asm_ sp)
          #{:CST_DCT}      (cmp:dict       (rest code) data asm_ sp)
+         #{:RECUR}        (cmp:recur      (rest code) data asm_ sp)
          #{:SP_SAVE
            :SP_SAVEX}     (cmp:sp_save    (rest code) data asm_ sp)
          #{:FJUMP_FW_X}   (cmp:jump_fwd   (rest code) data asm_ sp)
@@ -146,7 +148,7 @@
 (defn cmp:exit [code data asm sp]
   (cmp code
        data
-       (conc asm (uint8->byte sp) [:JUMP 0 0])
+       (conc asm (uint8->byte sp) [:JUMP_FORWARD 0 0])
        sp))
 
 
@@ -204,14 +206,20 @@
   (loop [asm a, asm2 []]
     (if (empty? asm)
       asm2
-      (recur (if (= :JUMP (first asm))
+      (recur (if (or (= :JUMP_FORWARD (first asm))
+                     (= :JUMP_BACK (first asm)))
                (nthrest asm 3)
                (rest asm))
-             (conc asm2 (if (= :JUMP (first asm))
-                          (conc [(:JUMP OP)] (uint16->byte (- (count a)
-                                                              (count asm2)
-                                                              x)))
-                          (first asm)))))))
+             (conc asm2 (if (= :JUMP_FORWARD (first asm))
+                          (conc [(:JUMP OP)] (int16->byte (- (count a)
+                                                             (count asm2)
+                                                             x)))
+                          (if (= :JUMP_BACK (first asm))
+                            (conc [(:JUMP OP)] (int16->byte (- (count asm)
+                                                               (count a)
+                                                               1
+                                                               x)))
+                            (first asm))))))))
 
 (defn cmp:loop [code data asm sp]
   (let [loop_ (cmp code data [] 0)]
@@ -244,6 +252,14 @@
                (uint16->byte (count proc_asm))
                proc_asm)
          sp)))
+
+(defn cmp:recur [code data asm sp]
+  (cmp code
+       data
+       (conc asm
+             (:REC_SET OP) (uint8->byte sp)
+             [:JUMP_BACK 0 0])
+       sp))
 
 (defn cmp:sp_save [code data asm sp]
   (let [[c d a] (cmp code data asm (inc sp))]

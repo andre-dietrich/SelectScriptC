@@ -14,10 +14,11 @@
                                      ss:if    ss:list
                                      ss:loc   ss:loop
                                      ss:op    ss:opX
-                                     ss:proc  ss:ref
-                                     ss:sql   ss:set
-                                     ss:try   ss:val
-                                     ss:val?  ss:var)]    :reload))
+                                     ss:proc  ss:recur
+                                     ss:ref   ss:sql
+                                     ss:set   ss:try
+                                     ss:val   ss:val?
+                                     ss:var)]    :reload))
 
 (declare -atom
          -assign
@@ -36,6 +37,7 @@
          -procedure
          -procedure_params
          -prog
+         -recur_expr
          -reference
          -selection
          -sel_as
@@ -58,13 +60,6 @@
          visitor
          visit)
 
-;(defmacro expr [op two]
-;  (list 'list :op op
-;         (let [param1 '(visit (.e1 ctx))]
-;           (if (= 2 two)
-;             (let [param2 '(visit (.e2 ctx))]
-;               (list 'list param1 param2)
-;             (list 'list param1))
 
 (defn expr [op ctx]
   (ss:op op (let [p1 (visit (.e1 ctx))
@@ -94,6 +89,7 @@
     (visitProcedure    [ctx] (-procedure    ctx))
     (visitProcedure_params [ctx] (-procedure_params    ctx))
     (visitProg         [ctx] (-prog         ctx))
+    (visitRecur_expr   [ctx] (-recur_expr   ctx))
     (visitReference    [ctx] (-reference    ctx))
     (visitSelection    [ctx] (-selection    ctx))
     (visitSel_as       [ctx] (-sel_as       ctx))
@@ -182,11 +178,13 @@
 
 
 (defn -atom [ctx]
-  (if-let [elem (.elem_ ctx)]
-    (visit elem)
-    (if-let [prog (.prog_ ctx)]
-      (visit prog)
-      (.visitChildren visitor ctx))))
+  (if-let [rec (.xxx ctx)]
+    (-recur_expr rec)
+    (if-let [elem (.elem_ ctx)]
+      (visit elem)
+      (if-let [prog (.prog_ ctx)]
+        (visit prog)
+        (.visitChildren visitor ctx)))))
 
 (defn children
   ([ctx start]
@@ -321,6 +319,10 @@
 (defn -prog [ctx]
   (map visit (.elem_ ctx)))
 
+(defn -recur_expr [ctx]
+  (ss:recur (if-let [elem (.elements_ ctx)]
+              (-stmt_list elem)
+              ())))
 
 (defn -reference [ctx]
   (ss:ref (visit (.elem ctx))))

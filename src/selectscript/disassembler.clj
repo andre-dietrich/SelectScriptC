@@ -55,7 +55,8 @@
             (var-set op_code (dis:key @op_code))
             (print (format "%-10s " (str (name @op_code) ",")))))
         (condp contains? @op_code
-          #{:EXIT}      (do
+          #{:EXIT
+            :REC_SET}   (do
                           (println (format "%d," (nth @code 0)))
                           (var-set code (rest @code))
                           (var-set addr (inc  @addr)))

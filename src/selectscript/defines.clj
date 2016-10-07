@@ -33,6 +33,9 @@
 (defn ss:proc [params code info]
   (list :proc params code info))
 
+(defn ss:recur [params]
+  (list :recur params))
+
 (defn ss:ref [elem]
   (list :ref elem))
 

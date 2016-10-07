@@ -94,7 +94,7 @@ LOOP: L O O P;
 EXIT: E X I T;
 
 TRY : T R Y;
-
+RECUR : R E C U R;
 REF : R E F;
 
 NEWLINE	: ('\r'? '\n') -> skip ; // {self.skip()};
@@ -154,6 +154,7 @@ atom
 	| try_expr
 	| loop
 	| reference
+	| xxx=recur_expr
 	| '(' elem_=stmt ')'
 	| '(' prog_=prog ')'
 ;
@@ -262,6 +263,10 @@ procedure
 
 procedure_params
 	: ((IDENTIFIER | LOC | dict_elem) (SEP (IDENTIFIER | dict_elem))*)?
+;
+
+recur_expr
+	: RECUR '(' (elements_ = stmt_list)? ')'
 ;
 
 reference
