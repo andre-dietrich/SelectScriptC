@@ -101,10 +101,10 @@
 (deftest nesting
   (let [env (vm:init 100 100 0)]
     (iss [["red" "green" "green" "red"] ["green" "red" "red" "green"]]
-         "colors = ['red', 'green'];                                          "
+         "colors = ['red', 'green'];                              "
          "neighbours = [[PROC:a$, PROC:b$], [PROC:a$, PROC:c$],   "
          "              [PROC:b$, PROC:d$], [PROC:c$, PROC:d$]];  "
-         "                                                                    "
+         "                                                        "
          "SELECT [a$, b$, c$, d$]                                 "
          "  FROM a:colors, b:colors, c:colors, d:colors           "
          " WHERE not (SELECT $                                    "

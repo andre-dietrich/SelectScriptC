@@ -16,7 +16,7 @@
   (println (format "%d, %d, // %d" (first prog) (second prog) (byte->uint16 (take 2 prog))))
   (loop [i     (byte->uint16 (take 2 prog))
          data  (nthrest prog 2)
-         addr  (+ address 1)
+         addr  (+ address 2)
          word []]
     (if (zero? i)
       [data addr word]
@@ -54,17 +54,17 @@
     (print (clojure.string/join (repeat space "           "))
            (format "%-11s" (str (name op_code) (if pop "|POP," ","))))
     (condp contains? op_code
-      #{:SP_SAVEX}  (let [[c a d] (dis:data code addr (inc space))]
+      #{:SP_SAVEX}  (let [[c a d] (dis:data code (inc addr) (inc space))]
                       (dis:prog c a d space))
       #{:SP_SAVE}   (do
                       (println)
-                      (let [[c a d] (dis:prog code addr data space)]
+                      (let [[c a d] (dis:prog code (inc addr) data space)]
                         (if (not-empty c)
                           (dis:prog c a data space))))
       #{:RET_P
         :RET}       (do
                       (println)
-                      [code addr data])
+                      [code (inc addr) data])
       #{:EXIT
         :REC_SET}   (do
                       (println (format "%d," (first code)))
@@ -75,7 +75,7 @@
                                        (first  code)
                                        (second code)
                                        (byte->uint16 (take 2 code))))
-                      (dis:prog (nthrest code 2) (+ 2 addr) data space))
+                      (dis:prog (nthrest code 2) (+ 3 addr) data space))
       #{:CST_F}     (do
                       (println (format "%d, %d, %d, %d, // %f"
                                        (nth code 0)
@@ -83,7 +83,7 @@
                                        (nth code 2)
                                        (nth code 3)
                                        (byte->float (take 4 code))))
-                      (dis:prog (nthrest code 4) (+ 4 addr) data space))
+                      (dis:prog (nthrest code 4) (+ 5 addr) data space))
       #{:TRY_1
         :FJUMP
         :JUMP
@@ -92,7 +92,7 @@
                                        (first  code)
                                        (second code)
                                        (byte->int16 (take 2 code))))
-                      (dis:prog (nthrest code 2) (+ 2 addr) data space))
+                      (dis:prog (nthrest code 2) (+ 3 addr) data space))
 
       #{:CST_I}     (do
                       (println (format "%d, %d, %d, %d, // %d"
@@ -101,7 +101,7 @@
                                        (nth code 2)
                                        (nth code 3)
                                        (byte->int32 (take 4 code))))
-                      (dis:prog (nthrest code 4) (+ 4 addr) data space))
+                      (dis:prog (nthrest code 4) (+ 5 addr) data space))
       #{:CST_DCT}   (let [len (byte->uint8 (first code))]
                       (println (str (first code) ", // " len))
                       (loop [i len, c (rest code), a (inc addr)]
@@ -122,7 +122,7 @@
                       (println (format "%d, // %s"
                                        (first code)
                                        (nth data (byte->uint8 (first code)))))
-                      (dis:prog (rest code) (inc addr) data space))
+                      (dis:prog (rest code) (+ 2 addr) data space))
 
       #{:CALL_FCT
         :CALL_FCTX
@@ -130,11 +130,11 @@
                       (println (str (first code)
                                     ", // "
                                     (byte->uint8 (first code))))
-                      (dis:prog (rest code) (inc addr) data space))
+                      (dis:prog (rest code) (+ 2 addr) data space))
 
       #{:CST_B}     (do
                       (println (str (first code) ", "))
-                      (dis:prog (rest code) (inc addr) data space))
+                      (dis:prog (rest code) (+ 2 addr) data space))
       #{:CALL_OP
         :CALL_OPX}  (do
                       (println (format "%d, %s, // params: %d, op: %d"
@@ -142,7 +142,7 @@
                                        (name (dis:key (second code) op))
                                        (byte->uint8 (first  code))
                                        (byte->uint8 (second code))))
-                      (dis:prog (nthrest code 2) (+ 2 addr) data space))
+                      (dis:prog (nthrest code 2) (+ 3 addr) data space))
 
       #{:PROC}      (do
                       (println (format "%d, // help: %s"

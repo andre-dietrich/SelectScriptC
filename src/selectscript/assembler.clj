@@ -36,27 +36,11 @@
 
 (def as_value {:void 0 :val 1 :list 2 :set 4 :dict 3})
 
-(defn assemble
-  ([ast]     (assemble ast true))
-  ([ast opt] (if opt
-               (optimize (asm ast))
-               (asm ast))))
-
 (defn optimize
   ([code]       (optimize code []))
   ([code opt]   (if (empty? code)
                   opt
                   (case (first code)
-                    [:CST_N     :POP] (optimize (rest code) opt)
-                    [:CST_0     :POP] (optimize (rest code) opt)
-                    [:CST_1     :POP] (optimize (rest code) opt)
-                    [:CST_B     :POP] (optimize (nthrest code 2) opt)
-                    [:CST_S     :POP] (optimize (nthrest code 2) opt)
-                    [:CST_I     :POP] (optimize (nthrest code 2) opt)
-                    [:CST_F     :POP] (optimize (nthrest code 2) opt)
-                    [:CST_STR   :POP] (optimize (nthrest code 2) opt)
-                    [:LOAD      :POP] (optimize (nthrest code 2) opt)
-                    [:LOC       :POP] (optimize (nthrest code 2) opt)
                     [:STORE     :POP] (if (and (= [:LOAD] (nth code 2))
                                                (= (nth code 1) (nth code 3)))
                                         (optimize (nthrest code 3)
@@ -72,126 +56,178 @@
 
                     (optimize   (rest code) (concat opt [(first code)]))))))
 
-(defn asm [ast]
+
+
+(defn assemble [ast]
+  (asm ast false))
+
+(defn asm [ast pop]
   (case (first ast)
-    :dict   (asm:dict  (second ast))
-    :elem   (asm:elem  (rest ast))
-    :exit   (asm:exit  (second ast))
-    :fct    (asm:fct   (rest ast))
-    :if     (asm:if    (rest ast))
-    :list   (asm:list  (second ast))
-    :loc    (asm:loc   (rest ast))
-    :loop   (asm:loop  (second ast))
-    :op     (asm:op    (rest ast))
-    :opX    (asm:opX   (rest ast))
-    :proc   (asm:proc  (rest ast))
-    :recur  (asm:recur (second ast))
-    :ref    (asm:ref   (second ast))
-    :set    (asm:set   (second ast))
-    :sql    (asm:sql   (rest ast))
-    :try    (asm:try   (rest ast))
-    :val    (asm:val   (second ast))
-    :var    (asm:var   (second ast))
+    :dict   (asm:dict  (second ast) pop)
+    :elem   (asm:elem  (rest ast)   pop)
+    :exit   (asm:exit  (second ast) pop)
+    :fct    (asm:fct   (rest ast)   pop)
+    :if     (asm:if    (rest ast)   pop)
+    :list   (asm:list  (second ast) pop)
+    :loc    (asm:loc   (rest ast)   pop)
+    :loop   (asm:loop  (second ast) pop)
+    :op     (asm:op    (rest ast)   pop)
+    :opX    (asm:opX   (rest ast)   pop)
+    :proc   (asm:proc  (rest ast)   pop)
+    :recur  (asm:recur (second ast) pop)
+    :ref    (asm:ref   (second ast) pop)
+    :set    (asm:set   (second ast) pop)
+    :sql    (asm:sql   (rest ast)   pop)
+    :try    (asm:try   (rest ast)   pop)
+    :val    (asm:val   (second ast) pop)
+    :var    (asm:var   (second ast) pop)
 
     (concat '((:SP_SAVE))
-            (pop:rm (seq:loop ast true))
-            '((:RET)))))
+            (seq:loop ast true)
+            (if pop
+              '((:RET :POP))
+              '((:RET))))))
 
 
-(defn asm:dict [dict]
-  (concat (seq:loop (map second dict))
-          (list '(:CST_DCT) (map first dict))))
+(defn asm:dict [dict pop]
+  (concat (seq:loop (map second dict) false)
+          (list (if pop
+                  '(:CST_DCT :POP)
+                  '(:CST_DCT))
+                (map first dict))))
 
-(defn asm:elem [[p1 p2]]
-  (concat (asm p1)
+(defn asm:elem [[p1 p2] pop]
+  (concat (asm p1 false)
           (loop [elems [] code p2]
-            (if (empty? code)
-              elems
+            (if (= 1 (count code))
+              (concat elems
+                      (asm (first code) false)
+                      (if pop
+                        '((:ELEM :POP))
+                        '((:ELEM))))
               (recur (concat elems
-                             (asm (first code))
+                             (asm (first code) false)
                              '((:ELEM)))
                      (rest code))))))
 
-(defn asm:exit [ast]
-  (concat (asm ast)
+(defn asm:exit [ast pop]
+  (concat (asm ast false)
           '((:EXIT))))
 
-(defn asm:fct [[id params]]
-  (concat (seq:loop params)
-          (asm id)
-          '((:CALL_FCT))
-          (list (count params))))
+(defn asm:fct [[id params] pop]
+  (let [param_count (count params)]
+    (concat (if (zero? param_count)
+              ()
+              (seq:loop params false))
+            (asm id false)
+            (if pop
+              '((:CALL_FCT :POP))
+              '((:CALL_FCT)))
+            (list (count params)))))
 
-(defn asm:if [[if_ then_ else_]]
-  (concat '((:SP_SAVE))
-          (asm if_  ) '((:IF))
-          (asm then_) '((:RET_X))
-          (asm else_) '((:RET_X))
-          '((:RET))))
+(defn asm:if [[if_ then_ else_] pop]
+  (let [asm_if   (asm if_   false)
+        asm_then (asm then_ pop)
+        asm_else (asm else_ pop)]
+    (if (= 0
+           (count asm_then)
+           (count asm_else))
+      (asm if_ true)
+      (concat asm_if   '((:IF))
+              asm_then '((:RET_X))
+              asm_else '((:RET_X))))))
 
-(defn asm:loop [ast]
-  (concat '((:SP_SAVE) (:LOOP_BEGIN))
+(defn asm:loop [ast pop]
+  (concat '((:LOOP_BEGIN))
           (if (list? (first ast))
             (seq:loop ast true)
-            (pop:add (asm ast)))
-          '((:RET_X) (:RET))))
+            (asm ast true))
+          '((:RET_X))))
 
-(defn asm:list [ast]
-  (concat (seq:loop ast)
-          (list '(:CST_LST) (count ast))))
+(defn asm:list [ast pop]
+  (concat (if (not-empty ast)
+            (seq:loop ast false)
+            ())
+          (list (if pop
+                  '(:CST_LST :POP)
+                  '(:CST_LST))
+                (count ast))))
 
-(defn asm:loc [[id extension]]
-  (if (empty? extension)
-    (list '(:LOC) id)
-    (concat (asm extension)
-            (list '(:LOCX) id))))
+(defn asm:loc [[id extension] pop]
+  (if (not pop)
+    (if (empty? extension)
+      (list '(:LOC) id)
+      (concat (asm extension false)
+              (list '(:LOCX) id)))))
 
-(defn asm:op [[op params]]
+(defn asm:op [[op params] pop]
   (if (= op :assign)
     (case (first (first params))
-      :var  (concat (seq:loop (rest  params)) '((:STORE))     [(second (first params))])
-      :loc  (concat (seq:loop (rest  params)) '((:STORE_LOC)) [(second (first params))])
-      :elem (concat (asm (first params))
-                    (seq:loop (rest  params))
-                    '((:STORE_RF))))
-    (concat (seq:loop params)
-            (list '(:CALL_OP)
+      :var  (concat (seq:loop (rest  params) false)
+                    (if pop
+                      '((:STORE :POP))
+                      '((:STORE)))
+                    [(second (first params))])
+      :loc  (concat (seq:loop (rest  params) false)
+                    (if pop
+                      '((:STORE_LOC :POP))
+                      '((:STORE_LOC)))
+                    [(second (first params))])
+      :elem (concat (asm (first params) false)
+                    (seq:loop (rest  params) false)
+                    (if pop
+                      '((:STORE_RF :POP))
+                      '((:STORE_RF)))))
+    (concat (seq:loop params false)
+            (list (if pop
+                    '(:CALL_OP :POP)
+                    '(:CALL_OP))
                   op
                   (dec (count params))))))
 
-(defn asm:opX [[op params]]
-  (concat (seq:loop params)
-          (list '(:CALL_OPX)
-                 op
-                 (dec (count params)))))
+(defn asm:opX [[op params] pop]
+  (concat (seq:loop params false)
+          (list (if pop
+                  '(:CALL_OPX :POP)
+                  '(:CALL_OPX))
+                op
+                (dec (count params)))))
 
-(defn asm:proc [[params code info]]
-  (concat (asm params)
-          '((:PROC))
-          [info]
-          [(concat '((:SP_SAVE))
-                  (asm code)
-                  '((:RET_P)))]))
+(defn asm:proc [[params code info] pop]
+  (if (not pop)
+    (concat (asm params false)
+            '((:PROC))
+            [info]
+            [(concat '((:SP_SAVE))
+                    (if (list? (first code))
+                      (seq:loop code true)
+                      (asm code false))
+                    '((:RET_P)))])))
 
-(defn asm:recur [ast]
-  (concat (seq:loop ast)
+(defn asm:recur [ast _]
+  (concat (seq:loop ast false)
           ['(:CST_LST) (count ast)]
           '((:RECUR))))
 
-(defn asm:ref [ast]
-  (concat (asm ast)
-         '((:REF))))
+(defn asm:ref [ast pop]
+  (if (not pop)
+    (concat (asm ast false) '((:REF)))))
 
-(defn asm:set [ast]
-  (concat (seq:loop ast)
-          (list '(:CST_SET) (count ast))))
+(defn asm:set [ast pop]
+  (if (not pop)
+    (concat (if (not-empty ast)
+              (seq:loop ast false)
+              ())
+            (list '(:CST_SET) (count ast)))))
 
-(defn asm:sql [[from select where start connect stop group order limit as]]
+(defn asm:sql [[from select where start connect stop group order limit as] pop]
   (with-local-vars [asm '((:SP_SAVE))]
     (let [FROM    (asm:sql_from      from)
           SELECT  (asm:sql_select    select)
           WHERE   (asm:sql_where     where)
-          START   (seq:loop start true)
+          START   (if (not-empty start)
+                    (seq:loop start true)
+                    ())
           CONNECT ()
           STOP    ()
           ORDER   (asm:sql_order     order)
@@ -249,7 +285,9 @@
                                      '((:RET_X)))
                                    GROUP)))))
 
-        (var-set asm (concat @asm '((:RET))))
+        (var-set asm (concat @asm (if pop
+                                    '((:RET :POP))
+                                    '((:RET)))))
         @asm))))
 
 (defn asm:sql_as [type ids]
@@ -270,7 +308,7 @@
   (with-local-vars [expr (), ids ()]
     (loop [elem elements]
       (var-set ids  (concat @ids  [(first elem)]))
-      (var-set expr (concat @expr (asm (second elem))))
+      (var-set expr (concat @expr (asm (second elem) false)))
       (let [next_elems (nthrest elem 2)]
         (if (not-empty next_elems)
           (recur next_elems))))
@@ -280,7 +318,7 @@
   (with-local-vars [expr (), ids ()]
     (loop [elem elements]
       (var-set ids  (concat @ids  [(first elem)]))
-      (var-set expr (concat @expr (asm (second elem))))
+      (var-set expr (concat @expr (asm (second elem) false)))
       (let [next_elems (nthrest elem 2)]
         (if (not-empty next_elems)
           (recur next_elems))))
@@ -290,13 +328,13 @@
   (if (empty? ast)
     ()
     (concat '((:FJUMP_WHERE))
-            (asm ast)
+            (asm ast false)
             '((:RET_X)))))
 
 (defn asm:sql_limit [ast]
   (if (empty? ast)
     ()
-    (concat (asm ast)
+    (concat (asm ast false)
             '((:IT_LIMIT)))))
 
 (defn asm:sql_group [ast, ids]
@@ -305,7 +343,7 @@
     (concat '((:CST_DCT) ())
             '((:IT_NEXT3))
             '((:FJUMP_BK_X) 5 -5)
-            (asm ast)
+            (asm ast false)
             (list '(:IT_GROUP) (count ids))
             '((:RET_X)))))
 
@@ -314,7 +352,7 @@
     (if (empty? elem)
       rslt
       (let [[expr dir] (first elem)
-            asm_expr (asm expr)]
+            asm_expr (asm expr false)]
         (concat rslt
                 '((:CST_0))
                 '((:IT_ORDER))
@@ -329,63 +367,41 @@
                   '(:GT 1))
                 '((:RET_X)))))))
 
-(defn asm:try [[ast1 ast2]]
+(defn asm:try [[ast1 ast2] pop]
   (concat '((:SP_SAVE))
           '((:TRY_1))
-          (asm ast1)
+          (asm ast1 false)
           '((:RET_X))
-          (asm ast2)
+          (asm ast2 false)
           '((:RET_X))
-          '((:RET))))
+          (if pop
+            '((:RET :POP))
+            '((:RET)))))
 
-(defn asm:val [val]
-  (cond
-    (nil?     val)  '((:CST_N))
-    (false?   val)  '((:CST_0))
-    (true?    val)  '((:CST_1))
-    (integer? val)  (if (and (< -127 val) (> 127 val))
-                      (list '(:CST_B) val)
-                      (if (and (< -32767 val) (> 32767 val))
-                        (list '(:CST_S) val)
-                        (list '(:CST_I) val)))
-    (float?   val)  (list '(:CST_F) val)
-    (string?  val)  (list '(:CST_STR) val)))
+(defn asm:val [val pop]
+  (if (not pop)
+    (cond
+      (nil?     val)  '((:CST_N))
+      (false?   val)  '((:CST_0))
+      (true?    val)  '((:CST_1))
+      (integer? val)  (if (and (< -127 val) (> 127 val))
+                        (list '(:CST_B) val)
+                        (if (and (< -32767 val) (> 32767 val))
+                          (list '(:CST_S) val)
+                          (list '(:CST_I) val)))
+      (float?   val)  (list '(:CST_F) val)
+      (string?  val)  (list '(:CST_STR) val))))
 
-(defn asm:var [ast]
-  (list '(:LOAD) ast))
+(defn asm:var [ast pop]
+  (if (not pop)
+    (list '(:LOAD) ast)))
 
-(defn seq:loop
-  ([ast] (seq:loop ast false))
-  ([ast pop] (let [assemble_ (if pop
-                               (comp pop:add asm first)
-                               (comp asm first))]
-               (loop [from ast, to '()]
-                 (if (empty? from)
-                   to
-                   (recur (rest from)
-                          (concat to
-                                  (assemble_ from))))))))
-
-(defn pop:add [code]
-  (loop [i (dec (count code))]
-    (let [elem (nth code i)]
-      (if (and (list? elem)
-               ;(or (= :RET_X (first elem))
-               (.contains (keys OP) (first elem)))
-        (let [[left right] (split-at i code)]
-          (concat left
-                  (list (list (first elem) :POP))
-                  (rest right)))
-        (recur (dec i))))))
-
-(defn pop:rm [code]
-  (loop [i (dec (count code))]
-    (let [elem (nth code i)]
-      (if (and (list? elem)
-               (= :POP (second elem)))
-        (let [[left right] (split-at i code)]
-          (concat left (list (list(first elem))) (rest right)))
-        (recur (dec i))))))
-
+(defn seq:loop [ast pop]
+  (loop [from ast, to '()]
+    (if (= 1 (count from))
+      (concat to (asm (first from) false))
+      (recur (rest from)
+             (concat to
+                     (asm (first from) pop))))))
 
 ;(asm (parse "f(); f();"))

@@ -155,14 +155,26 @@
 (defn cmp:if [code data asm sp]
   (let [then (cmp code data [] sp)]
     (let [else (cmp (first then) (second then) [] sp)]
-      (let [pop (or (last then) (last else))]
+      (let [count_then (count (nth then 2))
+            count_else (count (nth else 2))]
         (cmp (first else)
              (second else)
              (conc asm
-                   (:FJUMP OP) (int16->byte (+ 5 (count (nth then 2))))
-                   (nth then 2)
-                   (:JUMP OP)  (int16->byte (+ 2 (count (nth else 2))))
-                   (nth else 2))
+                   (if (and (< 0 count_then)
+                            (< 0 count_else))
+                     (conc [(:FJUMP OP)]
+                           (int16->byte (+ 5 count_then))
+                           (nth then 2)
+                           (:JUMP OP)
+                           (int16->byte (+ 2 count_else))
+                           (nth else 2))
+                     (if (zero? count_else)
+                       (conc [(:FJUMP OP)]
+                             (int16->byte (+ 2 count_then))
+                             (nth then 2))
+                       (conc [(:FJUMP OP)]
+                             (int16->byte (+ 2 count_else))
+                             (nth else 2)))))
              sp)))))
 
 (defn cmp:jump_back [code data asm sp]
