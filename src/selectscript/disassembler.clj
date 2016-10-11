@@ -44,7 +44,9 @@
    (loop [[[k v] & elements] (into [] base)]
      (if (= v val)
        k
-       (recur elements)))))
+       (if (empty? elements)
+         val
+         (recur elements))))))
 
 (defn dis:prog [prog addr data space]
   (let [code (rest prog)
@@ -52,8 +54,10 @@
                         [(dis:key (+ 128 (first prog))) true]
                         [(dis:key (first prog)) false])]
     (print (format "/*%04d*/" addr))
-    (print (clojure.string/join (repeat space "           "))
-           (format "%-11s" (str (name op_code) (if pop "|POP," ","))))
+    (if (keyword? op_code)
+      (print (clojure.string/join (repeat space "           "))
+             (format "%-11s" (str (name op_code) (if pop "|P," ","))))
+      (print (clojure.string/join (repeat space "           "))))
     (condp contains? op_code
       #{:SP_SAVEX}  (let [[c a d] (dis:data code (inc addr) (inc space))]
                       (dis:prog c a d space))
@@ -136,15 +140,6 @@
       #{:CST_B}     (do
                       (println (str (first code) ", "))
                       (dis:prog (rest code) (+ 2 addr) data space))
-      #{:CALL_OP
-        :CALL_OPX}  (do
-                      (println (format "%d, %s, // params: %d, op: %d"
-                                       (first code)
-                                       (name (dis:key (second code) op))
-                                       (byte->uint8 (first  code))
-                                       (byte->uint8 (second code))))
-                      (dis:prog (nthrest code 2) (+ 3 addr) data space))
-
       #{:PROC}      (do
                       (println (format "%d, // help: %s"
                                        (first code)
@@ -159,6 +154,21 @@
                       (let [[c a _] (dis:prog (nthrest code 3) (+ 3 addr) [] (inc space))]
                         (println "//////////////////////////////////////////////////////////")
                         (dis:prog c a data space)))
-      (do
-        (println)
-        (dis:prog code (inc addr) data space)))))
+      (if (not (keyword? op_code))
+        (do
+          (if (<= (:OPX OP) op_code)
+            (println (format " OPX|%s%-4s %d, // params: %d"
+                             (name (dis:key (- op_code (:OPX OP)) op))
+                             (if pop "|P," ",")
+                             (first code)
+                             (inc (byte->uint8 (first  code)))))
+            (println (format " OP|%s%-4s %d, // params: %d"
+                             (name (dis:key (- op_code (:OP OP)) op))
+                             (if pop "|P," ",")
+                             (first code)
+                             (inc (byte->uint8 (first  code))))))
+          (dis:prog (rest code) (+ 2 addr) data space))
+
+        (do
+          (println)
+          (dis:prog code (inc addr) data space))))))

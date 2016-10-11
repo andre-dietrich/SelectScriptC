@@ -21,7 +21,6 @@
           :CST_STR 11, :CST_LST 12, :CST_SET 13, :CST_DCT 14,
           :LOAD 15, :ELEM 16,
           :STORE 17, :STORE_RF 18, :STORE_LOC 19,
-          :CALL_OPX 20, :CALL_OP 21,
           :CALL_FCTX 22, :CALL_FCT 23,
           :FJUMP 24, :JUMP 25,
           :PROC 26,
@@ -29,7 +28,8 @@
           :IT_INIT 29,
           :IT_NEXT0 30, :IT_NEXT1 31, :IT_NEXT2 32, :IT_NEXT3 33,
           :IT_STORE 34, :IT_LIMIT 35, :IT_GROUP 36, :IT_ORDER 37, :IT_AS 38,
-          :EXIT 39, :TRY_1 40, :TRY_0 41, :REF 42, :REC_SET 43})
+          :EXIT 39, :TRY_1 40, :TRY_0 41, :REF 42, :REC_SET 43,
+          :OP 64, :OPX   96})
 
 (declare cmp
          cmp:cmd
@@ -113,8 +113,7 @@
            :LOCX
            :STORE
            :STORE_LOC}    (cmp:str        (rest code) data asm_ sp)
-         #{:CALL_OP
-           :CALL_OPX}     (cmp:op         (rest code) data asm_ sp)
+         #{:OP :OPX}      (cmp:op         (rest code) data asm_ sp)
          #{:LOOP_BEGIN}   (cmp:loop       (rest code) data asm_ sp)
          #{:EXIT}         (cmp:exit       (rest code) data asm_ sp)
          #{:IF}           (cmp:if         (rest code) data asm_ sp)
@@ -245,12 +244,12 @@
            sp))))
 
 
-(defn cmp:op [code data asm sp]
-  (cmp (nthrest code 2)
+(defn cmp:op [[operation params & code] data asm sp]
+  (cmp code
        data
-       (conc asm
-             (uint8->byte (second code))
-             [((first code) op)])
+       (conc (drop-last asm)
+             [(+ (last asm) (operation op))]
+             (uint8->byte params))
        sp))
 
 

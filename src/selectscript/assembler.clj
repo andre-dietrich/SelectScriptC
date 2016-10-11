@@ -180,16 +180,16 @@
                       '((:STORE_RF)))))
     (concat (seq:loop params false)
             (list (if pop
-                    '(:CALL_OP :POP)
-                    '(:CALL_OP))
+                    '(:OP :POP)
+                    '(:OP))
                   op
                   (dec (count params))))))
 
 (defn asm:opX [[op params] pop]
   (concat (seq:loop params false)
           (list (if pop
-                  '(:CALL_OPX :POP)
-                  '(:CALL_OPX))
+                  '(:OPX :POP)
+                  '(:OPX))
                 op
                 (dec (count params)))))
 
@@ -361,7 +361,7 @@
                 asm_expr
                 '((:IT_NEXT2))
                 asm_expr
-                '((:CALL_OP))
+                '((:OP))
                 (if (= dir :asc)
                   '(:LT 1)
                   '(:GT 1))
