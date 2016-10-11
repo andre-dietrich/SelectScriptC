@@ -45,47 +45,30 @@
           :FJUMP        24,
           :JUMP         25,
 
-          :PROC        26      // unsigned char, unsigned short})
+          :PROC         26,
 
-#define IT_INIT     27
-#define IT_NEXT0    28
-#define IT_NEXT1    29
-#define IT_NEXT2    30
-#define IT_NEXT3    31
-#define IT_STORE    32
-#define IT_LIMIT    33
+          :IT_INIT      27,
+          :IT_NEXT0     28,
+          :IT_NEXT1     29,
+          :IT_NEXT2     30,
+          :IT_NEXT3     31,
+          :IT_STORE     32,
+          :IT_LIMIT     33,
 
-#define IT_GROUP    34
-#define IT_ORDER    35
-#define IT_AS       36
+          :IT_GROUP     34,
+          :IT_ORDER     35,
+          :IT_AS        36,
 
-#define EXIT        37
-#define REC_SET     38
+          :EXIT         37,
+          :REC_SET      38,
 
-#define TRY_1       39
-#define TRY_0       40
+          :TRY_1        39,
+          :TRY_0        40,
 
-#define REF         41
+          :REF          41,
 
-
-
-
-
-     :RET 0, :SP_SAVEX 1, :RET_P 2,
-          :SP_SAVE 3,
-          :CST_N 4, :CST_0 5, :CST_1 6, :CST_B 7, :CST_S 8, :CST_I 9, :CST_F 10,
-          :CST_STR 11, :CST_LST 12, :CST_SET 13, :CST_DCT 14,
-          :LOAD 15, :ELEM 16,
-          :STORE 17, :STORE_RF 18, :STORE_LOC 19,
-          :CALL_FCTX 22, :CALL_FCT 23,
-          :FJUMP 24, :JUMP 25,
-          :PROC 26,
-          :LOC 27, :LOCX 28,
-          :IT_INIT 29,
-          :IT_NEXT0 30, :IT_NEXT1 31, :IT_NEXT2 32, :IT_NEXT3 33,
-          :IT_STORE 34, :IT_LIMIT 35, :IT_GROUP 36, :IT_ORDER 37, :IT_AS 38,
-          :EXIT 39, :TRY_1 40, :TRY_0 41, :REF 42, :REC_SET 43,
-          :OP 64, :OPX   96
+          :OP           64,
+          :OPX          96})
 
 (declare cmp
          cmp:cmd
