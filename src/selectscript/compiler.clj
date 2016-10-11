@@ -83,12 +83,12 @@
   ([code] (let [[data asm] (cmp code [] [] -1)]
             (map #(if (< 127 %) (- % 256) %)
                  (conc [(:SP_SAVEX OP)]
-                       (uint16->byte (count data))
+                       (uint8->byte (count data))
                    (loop [d data bytes []]
                      (if (empty? d)
                        bytes
                        (recur (rest d)
-                              (conc bytes (string->byte (first d))))))
+                              (conc bytes (+ 2 (count (first d))) (string->byte (first d))))))
                    (cmp:exit2 (rest asm) -1)))))
 
   ([code data asm sp]

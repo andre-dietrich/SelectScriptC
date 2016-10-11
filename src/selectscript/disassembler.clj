@@ -13,10 +13,10 @@
   ([code addr data space]  (dis:prog code addr data space))) ;(first next) (second next)))
 
 (defn dis:data [prog address space]
-  (println (format "%d, %d, // %d" (first prog) (second prog) (byte->uint16 (take 2 prog))))
-  (loop [i     (byte->uint16 (take 2 prog))
-         data  (nthrest prog 2)
-         addr  (+ address 2)
+  (println (format "%d, // %d" (first prog) (byte->uint8 (first prog))))
+  (loop [i     (byte->uint8 (first prog))
+         data  (rest prog)
+         addr  (inc address)
          word []]
     (if (zero? i)
       [data addr word]
@@ -24,7 +24,8 @@
              new_addr
              new_word]  (do
                           (print "        " (clojure.string/join (repeat space "           ")))
-                          (loop [d data a addr w "\""]
+                          (print (format "%d, " (first data)))
+                          (loop [d (rest data) a (inc addr) w "\""]
                             (let [c (first d)]
                               (print (if (<= 32 c 126)
                                        (format "'%s', " (char c))
