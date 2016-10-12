@@ -12,6 +12,16 @@
                  [org.clojure/tools.cli     "0.3.5"]
                  [org.antlr/antlr4-runtime  "4.5.3"]
                  [org.antlr/antlr4          "4.5.3"]
+                 ;; web-socket
+                 ;[org.clojure/tools.logging "0.3.1"]
+                 ;[environ                   "1.1.0"]
+                 ;[compojure                 "1.5.1"]
+                 ;[http-kit                  "2.2.0"]
+                 ;[cheshire                  "5.6.3"]
+                 ;; ------
+                 [org.webbitserver/webbit   "0.4.3"]
+                 [org.clojure/data.json     "0.1.2"]
+                 ;; ------
                  [proto-repl                "0.3.1"]]
                  ;[net.java.dev.jna/jna  "4.1.0"]
 
