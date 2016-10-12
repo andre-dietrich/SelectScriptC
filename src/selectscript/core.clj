@@ -55,7 +55,7 @@
       (if (:repl options)
         (ss:repl (:optimize options))
         (if (:server options)
-          (ss:server (:port options))
+          (ss:server (:port options) (:optimize options))
           (if (empty? arguments)
             (ss:repl (:optimize options))
             (with-local-vars [code (slurp (first arguments))]
@@ -90,19 +90,19 @@
               (if (:execute options)
                 (ss:execute @code false)))))))))
 
-(defn on-message [connection message]
-  (let [bytecode (str (list (ss:compile message true)))]
+(defn on-message [connection message optimization]
+  (let [bytecode (str (list (ss:compile message optimization)))]
     (.send connection (subs bytecode 2 (- (count bytecode) 2)))))
 
 
-(defn ss:server [port]
+(defn ss:server [port opt]
   (println (format "Starting server at localhost:%d\n" port))
   (doto (WebServers/createWebServer port)
     (.add "/"
           (proxy [WebSocketHandler] []
             (onOpen    [c]   (println "opened" c))
             (onClose   [c]   (println "closed" c))
-            (onMessage [c j] (on-message c j))))
+            (onMessage [c j] (on-message c j opt))))
     (.add (StaticFileHandler. "."))
     (.start)))
 
