@@ -54,7 +54,9 @@
                         [(dis:key (+ 128 (first prog))) true]
                         [(dis:key (first prog)) false])]
     (print (format "/*%04d*/" addr))
-    (if (keyword? op_code)
+    (if (and (keyword? op_code)
+             (not (= :OP op_code))
+             (not (= :OPX op_code)))
       (print (clojure.string/join (repeat space "           "))
              (format "%-11s" (str (name op_code) (if pop "|P," ","))))
       (print (clojure.string/join (repeat space "           "))))
@@ -154,16 +156,21 @@
                       (let [[c a _] (dis:prog (nthrest code 3) (+ 3 addr) [] (inc space))]
                         (println "//////////////////////////////////////////////////////////")
                         (dis:prog c a data space)))
-      (if (not (keyword? op_code))
-        (do
-          (if (<= (:OPX OP) op_code)
+      (if (or (not (keyword? op_code))
+              (= :OP op_code)
+              (= :OPX op_code))
+        (let [op_code2 (case op_code
+                         :OP  (:OP OP)
+                         :OPX (:OPX OP)
+                         op_code)]
+          (if (<= (:OPX OP) op_code2)
             (println (format " OPX|%s%-4s %d, // params: %d"
-                             (name (dis:key (- op_code (:OPX OP)) op))
+                             (name (dis:key (- op_code2 (:OPX OP)) op))
                              (if pop "|P," ",")
                              (first code)
-                             (inc (byte->uint8 (first  code)))))
+                             (inc (byte->uint8 (first code)))))
             (println (format " OP|%s%-4s %d, // params: %d"
-                             (name (dis:key (- op_code (:OP OP)) op))
+                             (name (dis:key (- op_code2 (:OP OP)) op))
                              (if pop "|P," ",")
                              (first code)
                              (inc (byte->uint8 (first  code))))))
