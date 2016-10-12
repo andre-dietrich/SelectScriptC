@@ -140,7 +140,7 @@
 (defn asm:loop [ast pop]
   (concat '((:LOOP_BEGIN))
           (if (list? (first ast))
-            (seq:loop ast true)
+            (seq:loop ast true true)
             (asm ast true))
           '((:RET_X))))
 
@@ -396,12 +396,13 @@
   (if (not pop)
     (list '(:LOAD) ast)))
 
-(defn seq:loop [ast pop]
-  (loop [from ast, to '()]
-    (if (= 1 (count from))
-      (concat to (asm (first from) false))
-      (recur (rest from)
-             (concat to
-                     (asm (first from) pop))))))
+(defn seq:loop
+  ([ast pop] (seq:loop ast pop false))
+  ([ast pop pop_last] (loop [from ast, to '()]
+                        (if (= 1 (count from))
+                          (concat to (asm (first from) pop_last))
+                          (recur (rest from)
+                                 (concat to
+                                         (asm (first from) pop)))))))
 
 ;(asm (parse "f(); f();"))
