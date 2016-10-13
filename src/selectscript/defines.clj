@@ -12,6 +12,10 @@
 (defn ss:fct [fct params]
   (list :fct fct params))
 
+(defn ss:fctX
+  ([fct params]         (list :fctX fct params))
+  ([fct extra params]   (ss:fctX fct (concat extra params))))
+
 (defn ss:if [if_ then else]
   (list :if if_ then else))
 

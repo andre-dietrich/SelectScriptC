@@ -27,6 +27,8 @@
                       (if (not-empty (last ast))
                         (optimize (last ast))
                         ()))
+      :fctX  (ss:fctX (optimize (second ast))
+                      (optimize (last ast)))
       :if    (optimize:if  (rest ast))
       :list  (ss:list (optimize (second ast)))
       :loop  (ss:loop (optimize (second ast)))

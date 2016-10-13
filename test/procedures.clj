@@ -42,7 +42,7 @@
     (iss 54 "p();    ")
     (iss 54 "p();    ")))
 
-(deftest procedure_4
+(deftest procedure_5
   (let [env (vm:init 100 100 0)]
     (iss 1  "fak = PROC(x): if(x$,"
             "                  x$*fak(x$ - 1),"
@@ -54,3 +54,10 @@
     (iss  24  "fak(4);    ")
     (iss 120  "fak(5);    ")
     (iss 720  "fak(6);    ")))
+
+(deftest procedure_6
+  (let [env (vm:init 100 100 0)]
+    (iss 1  "p = PROC(x, y): x$ + str(y$) ; 1;      ")
+    (iss [] "x = [];                                ")
+    (iss ["22"]         "x@p(22);")
+    (iss ["22", "22"]   "x@p(22);")))

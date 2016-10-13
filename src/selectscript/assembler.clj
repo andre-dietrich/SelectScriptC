@@ -7,6 +7,7 @@
          asm:elem
          asm:exit
          asm:fct
+         asm:fctX
          asm:if
          asm:list
          asm:loc
@@ -59,7 +60,7 @@
 
 
 (defn assemble [ast]
-  (asm ast false))
+  (optimize (asm ast false)))
 
 (defn asm [ast pop]
   (case (first ast)
@@ -67,6 +68,7 @@
     :elem   (asm:elem  (rest ast)   pop)
     :exit   (asm:exit  (second ast) pop)
     :fct    (asm:fct   (rest ast)   pop)
+    :fctX   (asm:fctX  (rest ast)   pop)
     :if     (asm:if    (rest ast)   pop)
     :list   (asm:list  (second ast) pop)
     :loc    (asm:loc   (rest ast)   pop)
@@ -124,6 +126,16 @@
               '((:CALL_FCT :POP))
               '((:CALL_FCT)))
             (list (count params)))))
+
+(defn asm:fctX [[id params] pop]
+  (let [param_count (count params)]
+    (concat (seq:loop params false)
+            (asm id false)
+            (if pop
+              '((:CALL_FCTX :POP))
+              '((:CALL_FCTX)))
+            (list (count params)))))
+
 
 (defn asm:if [[if_ then_ else_] pop]
   (let [asm_if   (asm if_   false)

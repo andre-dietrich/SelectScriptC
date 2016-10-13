@@ -11,14 +11,14 @@
 
   (:use [selectscript.defines :only (ss:dict  ss:elem
                                      ss:exit  ss:fct
-                                     ss:if    ss:list
-                                     ss:loc   ss:loop
-                                     ss:op    ss:opX
-                                     ss:proc  ss:recur
-                                     ss:ref   ss:sql
-                                     ss:set   ss:try
-                                     ss:val   ss:val?
-                                     ss:var)]    :reload))
+                                     ss:fctX  ss:if
+                                     ss:list  ss:loc
+                                     ss:loop  ss:op
+                                     ss:opX   ss:proc
+                                     ss:recur ss:ref
+                                     ss:sql   ss:set
+                                     ss:try   ss:val
+                                     ss:val?  ss:var)]    :reload))
 
 (declare -atom
          -assign
@@ -238,10 +238,16 @@
     (-function_mem mem)
     (if-let [del (.del_ ctx)]
       (-function_del del)
-      (ss:fct (visit (.repo_ ctx))
-              (if-let [elem (.elem_ ctx)]
-                (-stmt_list elem)
-                ())))))
+      (if-let [extra (.extra_ ctx)]
+        (ss:fctX (visit extra)
+                 [(visit (.repo_ ctx))]
+                 (if-let [elem (.elem_ ctx)]
+                   (-stmt_list elem)
+                   ()))
+        (ss:fct (visit (.repo_ ctx))
+                (if-let [elem (.elem_ ctx)]
+                  (-stmt_list elem)
+                  ()))))))
 
 
 (defn -function_del [ctx]
