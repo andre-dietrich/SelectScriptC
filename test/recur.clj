@@ -19,7 +19,7 @@
     (iss  120 "fak(5);")
     (iss  720 "fak(6);")))
 
-(deftest fak
+(deftest ackermann
   (let [env (vm:init 100 100 0)]
     (iss  22  "A = PROC(m, n) : IF ( not m$,                                "
               "                      n$ + 1,                                "
