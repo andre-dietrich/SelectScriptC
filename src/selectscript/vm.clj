@@ -2,7 +2,7 @@
   (:import (com.sun.jna Function Pointer Memory))
   (:import (com.sun.jna.ptr PointerByReference)))
 
-(declare vm:s2
+(declare vm:S2
          vm:init
          vm:prog
          vm:exec
@@ -15,11 +15,11 @@
 ;(System/setProperty "jna.library.path" "/home/andre/Workspace/Projects/gitlab/2SOS/runtime/")
 
 
-(def init_ (Function/getFunction "2s" "vm_init"))
-(def exec_ (Function/getFunction "2s" "vm_execute"))
-(def stat_ (Function/getFunction "2s" "vm_ready"))
-(def rslt_ (Function/getFunction "2s" "vm_get_rslt"))
-(def size_ (Function/getFunction "2s" "vm_size"))
+(def init_ (Function/getFunction "S2" "vm_init"))
+(def exec_ (Function/getFunction "S2" "vm_execute"))
+(def stat_ (Function/getFunction "S2" "vm_ready"))
+(def rslt_ (Function/getFunction "S2" "vm_get_rslt"))
+(def size_ (Function/getFunction "S2" "vm_size"))
 
 
 (defn vm:init
@@ -59,7 +59,7 @@
 
 
 (defn dyn [func ret & args]
-  (let [f (Function/getFunction "2s" (name func))]
+  (let [f (Function/getFunction "S2" (name func))]
     (.invoke f ret (to-array args))))
 
 (defn round [val len]

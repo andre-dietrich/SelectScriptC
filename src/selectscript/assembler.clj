@@ -19,8 +19,10 @@
          asm:ref
          asm:sql
          asm:sql_as
+         asm:sql_connect
          asm:sql_from
          asm:sql_select
+         asm:sql_stop
          asm:sql_where
          asm:sql_order
          asm:sql_group
@@ -165,12 +167,14 @@
                   '(:CST_LST))
                 (count ast))))
 
-(defn asm:loc [[id extension] pop]
+(defn asm:loc [[id extension pp] pop]
   (if (not pop)
-    (if (empty? extension)
-      (list '(:LOC) id)
-      (concat (asm extension false)
-              (list '(:LOCX) id)))))
+    (if (= nil pp)
+      (if (empty? extension)
+        (list '(:LOC) id)
+        (concat (asm extension false)
+                (list '(:LOCX) id)))
+      [[pp]])))
 
 (defn asm:op [[op params] pop]
   (if (= op :assign)
@@ -234,72 +238,117 @@
 
 (defn asm:sql [[from select where start connect stop group order limit as] pop]
   (with-local-vars [asm '((:SP_SAVE))]
-    (let [FROM    (asm:sql_from      from)
-          SELECT  (asm:sql_select    select)
-          WHERE   (asm:sql_where     where)
-          START   (if (not-empty start)
-                    (seq:loop start true)
-                    ())
-          CONNECT ()
-          STOP    ()
-          ORDER   (asm:sql_order     order)
-          LIMIT   (asm:sql_limit     limit)]
-      (let [AS    (asm:sql_as        as (second SELECT))
-            GROUP (asm:sql_group     group (second SELECT))]
+    (let [FROM      (asm:sql_from      from)
+          SELECT    (asm:sql_select    select)
+          WHERE     (asm:sql_where     where)
+          START     (if (not-empty start)
+                      (seq:loop start true true)
+                      ())
+          [CONNECT
+           C_OPT]   (asm:sql_connect   connect)
+          STOP      (asm:sql_stop      stop)
+          ORDER     (asm:sql_order     order)
+          LIMIT     (asm:sql_limit     limit)]
+      (let [AS      (asm:sql_as        as (second SELECT))
+            GROUP   (asm:sql_group     group (second SELECT))]
         (var-set asm (concat @asm FROM))
         (var-set asm (concat @asm '((:IT_INIT))))
 
         (var-set asm (concat @asm START))
 
-        (if (and (= as :val)
-                 (= () WHERE GROUP))
+        (if (.contains C_OPT :IT_UNIQUE)
+          (var-set asm (concat @asm ['(:CST_LST) 0 '(:STORE :POP) "__uniq"])))
+
+
+        (if (not (= () CONNECT STOP))
           (var-set asm (concat @asm
-                               '((:IT_NEXT0))
-                               (first SELECT)
-                               '((:IT_AS) 1)))
+                               ;;;;;;;;;
+                               '((:CONNECT))
+
+                               [(concat '((:IT_INITX))
+                                        CONNECT
+                                        STOP
+                                        '((:OP) :NOT 0)
+                                        '((:RET_X)))]
+
+                               [(concat '((:IT_NEXT0))
+                                        (list '(:FJUMP_FW_X) (if (empty? C_OPT) 4 5))
+                                        (if (empty? C_OPT)
+                                          ()
+                                          '((:RETURN_FJUMP) -5))
+                                        (first SELECT)
+                                        (list '(:CST_LST) (count (second SELECT)))
+                                        (if (empty? C_OPT)
+                                          ()
+                                          (list C_OPT '(:RET_X)))
+                                        (butlast (rest WHERE))
+                                        '((:FJUMP_FW_X) 2)
+                                        '((:IT_STOREX))
+                                        '((:RET_X))
+                                        '((:RET))
+                                        '((:RET_X)))]
+
+                               ['((:CHK_FIRST) (:FJUMP_FW_X) 6 (:IT_STOREX2 :POP) (:RET_X) (:RET_X))]
+
+                               [(if (empty? C_OPT) 0 1)]))
+                               ;;;;;;;;;
+
+
           (if (and (= as :val)
-                   (empty GROUP)
-                   (not-empty WHERE))
+                   (= () WHERE GROUP))
             (var-set asm (concat @asm
-                                 AS
                                  '((:IT_NEXT0))
-                                 '((:FJUMP_FW_X) 2)
-                                 WHERE
                                  (first SELECT)
-                                 '((:IT_AS) 1)
-                                 '((:RET_X))))
-            (if (and (not= as :val)
-                     (= () GROUP ORDER LIMIT))
+                                 '((:IT_AS) 1)))
+            (if (and (= as :val)
+                     (empty GROUP)
+                     (not-empty WHERE))
               (var-set asm (concat @asm
                                    AS
                                    '((:IT_NEXT0))
-                                   '((:FJUMP_BK_X) 5 -5)
+                                   '((:FJUMP_FW_X) 2)
                                    WHERE
                                    (first SELECT)
-                                   (list '(:IT_AS) (as as_value))
+                                   '((:IT_AS) 1)
                                    '((:RET_X))))
-              (var-set asm (concat @asm
-                                   '((:IT_NEXT0))
-                                   '((:FJUMP_BK_X) 5 -5)
-                                   WHERE
-                                   '((:IT_STORE))
-                                   LIMIT
-                                   '((:RET_X))
-                                   ORDER
-                                   AS
-                                   (if (= :val as)
-                                     '((:IT_NEXT1))
-                                     '((:IT_NEXT3) (:FJUMP_BK_X) 5 -5))
-                                   (first SELECT)
-                                   (list '(:IT_AS) (as as_value))
-                                   (if (= :val as)
-                                     ()
-                                     '((:RET_X)))
-                                   GROUP)))))
+              (if (and (not= as :val)
+                       (= () GROUP ORDER LIMIT))
+                (var-set asm (concat @asm
+                                     AS
+                                     '((:IT_NEXT0))
+                                     '((:FJUMP_BK_X) 5 -5)
+                                     WHERE
+                                     (first SELECT)
+                                     (list '(:IT_AS) (as as_value))
+                                     '((:RET_X))))
+                (var-set asm (concat @asm
+                                     '((:IT_NEXT0))
+                                     '((:FJUMP_BK_X) 5 -5)
+                                     WHERE
+                                     '((:IT_STORE))
+                                     LIMIT
+                                     '((:RET_X))
+                                     ORDER
+                                     AS
+                                     (if (= :val as)
+                                       '((:IT_NEXT1))
+                                       '((:IT_NEXT3) (:FJUMP_BK_X) 5 -5))
+                                     (first SELECT)
+                                     (list '(:IT_AS) (as as_value))
+                                     (if (= :val as)
+                                       ()
+                                       '((:RET_X)))
+                                     GROUP))))))
 
         (var-set asm (concat @asm (if pop
                                     '((:RET :POP))
                                     '((:RET)))))
+
+        (if (.contains C_OPT :IT_UNIQUE)
+          (var-set asm (concat @asm ['(:CST_STR) "__uniq"
+                                     '(:LOAD) "del"
+                                     '(:CALL_FCT :POP) 1])))
+
         @asm))))
 
 (defn asm:sql_as [type ids]
@@ -315,6 +364,12 @@
     :val    '((:CST_N))
     :void   '((:CST_N))))
 
+(defn asm:sql_connect [ast]
+  (if (empty? (first ast))
+    [[] []]
+    (let [[elem optimization cost] ast]
+      (list (seq:loop elem true true)
+            optimization))))
 
 (defn asm:sql_from [elements]
   (with-local-vars [expr (), ids ()]
@@ -335,6 +390,11 @@
         (if (not-empty next_elems)
           (recur next_elems))))
     [@expr @ids]))
+
+(defn asm:sql_stop [ast]
+  (if (empty? ast)
+    ()
+    (concat (asm ast false))))
 
 (defn asm:sql_where [ast]
   (if (empty? ast)

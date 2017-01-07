@@ -3,7 +3,8 @@
 all: lib antlr
 
 lib:
-	cd runtime; make lib
+	cd SandhillSkipper; make lib
+	cp SandhillSkipper/libS2.so native/linux-x86-64/
 
 antlr:
 	cd resources; java -jar ~/.m2/repository/org/antlr/antlr4/4.5.3/antlr4-4.5.3.jar \

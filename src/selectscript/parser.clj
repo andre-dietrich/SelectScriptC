@@ -295,7 +295,12 @@
             "")
           (if-let [extra (.extra_ ctx)]
             (-stmt extra)
-            ())))
+            ())
+          (if-let [extra2 (.extra2_ ctx)]
+            (case (clojure.string/lower-case (.getText extra2))
+              "step"    :LOC_STEP
+              "count"   :LOC_COUNT
+              nil))))
 
 (defn -procedure [ctx]
   (ss:proc (if (.params_ ctx)
@@ -367,7 +372,20 @@
       "val"          :val
       "value"        :val
       "void"         :void
-      (as))))
+      as)))
+
+(defn -sel_connect [ctx]
+  (list (-stmt_list (.elem_ ctx))
+        (if (.CYCLE ctx)
+          '(:IT_CYCLE)
+          (if (.UNIQUE ctx)
+            '(:IT_UNIQUE)
+            (if (.MEMORIZE ctx)
+              '(:IT_MEMORIZE)
+              '())))
+        (if (.COST ctx)
+          (visit (.cost_ ctx))
+          '())))
 
 (defn -sel_order [ctx]
   (with-local-vars [ast ()]

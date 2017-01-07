@@ -5,7 +5,9 @@
 (declare dis
          dis:key
          dis:data
-         dis:prog)
+         dis:prog
+         print:space
+         whitespace)
 
 
 (defn dis
@@ -23,7 +25,7 @@
       (let [[new_data
              new_addr
              new_word]  (do
-                          (print "        " (clojure.string/join (repeat space "           ")))
+                          (print:space space)
                           (print (format "%d, " (first data)))
                           (loop [d (rest data) a (inc addr) w "\""]
                             (let [c (first d)]
@@ -57,15 +59,17 @@
     (if (and (keyword? op_code)
              (not (= :OP op_code))
              (not (= :OPX op_code)))
-      (print (clojure.string/join (repeat space "           "))
-             (format "%-11s" (str (name op_code) (if pop "|P," ","))))
-      (print (clojure.string/join (repeat space "           "))))
+      (print (clojure.string/join (repeat space whitespace))
+             (format "%-13s" (str (name op_code) (if pop "|P," ","))))
+      (print (clojure.string/join (repeat space whitespace))))
     (condp contains? op_code
       #{:SP_SAVEX}  (let [[c a d] (dis:data code (inc addr) (inc space))]
-                      (dis:prog c a d space))
+                      (print:space space)
+                      (println (str whitespace (first c) ", // local variables"))
+                      (dis:prog (rest c) (inc a) d space))
       #{:SP_SAVE}   (do
-                      (println)
-                      (let [[c a d] (dis:prog code (inc addr) data space)]
+                      (println (str (first code) ", // local variables"))
+                      (let [[c a d] (dis:prog (rest code) (+ 2 addr) data space)]
                         (if (not-empty c)
                           (dis:prog c a data space))))
       #{:RET_P
@@ -111,11 +115,11 @@
                       (dis:prog (nthrest code 4) (+ 5 addr) data space))
       #{:CST_DCT}   (let [len (byte->uint8 (first code))]
                       (println (str (first code) ", // " len))
-                      (loop [i len, c (rest code), a (+ 2 addr)]
+                      (loop [i len, c (rest code), a (inc addr)]
                         (if (zero? i)
-                          (dis:prog c a data space)
+                          (dis:prog c (inc a) data space)
                           (do
-                            (print "       " (clojure.string/join (repeat (inc space) "            ")))
+                            (print:space (inc space))
                             (print (str "" (first c) ", "))
                             (println "//" (nth data (byte->uint8 (first c))))
                             (recur (dec i) (rest c) (inc a))))))
@@ -146,14 +150,14 @@
                       (println (format "%d, // help: %s"
                                        (first code)
                                        (nth data (byte->uint8 (first code)))))
-                      (print "       " (clojure.string/join (repeat (inc space) "            ")))
+                      (print:space (inc space))
                       (println (format "%d, %d, // length: %d"
                                        (nth code 1)
                                        (nth code 2)
                                        (byte->uint16 (list (nth code 1)
                                                            (nth code 2)))))
                       (println "//////////////////////////////////////////////////////////")
-                      (let [[c a _] (dis:prog (nthrest code 3) (+ 4 addr) [] (inc space))]
+                      (let [[c a _] (dis:prog (nthrest code 3) (+ 3 addr) [] (inc space))]
                         (println "//////////////////////////////////////////////////////////")
                         (dis:prog c a data space)))
       (if (or (not (keyword? op_code))
@@ -164,14 +168,14 @@
                          :OPX (:OPX OP)
                          op_code)]
           (if (<= (:OPX OP) op_code2)
-            (println (format " OPX|%s%-4s %d, // params: %d"
-                             (name (dis:key (- op_code2 (:OPX OP)) op))
-                             (if pop "|P," ",")
+            (println (format " OPX|%-8s %d, // params: %d"
+                             (str (name (dis:key (- op_code2 (:OPX OP)) op))
+                                  (if pop "|P," ","))
                              (first code)
                              (inc (byte->uint8 (first code)))))
-            (println (format " OP|%s%-4s %d, // params: %d"
-                             (name (dis:key (- op_code2 (:OP OP)) op))
-                             (if pop "|P," ",")
+            (println (format " OP|%-9s %d, // params: %d"
+                             (str (name (dis:key (- op_code2 (:OP OP)) op))
+                                  (if pop "|P," ","))
                              (first code)
                              (inc (byte->uint8 (first  code))))))
           (dis:prog (rest code) (+ 2 addr) data space))
@@ -179,3 +183,10 @@
         (do
           (println)
           (dis:prog code (inc addr) data space))))))
+
+
+(def whitespace "              ")
+
+(defn print:space
+  ([space]      (print:space space true))
+  ([space addr] (print (str (if addr "        ") (clojure.string/join (repeat space whitespace))))))

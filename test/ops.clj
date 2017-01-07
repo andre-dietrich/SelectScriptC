@@ -167,8 +167,8 @@
 
     (iss false "[1,2] < [1,2];  ")
     (iss true  "[1,2] < [1,2,3];")
-    (iss false "[1,2] < [2,1];  ")
-    (iss false "[1,2] < [2,2];  ")
+    (iss true  "[1,2] < [2,1];  ")
+    (iss true  "[1,2] < [2,2];  ")
     (iss false "[1,2] < None;   ")
 
     (iss false  "{1,2} < {1,3};  ")

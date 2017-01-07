@@ -15,6 +15,8 @@
   (:import  [org.webbitserver WebServer WebServers WebSocketHandler]
             [org.webbitserver.handler StaticFileHandler])
 
+  (:import java.util.Base64)
+
   (:gen-class :main true))
 
 (declare cli-options
@@ -91,8 +93,12 @@
                 (ss:execute @code false)))))))))
 
 (defn on-message [connection message optimization]
-  (let [bytecode (str (list (ss:compile message optimization)))]
-    (.send connection (subs bytecode 2 (- (count bytecode) 2)))))
+  (println message)
+  (println "-----------------------------")
+  (let [bytecode (.encodeToString (Base64/getEncoder)
+                                  (byte-array (ss:compile message optimization)))]
+      (println bytecode)
+      (.send connection bytecode)))
 
 
 (defn ss:server [port opt]

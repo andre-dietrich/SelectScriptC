@@ -22,8 +22,10 @@
 (defn ss:list [elements]
   (list :list elements))
 
-(defn ss:loc [loc extra]
-  (list :loc loc extra))
+(defn ss:loc
+  ([loc extra]      (list :loc loc extra nil))
+  ([loc extra opt]  (list :loc loc extra opt)))
+
 
 (defn ss:loop [elements]
   (list :loop elements))

@@ -67,6 +67,16 @@
 
           :REF          41,
 
+          :IT_INITX     42,
+          :IT_STOREX    43,
+          :CHK_FIRST    44,
+          :RETX         45,
+          :IT_STOREX2   46,
+          :LOC_STEP     47,
+          :LOC_COUNT    48,
+          :IT_CYCLE     49,
+          :IT_UNIQUE    50,
+
           :OP           64,
           :OPX          96})
 
@@ -75,11 +85,13 @@
          cmp:data
 
          cmp:base
+         cmp:connect
          cmp:proc
          cmp:dict
          cmp:exit
          cmp:exit2
          cmp:recur
+         cmp:store_loc
          cmp:str
          cmp:op
          cmp:loop
@@ -90,6 +102,8 @@
          cmp:jump_fwd
          cmp:sp_save
          cmp:pop
+
+         cmp:return_fjump
 
          conc)
 
@@ -112,14 +126,15 @@
       [(conc repo [string]) (count repo)]
       [repo pos])))
 
-(defn cmp:base [code data asm fct sp]
+(defn cmp:base [code data asm fct sp local_vars]
   (cmp (rest code)
        data
        (conc asm (fct (first code)))
-       sp))
+       sp
+       local_vars))
 
 (defn cmp
-  ([code] (let [[data asm] (cmp code [] [] -1)]
+  ([code] (let [[data asm] (cmp code [] [] -1 [])]
             (map #(if (< 127 %) (- % 256) %)
                  (conc [(:SP_SAVEX OP)]
                        (uint8->byte (count data))
@@ -128,51 +143,86 @@
                        bytes
                        (recur (rest d)
                               (conc bytes (+ 2 (count (first d))) (string->byte (first d))))))
-                   (cmp:exit2 (rest asm) -1)))))
+                   (cmp:exit2 (rest asm) 2)))))
 
-  ([code data asm sp]
+  ([code data asm sp local_vars]
    ;(println "->>>>>" code data asm)
    (if (empty? code)
      [data asm]
      (let [[cmd pop asm_] (cmp:cmd (first code) asm)]
        (condp contains? cmd
          ;#{:IT_GROUP}     (cmp:base       (rest code) data asm_ uint8->byte  sp)
-         #{:CST_B}        (cmp:base       (rest code) data asm_ int8->byte   sp)
-         #{:CST_F}        (cmp:base       (rest code) data asm_ float->byte  sp)
-         #{:CST_I}        (cmp:base       (rest code) data asm_ int32->byte  sp)
-         #{:CST_S}        (cmp:base       (rest code) data asm_ int16->byte  sp)
+         #{:CST_B}        (cmp:base       (rest code) data asm_ int8->byte   sp local_vars)
+         #{:CST_F}        (cmp:base       (rest code) data asm_ float->byte  sp local_vars)
+         #{:CST_I}        (cmp:base       (rest code) data asm_ int32->byte  sp local_vars)
+         #{:CST_S}        (cmp:base       (rest code) data asm_ int16->byte  sp local_vars)
          #{:CST_LST
-           :CST_SET}      (cmp:base       (rest code) data asm_ uint16->byte sp)
+           :CST_SET}      (cmp:base       (rest code) data asm_ uint16->byte sp local_vars)
          #{:CALL_FCTX
            :CALL_FCT
-           :IT_GROUP}     (cmp:base       (rest code) data asm_ uint8->byte  sp)
+           :IT_GROUP}     (cmp:base       (rest code) data asm_ uint8->byte  sp local_vars)
          #{:CST_STR
            :LOAD
            :LOC
            :LOCX
-           :STORE
-           :STORE_LOC}    (cmp:str        (rest code) data asm_ sp)
-         #{:OP :OPX}      (cmp:op         (rest code) data asm_ sp)
-         #{:LOOP_BEGIN}   (cmp:loop       (rest code) data asm_ sp)
-         #{:EXIT}         (cmp:exit       (rest code) data asm_ sp)
-         #{:IF}           (cmp:if         (rest code) data asm_ sp)
-         #{:TRY_1}        (cmp:try        (rest code) data asm_ sp)
-         #{:PROC}         (cmp:proc       (rest code) data asm_ sp)
-         #{:CST_DCT}      (cmp:dict       (rest code) data asm_ sp)
-         #{:RECUR}        (cmp:recur      (rest code) data asm_ sp)
-         #{:SP_SAVE}      (cmp:sp_save    (rest code) data asm_ sp)
-         #{:FJUMP_FW_X}   (cmp:jump_fwd   (rest code) data asm_ sp)
-         #{:FJUMP_WHERE}  (cmp:jump_where (rest code) data asm_ sp)
-         #{:FJUMP_BK_X}   (cmp:jump_back  (rest code) data asm_ sp)
-         #{:IT_AS}        (cmp (nthrest code 2) data (conc asm_ (second code)) sp)
-         #{:IT_LIMIT}     (cmp (rest code) data (conc asm_ (:FJUMP OP) (int16->byte 5)) sp)
-         #{:RET_X}        [(rest code) data asm_ pop]
+           :STORE}        (cmp:str          (rest code) data asm_ sp local_vars)
+         #{:STORE_LOC}    (cmp:store_loc    (rest code) data asm_ sp local_vars)
+         #{:OP :OPX}      (cmp:op           (rest code) data asm_ sp local_vars)
+         #{:LOOP_BEGIN}   (cmp:loop         (rest code) data asm_ sp local_vars)
+         #{:EXIT}         (cmp:exit         (rest code) data asm_ sp local_vars)
+         #{:IF}           (cmp:if           (rest code) data asm_ sp local_vars)
+         #{:TRY_1}        (cmp:try          (rest code) data asm_ sp local_vars)
+         #{:PROC}         (cmp:proc         (rest code) data asm_ sp local_vars)
+         #{:CST_DCT}      (cmp:dict         (rest code) data asm_ sp local_vars)
+         #{:RECUR}        (cmp:recur        (rest code) data asm_ sp local_vars)
+         #{:SP_SAVE}      (cmp:sp_save      (rest code) data asm_ sp local_vars)
+         #{:FJUMP_FW_X}   (cmp:jump_fwd     (rest code) data asm_ sp local_vars)
+         #{:FJUMP_WHERE}  (cmp:jump_where   (rest code) data asm_ sp local_vars)
+         #{:FJUMP_BK_X}   (cmp:jump_back    (rest code) data asm_ sp local_vars)
+         #{:RETURN_FJUMP} (cmp:return_fjump (rest code) data asm_ sp local_vars)
+         #{:CONNECT}      (cmp:connect      (rest code) data asm_ sp local_vars)
+         #{:IT_AS}        (cmp (nthrest code 2) data (conc asm_ (second code)) sp local_vars)
+         #{:IT_LIMIT}     (cmp (rest code) data (conc asm_ (:FJUMP OP) (int16->byte 5)) sp local_vars)
+         #{:RET_X}        [(rest code) data asm_ local_vars]
          #{:RET
            :RET_L
-           :RET_P}        [(rest code) data asm_]
-         (cmp (rest code) data asm_ sp))))))
+           :RET_P}        [(rest code) data asm_ local_vars]
+         (cmp (rest code) data asm_ sp local_vars))))))
 
-(defn cmp:dict [[keys & code] data asm sp]
+
+(defn cmp:connect [[_begin _middle _end _p & code] data asm sp local_vars]
+  (with-local-vars [data_ data
+                    asm_begin [] asm_middle [] asm_end []]
+
+    (let [c_begin   (cmp _begin @data_ [] sp local_vars)]
+      (var-set data_     (nth c_begin 1))
+      (var-set asm_begin (nth c_begin 2)))
+
+    (let [c_middle  (cmp _middle @data_ [] sp local_vars)]
+      (var-set data_      (nth c_middle 1))
+      (var-set asm_middle (nth c_middle 2)))
+
+    (let [c_end  (cmp _end @data_ [] sp local_vars)]
+      (var-set data_   (nth c_end 1))
+      (var-set asm_end (nth c_end 2)))
+
+    (cmp code @data_
+         (conc asm
+               (:JUMP OP) (int16->byte (+ 7 (count @asm_begin)))
+               (:SP_SAVE OP) '(:LOC_COUNTER)
+               @asm_begin
+               (:FJUMP OP) (int16->byte (+ 4 _p (count @asm_middle)))
+               (butlast @asm_middle)
+               (:JUMP OP) (int16->byte (- -5 _p (count @asm_middle) (count @asm_begin)))
+               (:RETX OP)
+               @asm_end
+               (:JUMP OP) (int16->byte (- -9 _p (count @asm_middle))))
+               ;(:RET OP))
+         sp local_vars)))
+
+
+
+(defn cmp:dict [[keys & code] data asm sp local_vars]
   (let [[new_data ids] (loop [d data, i [], k keys]
                          (if (empty? k)
                            [d i]
@@ -181,18 +231,20 @@
     (cmp code
          new_data
          (conc asm [(count ids)] ids)
-         sp)))
+         sp
+         local_vars)))
 
-(defn cmp:exit [code data asm sp]
+(defn cmp:exit [code data asm sp local_vars]
   (cmp code
        data
        (conc asm (uint8->byte sp) [:JUMP_FORWARD 0 0])
-       sp))
+       sp
+       local_vars))
 
 
-(defn cmp:if [code data asm sp]
-  (let [then (cmp code data [] sp)]
-    (let [else (cmp (first then) (second then) [] sp)]
+(defn cmp:if [code data asm sp local_vars]
+  (let [then (cmp code data [] sp local_vars)]
+    (let [else (cmp (first then) (second then) [] sp local_vars)]
       (let [count_then (count (nth then 2))
             count_else (count (nth else 2))]
         (cmp (first else)
@@ -213,12 +265,13 @@
                        (conc [(:FJUMP OP)]
                              (int16->byte (+ 2 count_else))
                              (nth else 2)))))
-             sp)))))
+             sp
+             local_vars)))))
 
-(defn cmp:jump_back [code data asm sp]
+(defn cmp:jump_back [code data asm sp local_vars]
   (let [overhead1 (first  code)
         overhead2 (second code)
-        new (cmp (nthrest code 2) data [] sp)]
+        new (cmp (nthrest code 2) data [] sp local_vars)]
     (cmp (first new)
          (second new)
          (concat asm
@@ -227,30 +280,45 @@
                  (nth new 2)
                  [(:JUMP OP)]
                  (int16->byte (- overhead2 (count (nth new 2)))))
-         sp)))
+         sp
+         local_vars)))
 
 
-(defn cmp:jump_fwd [code data asm sp]
+(defn cmp:jump_fwd [code data asm sp local_vars]
   (let [overhead (first code)
-        new (cmp (rest code) data () sp)]
+        new (cmp (rest code) data () sp local_vars)]
     (cmp (first new)
          (second new)
          (concat asm
                  [(:FJUMP OP)]
                  (int16->byte (+ (count (nth new 2)) overhead))
                  (nth new 2))
-         sp)))
+         sp
+         local_vars)))
+
+(defn cmp:return_fjump [code data asm sp local_vars]
+  (let [overhead (first code)
+        new (cmp (rest code) data () sp local_vars)]
+    (cmp (first new)
+         (second new)
+         (concat asm
+                 (nth new 2)
+                 [(:FJUMP OP)
+                  (int16->byte (- overhead (count (nth new 2))))])
+         sp
+         local_vars)))
 
 
-(defn cmp:jump_where [code data asm sp]
-  (let [new (cmp code data [] sp)]
+(defn cmp:jump_where [code data asm sp local_vars]
+  (let [new (cmp code data [] sp local_vars)]
     (cmp (first new)
          (second new)
          (concat asm
                  (nth new 2)
                  [(:FJUMP OP)]
                  (int16->byte (- (- (count (nth new 2))) 5)))
-         sp)))
+         sp
+         local_vars)))
 
 (defn cmp:exit2 [a x]
   (loop [asm a, asm2 []]
@@ -267,12 +335,12 @@
                           (if (= :JUMP_BACK (first asm))
                             (conc [(:JUMP OP)] (int16->byte (- (count asm)
                                                                (count a)
-                                                               2
+                                                               -2
                                                                x)))
                             (first asm))))))))
 
-(defn cmp:loop [code data asm sp]
-  (let [loop_ (cmp code data [] 0)]
+(defn cmp:loop [code data asm sp local_vars]
+  (let [loop_ (cmp code data [] 0 local_vars)]
     (let [asm_ (cmp:exit2 (nth loop_ 2) -2)]
       (cmp (first loop_)
            (second loop_)
@@ -280,19 +348,21 @@
                  asm_
                  (:JUMP OP)
                  (int16->byte (- -1 (count asm_))))
-           sp))))
+           sp
+           local_vars))))
 
 
-(defn cmp:op [[operation params & code] data asm sp]
+(defn cmp:op [[operation params & code] data asm sp local_vars]
   (cmp code
        data
        (conc (drop-last asm)
              [(+ (last asm) (operation op))]
              (uint8->byte params))
-       sp))
+       sp
+       local_vars))
 
 
-(defn cmp:proc [[info code_proc & code] data asm sp]
+(defn cmp:proc [[info code_proc & code] data asm sp local_vars]
   (let [[i_data, i_id] (cmp:data data info)
         proc_asm (cmp code_proc)]
     (cmp code
@@ -301,27 +371,43 @@
                (uint8->byte i_id)
                (uint16->byte (count proc_asm))
                proc_asm)
-         sp)))
+         sp
+         local_vars)))
 
-(defn cmp:recur [code data asm sp]
+(defn cmp:recur [code data asm sp local_vars]
   (cmp code
        data
        (conc asm
              (:REC_SET OP) (uint8->byte sp)
              [:JUMP_BACK 0 0])
-       sp))
+       sp
+       local_vars))
 
-(defn cmp:sp_save [code data asm sp]
-  (let [[c d a] (cmp code data asm (inc sp))]
-    (cmp c d a sp)))
+(defn cmp:sp_save [code data asm sp local_vars]
+  (let [[c d a l] (cmp code data [] (inc sp) local_vars)]
+    (let [l_count (count (nthrest l (count local_vars)))]
+      (cmp c
+           d
+           (conc asm
+                 l_count
+                 (map #(if (= :LOC_COUNTER %) l_count %) a))
+           sp
+           local_vars))))
 
-(defn cmp:str [code data asm sp]
+(defn cmp:store_loc [code data asm sp local_vars]
   (let [[data_ i] (cmp:data data (first code))]
-    (cmp:base (conj (rest code) i) data_ asm list sp)))
+    (cmp code data_ (conc asm i) sp (if (.contains local_vars i)
+                                      local_vars
+                                      (conc local_vars i)))))
 
-(defn cmp:try [code data asm sp]
-  (let [try_code (cmp code data [] sp)]
-    (let [catch_code (cmp (first try_code) (second try_code) [] sp)]
+
+(defn cmp:str [code data asm sp local_vars]
+  (let [[data_ i] (cmp:data data (first code))]
+    (cmp:base (conj (rest code) i) data_ asm list sp local_vars)))
+
+(defn cmp:try [code data asm sp local_vars]
+  (let [try_code (cmp code data [] sp local_vars)]
+    (let [catch_code (cmp (first try_code) (second try_code) [] sp local_vars)]
       (cmp (first  catch_code)
            (second catch_code)
            (conc  asm
@@ -331,7 +417,8 @@
                   (:JUMP OP)
                   (int16->byte (+ 2 (count (nth catch_code 2))))
                   (nth catch_code 2))
-           sp))))
+           sp
+           local_vars))))
 
 
 

@@ -7,6 +7,7 @@
          optimize:op
          optimize:proc
          optimize:sel
+         optimize:connect
          optimize:order
          opt:sort
          opt_op
@@ -35,21 +36,21 @@
       :op    (optimize:op (rest ast))
       :recur (ss:recur (optimize (second ast)))
       :ref   (ss:ref (optimize (second ast)))
-      :sql   (ss:sql (optimize:sel (nth ast 1))
-                     (optimize:sel (nth ast 2))
-                     (optimize (nth ast 3))
-                     (optimize (nth ast 4))
-                     (optimize (nth ast 5))
-                     (optimize (nth ast 6))
-                     (optimize (nth ast 7))
-                     (optimize:order (nth ast 8))
-                     (optimize (nth ast 9))
-                     (nth ast 10))
+      :sql   (ss:sql (optimize:sel      (nth ast 1))     ; from
+                     (optimize:sel      (nth ast 2))     ; select
+                     (optimize          (nth ast 3))     ; where
+                     (optimize          (nth ast 4))     ; start
+                     (optimize:connect  (nth ast 5))     ; connect
+                     (optimize          (nth ast 6))     ; stop
+                     (optimize          (nth ast 7))     ; group
+                     (optimize:order    (nth ast 8))     ; order
+                     (optimize          (nth ast 9))     ; limit
+                     (nth ast 10))                       ; as
       :set   (ss:set  (optimize (second ast)))
       :try   (ss:try  (optimize (second ast))
                       (optimize (last ast)))
       :proc  (optimize:proc (rest ast))
-      :loc   (ss:loc (second ast) (optimize (last ast)))
+      :loc   (ss:loc (nth ast 1) (optimize (nth ast 2)) (nth ast 3))
       :val   ast
       :var   ast
       :opX   (ss:opX (second ast) (optimize (last ast)))
@@ -74,6 +75,16 @@
       (let [[expr dir] (first elem)]
         (recur (rest elem)
                (concat rslt [(list (optimize expr) dir)]))))))
+
+
+(defn optimize:connect [[elem, optimization, cost]]
+  (list (optimize elem)
+        (if (= :memorize (first optimization))
+          (list :memorize (optimize (second optimization)))
+          optimization)
+        (if (not-empty cost)
+          (optimize cost)
+          '())))
 
 
 (defn optimize:sel [params]

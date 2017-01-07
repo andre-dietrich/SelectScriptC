@@ -16,28 +16,28 @@ OR  	: O R   ;
 NOT 	: N O T ;
 IN  	: I N   ;
 
-SHIFTR	: '>>' | 'irshift';
-SHIFTL	: '<<' | 'ilshift';
-IAND	: '&'  | 'iand';
-IXOR	: '^'  | 'ixor';
-IOR		: '|'  | 'ior';
-INV		: '~'  | 'inv';
+SHIFTR	: '>>' ;
+SHIFTL	: '<<' ;
+IAND	: '&'  ;
+IXOR	: '^'  ;
+IOR		: '|'  ;
+INV		: '~'  ;
 
 ASSIGN :  '=' ;
 
-EQ	: '==' | 'eq' ;
-NE	: '!=' | 'ne' ;
-LE	: '<=' | 'le' ;
-GE	: '>=' | 'ge' ;
-LT	:  '<' | 'lt' ;
-GT	:  '>' | 'gt' ;
+EQ	: '==' ;
+NE	: '!=' ;
+LE	: '<=' ;
+GE	: '>=' ;
+LT	:  '<' ;
+GT	:  '>' ;
 
-ADD : '+'  | 'add';
-SUB : '-'  | 'sub';
-MUL : '*'  | 'mul';
-DIV : '/'  | 'div';
-MOD : '%'  | 'mod';
-POW : '**' | 'pow';
+ADD : '+'  ;
+SUB : '-'  ;
+MUL : '*'  ;
+DIV : '/'  ;
+MOD : '%'  ;
+POW : '**' ;
 
 IF	: I F ;
 
@@ -190,22 +190,22 @@ exit
 
 expr
 	:   (special | special2)		# ex_spec
-	|  			MUL 	e1=expr		# ex_ex
-	| 			NOT 	e1=expr		# ex_not
-	| 			ADD 	e1=expr		# ex_pos
-	| 			SUB 	e1=expr		# ex_neg
+	|  				MUL 	e1=expr		# ex_ex
+	| 				NOT 	e1=expr		# ex_not
+	| 				ADD 	e1=expr		# ex_pos
+	| 				SUB 	e1=expr		# ex_neg
 	| e1=expr	POW 	e2=expr		# ex_pow
 	| e1=expr	(DIV
-				|MOD
-				|MUL)	e2=expr		# ex_div_mod_mul
+						|MOD
+						|MUL)	e2=expr		# ex_div_mod_mul
 	| e1=expr	(ADD
-				|SUB)	e2=expr		# ex_add_sub
+						|SUB)	e2=expr		# ex_add_sub
 	| e1=expr	(SHIFTL
-				|SHIFTR) e2=expr	# ex_shift
+						|SHIFTR) e2=expr	# ex_shift
 	| e1=expr 	IAND	e2=expr		# ex_iand
-	| e1=expr	IXOR	e2=expr  	# ex_ixor
-	| e1=expr	IOR		e2=expr		# ex_ior
-	| 			INV		e1=expr		# ex_inot
+	| e1=expr		IXOR	e2=expr  	# ex_ixor
+	| e1=expr		IOR		e2=expr		# ex_ior
+	| 					INV		e1=expr		# ex_inot
  	| e1=expr 	LT		e2=expr		# ex_lt
 	| e1=expr 	LE		e2=expr		# ex_le
 	| e1=expr 	GE		e2=expr		# ex_ge
@@ -247,7 +247,8 @@ list
 ;
 
 loc
-	: (id_=IDENTIFIER)? LOC (LOC '(' extra_=stmt ')')?
+	: (id_=IDENTIFIER)? LOC (LOC (	'(' extra_=stmt ')'
+									| extra2_ = IDENTIFIER ))?
 ;
 
 loop
@@ -294,16 +295,15 @@ selection
 
 sel_as
 	: AS   //( AS_LIST | AS_SET | AS_VALUE | AS_DICT | AS_VOID |
-	  IDENTIFIER ('(' params_=stmt_list ')')?
+	  IDENTIFIER
+	  ('(' params_=stmt_list ')')?
 ;
 
 sel_connect
 	: CONNECT BY
-		(NO CYCLE)?
-		(UNIQUE)?
-		(MEMORIZE mem_=stmt)?
+		( (NO CYCLE) | (UNIQUE) | (MEMORIZE mem_=stmt) )?
 		(COST cost_=stmt)?
-		stmt_list
+		elem_ = stmt_list
 ;
 
 sel_dir
