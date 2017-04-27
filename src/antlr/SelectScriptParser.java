@@ -571,21 +571,20 @@ public class SelectScriptParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(136);
-			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,4,_ctx) ) {
-			case 1:
+			switch (_input.LA(1)) {
+			case IDENTIFIER:
 				{
 				setState(130);
 				((ElementContext)_localctx).var_ = variable();
 				}
 				break;
-			case 2:
+			case LOC:
 				{
 				setState(131);
 				((ElementContext)_localctx).loc_ = loc();
 				}
 				break;
-			case 3:
+			case T__0:
 				{
 				setState(132);
 				match(T__0);
@@ -595,6 +594,8 @@ public class SelectScriptParser extends Parser {
 				match(T__1);
 				}
 				break;
+			default:
+				throw new NoViableAltException(this);
 			}
 			setState(155); 
 			_errHandler.sync(this);
@@ -1955,9 +1956,9 @@ public class SelectScriptParser extends Parser {
 	}
 
 	public static class LocContext extends ParserRuleContext {
-		public Token id_;
 		public StmtContext extra_;
 		public Token extra2_;
+		public Token id_;
 		public List<TerminalNode> LOC() { return getTokens(SelectScriptParser.LOC); }
 		public TerminalNode LOC(int i) {
 			return getToken(SelectScriptParser.LOC, i);
@@ -1983,49 +1984,49 @@ public class SelectScriptParser extends Parser {
 	public final LocContext loc() throws RecognitionException {
 		LocContext _localctx = new LocContext(_ctx, getState());
 		enterRule(_localctx, 28, RULE_loc);
-		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(300);
-			_la = _input.LA(1);
-			if (_la==IDENTIFIER) {
-				{
-				setState(299);
-				((LocContext)_localctx).id_ = match(IDENTIFIER);
-				}
-			}
-
-			setState(302);
+			setState(299);
 			match(LOC);
-			setState(311);
+			setState(308);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,26,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,25,_ctx) ) {
 			case 1:
 				{
-				setState(303);
-				match(LOC);
-				setState(309);
+				setState(305);
 				switch (_input.LA(1)) {
 				case T__0:
 					{
-					setState(304);
+					setState(300);
 					match(T__0);
-					setState(305);
+					setState(301);
 					((LocContext)_localctx).extra_ = stmt();
-					setState(306);
+					setState(302);
 					match(T__1);
 					}
 					break;
 				case IDENTIFIER:
 					{
-					setState(308);
+					setState(304);
 					((LocContext)_localctx).extra2_ = match(IDENTIFIER);
 					}
 					break;
 				default:
 					throw new NoViableAltException(this);
 				}
+				setState(307);
+				match(LOC);
+				}
+				break;
+			}
+			setState(311);
+			_errHandler.sync(this);
+			switch ( getInterpreter().adaptivePredict(_input,26,_ctx) ) {
+			case 1:
+				{
+				setState(310);
+				((LocContext)_localctx).id_ = match(IDENTIFIER);
 				}
 				break;
 			}
@@ -3933,7 +3934,7 @@ public class SelectScriptParser extends Parser {
 		"\f\3\f\7\f\u010b\n\f\f\f\16\f\u010e\13\f\5\f\u0110\n\f\3\f\3\f\3\r\3\r"+
 		"\3\r\5\r\u0117\n\r\3\r\3\r\3\16\3\16\3\16\3\16\3\16\3\16\3\16\5\16\u0122"+
 		"\n\16\5\16\u0124\n\16\3\16\3\16\3\17\3\17\5\17\u012a\n\17\3\17\3\17\3"+
-		"\20\5\20\u012f\n\20\3\20\3\20\3\20\3\20\3\20\3\20\3\20\5\20\u0138\n\20"+
+		"\20\3\20\3\20\3\20\3\20\3\20\5\20\u0134\n\20\3\20\5\20\u0137\n\20\3\20"+
 		"\5\20\u013a\n\20\3\21\3\21\3\21\3\22\3\22\3\22\3\22\3\22\5\22\u0144\n"+
 		"\22\3\22\5\22\u0147\n\22\3\22\3\22\3\22\3\23\3\23\3\23\5\23\u014f\n\23"+
 		"\3\23\3\23\3\23\5\23\u0154\n\23\7\23\u0156\n\23\f\23\16\23\u0159\13\23"+
@@ -3956,7 +3957,7 @@ public class SelectScriptParser extends Parser {
 		"\f\16\23\26!\u0256\2Y\3\2\2\2\4]\3\2\2\2\6o\3\2\2\2\bq\3\2\2\2\n|\3\2"+
 		"\2\2\f\u0082\3\2\2\2\16\u008a\3\2\2\2\20\u00a1\3\2\2\2\22\u00bc\3\2\2"+
 		"\2\24\u0103\3\2\2\2\26\u0105\3\2\2\2\30\u0113\3\2\2\2\32\u011a\3\2\2\2"+
-		"\34\u0127\3\2\2\2\36\u012e\3\2\2\2 \u013b\3\2\2\2\"\u013e\3\2\2\2$\u015a"+
+		"\34\u0127\3\2\2\2\36\u012d\3\2\2\2 \u013b\3\2\2\2\"\u013e\3\2\2\2$\u015a"+
 		"\3\2\2\2&\u015c\3\2\2\2(\u0163\3\2\2\2*\u0169\3\2\2\2,\u016c\3\2\2\2."+
 		"\u0186\3\2\2\2\60\u018e\3\2\2\2\62\u019d\3\2\2\2\64\u019f\3\2\2\2\66\u01a2"+
 		"\3\2\2\28\u01a6\3\2\2\2:\u01ab\3\2\2\2<\u01b7\3\2\2\2>\u01c7\3\2\2\2@"+
@@ -4032,11 +4033,11 @@ public class SelectScriptParser extends Parser {
 		"\2\2\u0123\u0124\3\2\2\2\u0124\u0125\3\2\2\2\u0125\u0126\7\4\2\2\u0126"+
 		"\33\3\2\2\2\u0127\u0129\7%\2\2\u0128\u012a\5N(\2\u0129\u0128\3\2\2\2\u0129"+
 		"\u012a\3\2\2\2\u012a\u012b\3\2\2\2\u012b\u012c\7&\2\2\u012c\35\3\2\2\2"+
-		"\u012d\u012f\7Q\2\2\u012e\u012d\3\2\2\2\u012e\u012f\3\2\2\2\u012f\u0130"+
-		"\3\2\2\2\u0130\u0139\7\63\2\2\u0131\u0137\7\63\2\2\u0132\u0133\7\3\2\2"+
-		"\u0133\u0134\5L\'\2\u0134\u0135\7\4\2\2\u0135\u0138\3\2\2\2\u0136\u0138"+
-		"\7Q\2\2\u0137\u0132\3\2\2\2\u0137\u0136\3\2\2\2\u0138\u013a\3\2\2\2\u0139"+
-		"\u0131\3\2\2\2\u0139\u013a\3\2\2\2\u013a\37\3\2\2\2\u013b\u013c\7B\2\2"+
+		"\u012d\u0136\7\63\2\2\u012e\u012f\7\3\2\2\u012f\u0130\5L\'\2\u0130\u0131"+
+		"\7\4\2\2\u0131\u0134\3\2\2\2\u0132\u0134\7Q\2\2\u0133\u012e\3\2\2\2\u0133"+
+		"\u0132\3\2\2\2\u0134\u0135\3\2\2\2\u0135\u0137\7\63\2\2\u0136\u0133\3"+
+		"\2\2\2\u0136\u0137\3\2\2\2\u0137\u0139\3\2\2\2\u0138\u013a\7Q\2\2\u0139"+
+		"\u0138\3\2\2\2\u0139\u013a\3\2\2\2\u013a\37\3\2\2\2\u013b\u013c\7B\2\2"+
 		"\u013c\u013d\5L\'\2\u013d!\3\2\2\2\u013e\u0143\7)\2\2\u013f\u0140\7\3"+
 		"\2\2\u0140\u0141\5$\23\2\u0141\u0142\7\4\2\2\u0142\u0144\3\2\2\2\u0143"+
 		"\u013f\3\2\2\2\u0143\u0144\3\2\2\2\u0144\u0146\3\2\2\2\u0145\u0147\7K"+
@@ -4111,7 +4112,7 @@ public class SelectScriptParser extends Parser {
 		"\2\u0213\u020f\3\2\2\2\u0213\u0210\3\2\2\2\u0213\u0211\3\2\2\2\u0213\u0212"+
 		"\3\2\2\2\u0214S\3\2\2\2\u0215\u0216\7Q\2\2\u0216U\3\2\2\2<[ow\u0082\u008a"+
 		"\u0092\u009b\u009d\u009f\u00a3\u00a8\u00ba\u00bc\u00f1\u00f3\u00fb\u00ff"+
-		"\u0103\u010c\u010f\u0116\u0121\u0123\u0129\u012e\u0137\u0139\u0143\u0146"+
+		"\u0103\u010c\u010f\u0116\u0121\u0123\u0129\u0133\u0136\u0139\u0143\u0146"+
 		"\u014e\u0153\u0157\u015a\u015f\u0169\u016c\u0170\u0173\u0178\u017b\u017e"+
 		"\u0181\u0184\u018c\u0195\u0199\u01ab\u01b0\u01b4\u01bb\u01c0\u01c4\u01d7"+
 		"\u01ef\u01fa\u0201\u0209\u0213";

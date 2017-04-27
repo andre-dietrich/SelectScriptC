@@ -247,8 +247,7 @@ list
 ;
 
 loc
-	: (id_=IDENTIFIER)? LOC (LOC (	'(' extra_=stmt ')'
-									| extra2_ = IDENTIFIER ))?
+	: LOC ((	'(' extra_=stmt ')' | extra2_ = IDENTIFIER ) LOC)? (id_=IDENTIFIER)?
 ;
 
 loop

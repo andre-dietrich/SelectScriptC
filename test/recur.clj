@@ -9,7 +9,7 @@
 (deftest fak
   (let [env (vm:init 100 100 0)]
     (iss  22  "fak = proc(x, rslt:1)                                        "
-              "      : IF (x$, recur(x$-1, rslt$*x$), rslt$);               "
+              "      : IF ($x, recur($x-1, $rslt*$x), $rslt);               "
               "22;                                                          ")
     (iss  1   "fak(0);")
     (iss  1   "fak(1);")
@@ -21,11 +21,11 @@
 
 (deftest ackermann
   (let [env (vm:init 100 100 0)]
-    (iss  22  "A = PROC(m, n) : IF ( not m$,                                "
-              "                      n$ + 1,                                "
-              "                      IF ( not n$,                           "
-              "                           recur( m$ - 1, 1),                "
-              "                           recur( m$ - 1, A(m$, n$ - 1))));  "
+    (iss  22  "A = PROC(m, n) : IF ( not $m,                                "
+              "                      $n + 1,                                "
+              "                      IF ( not $n,                           "
+              "                           recur( $m - 1, 1),                "
+              "                           recur( $m - 1, A($m, $n - 1))));  "
               "22;                                                          ")
     (iss   1  "A(0,0);")
     (iss   2  "A(1,0);")

@@ -26,9 +26,9 @@
          "    AS list;          ")
     (iss [[9 0] [8 1] [7 2] [6 3] [5 4]
           [4 5] [3 6] [2 7] [1 8] [0 9]]
-         "SELECT [a$, b$]     "
+         "SELECT [$a, $b]     "
          "  FROM a, b:a       "
-         " WHERE a$+b$==9     "
+         " WHERE $a+$b==9     "
          "    AS list;        ")))
 
 (deftest simple_dict
@@ -37,7 +37,7 @@
          "a = [0,1,2,3,4];")
     (iss {"a" [0 1 2 3 4 0 1 2 3 4 0 1 2 3 4 0 1 2 3 4 0 1 2 3 4]
           "b" [0 0 0 0 0 1 1 1 1 1 2 2 2 2 2 3 3 3 3 3 4 4 4 4 4]}
-         "c = SELECT a$, b$ FROM a, b:a AS dict;")
+         "c = SELECT $a, $b FROM a, b:a AS dict;")
     (iss [[0 0] [1 1] [2 2] [3 3] [4 4]]
          "SELECT [$['a'], $['b']]   "
          "  FROM c                  "
@@ -59,10 +59,10 @@
     (iss [[4 0 4] [0 4 4] [3 0 3]
           [0 3 3] [2 0 2] [0 2 2]
           [1 0 1] [0 1 1] [0 0 0]]
-         "  SELECT [a$, b$, c$]        "
+         "  SELECT [$a, $b, $c]        "
          "    FROM a, b:a, c:a         "
-         "   WHERE a$**2+b$**2==c$**2  "
-         "ORDER BY c$ DESC             "
+         "   WHERE $a**2+$b**2==$c**2  "
+         "ORDER BY $c DESC             "
          "      AS list;               ")))
 
 (deftest simple_order2
@@ -74,10 +74,10 @@
            "9" [[9 0 9] [0 9 9]]
           "16" [[16 0 16] [0 16 16]]}
 
-         "  SELECT [a$**2, b$**2, c$**2]   "
+         "  SELECT [$a**2, $b**2, $c**2]   "
          "    FROM a, b:a, c:a             "
-         "   WHERE a$**2+b$**2==c$**2      "
-         "GROUP BY c$**2                   "
+         "   WHERE $a**2+$b**2==$c**2      "
+         "GROUP BY $c**2                   "
          "       AS list;                  ")))
 
 (deftest simple_limit
@@ -102,10 +102,10 @@
   (let [env (vm:init 100 100 0)]
     (iss [["red" "green" "green" "red"] ["green" "red" "red" "green"]]
          "colors = ['red', 'green'];                              "
-         "neighbours = [[PROC:a$, PROC:b$], [PROC:a$, PROC:c$],   "
-         "              [PROC:b$, PROC:d$], [PROC:c$, PROC:d$]];  "
+         "neighbours = [[PROC:$a, PROC:$b], [PROC:$a, PROC:$c],   "
+         "              [PROC:$b, PROC:$d], [PROC:$c, PROC:$d]];  "
          "                                                        "
-         "SELECT [a$, b$, c$, d$]                                 "
+         "SELECT [$a, $b, $c, $d]                                 "
          "  FROM a:colors, b:colors, c:colors, d:colors           "
          " WHERE not (SELECT $                                    "
          "              FROM neighbours                           "

@@ -34,3 +34,6 @@ runtime/dynamic/dynamic_set.o
 runtime/dynamic/ss_string.o
 runtime/lib2s.so
 >>>>>>> clean_master/master
+hs_err_pid18155.log
+hs_err_pid2585.log
+hs_err_pid2821.log

@@ -25,27 +25,27 @@
 
 (deftest procedure_3
   (let [env (vm:init 100 100 0)]
-    (iss 1  "p = PROC (a,b): a$ + b$;"
+    (iss 1  "p = PROC (a,b): $a + $b;"
             "a=1; b=1;")
     (iss 2  "p(a , b);    ")
     (iss 2  "p(1 , 1);    ")
     (iss 5  "p(2*a , 3*b);")
 
-    (iss 4  "p = PROC (a,b): (a=22; a$ + b$;);"
+    (iss 4  "p = PROC (a,b): (a=22; $a + $b;);"
             "p(2 , 2);    ")
     (iss 22 "a;           ")))
 
 (deftest procedure_4
   (let [env (vm:init 100 100 0)]
-    (iss 1  "p = PROC : ( b = PROC(a) : 3*a$;       "
+    (iss 1  "p = PROC : ( b = PROC(a) : 3*$a;       "
             "             b(2)*b(3);           ); 1;")
     (iss 54 "p();    ")
     (iss 54 "p();    ")))
 
 (deftest procedure_5
   (let [env (vm:init 100 100 0)]
-    (iss 1  "fak = PROC(x): if(x$,"
-            "                  x$*fak(x$ - 1),"
+    (iss 1  "fak = PROC(x): if($x,"
+            "                  $x*fak($x - 1),"
             "                  1); 1;")
     (iss   1  "fak(0);    ")
     (iss   1  "fak(1);    ")
@@ -57,7 +57,7 @@
 
 (deftest procedure_6
   (let [env (vm:init 100 100 0)]
-    (iss 1  "p = PROC(x, y): x$ + str(y$) ; 1;      ")
+    (iss 1  "p = PROC(x, y): $x + str($y) ; 1;      ")
     (iss [] "x = [];                                ")
     (iss ["22"]         "x@p(22);")
     (iss ["22", "22"]   "x@p(22);")))
