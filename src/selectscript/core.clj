@@ -37,8 +37,8 @@
    ["-p" "--parse-tree"  "print parsetree"              :default false  :assoc-fn (fn [m k _] (update-in m [k] not))]
    ["-x" "--execute"     "Run the program"              :default false  :assoc-fn (fn [m k _] (update-in m [k] not))]
    ["-r" "--repl"        "interactive"                  :default false  :assoc-fn (fn [m k _] (update-in m [k] not))]
-   ["-s" "--server"     "run compiler as web-server"    :default false  :assoc-fn (fn [m k _] (update-in m [k] not))]
-   [nil  "--port"       "server port"                   :default 8080   :parse-fn #(Integer/parseInt %)]
+   ["-s" "--server"      "run compiler as web-server"   :default false  :assoc-fn (fn [m k _] (update-in m [k] not))]
+   [nil  "--port"        "server port"                  :default 8080   :parse-fn #(Integer/parseInt %)]
    ;; A boolean option defaulting to nil
    ["-h" "--help"]])
 
