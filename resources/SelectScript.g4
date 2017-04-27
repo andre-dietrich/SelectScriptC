@@ -39,6 +39,8 @@ DIV : '/'  ;
 MOD : '%'  ;
 POW : '**' ;
 
+PIPE : '|>' ;
+
 IF	: I F ;
 
 SQ 	: '\'';
@@ -49,8 +51,6 @@ LIST_END   : ']' ;
 
 DICT_BEGIN : '{' ;
 DICT_END   : '}' ;
-
-//DOLLAR : '$';
 
 PROCEDURE:  P R O C (E D U R E)? ;
 
@@ -254,6 +254,10 @@ loop
 	: LOOP do_=stmt
 ;
 
+pipe
+	: (e = expr) (PIPE fct += function)+
+;
+
 procedure
 	: PROCEDURE
 	  ( '(' params_ = procedure_params ')' )?
@@ -371,6 +375,7 @@ special2
 
 stmt
 	: assign
+	| pipe
 	| expr
 	| procedure
 	| exit

@@ -34,6 +34,7 @@
          -list
          -loc
          -loop
+         -pipe
          -procedure
          -procedure_params
          -prog
@@ -86,6 +87,7 @@
     (visitList         [ctx] (-list         ctx))
     (visitLoc          [ctx] (-loc          ctx))
     (visitLoop         [ctx] (-loop         ctx))
+    (visitPipe         [ctx] (-pipe         ctx))
     (visitProcedure    [ctx] (-procedure    ctx))
     (visitProcedure_params [ctx] (-procedure_params    ctx))
     (visitProg         [ctx] (-prog         ctx))
@@ -301,6 +303,16 @@
               "step"    :LOC_STEP
               "count"   :LOC_COUNT
               nil))))
+
+(defn -pipe [ctx]
+  (loop [fct (map visit (.fct ctx)), e (visit (.e ctx))]
+    (if (empty? fct)
+      e
+      (let [[f, name, parameter] (first fct)]
+        (recur (rest fct)
+               (ss:fct name (if (empty? parameter)
+                              [e]
+                              (concat [e] [parameter]))))))))
 
 (defn -procedure [ctx]
   (ss:proc (if (.params_ ctx)
