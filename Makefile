@@ -14,4 +14,4 @@ antlr:
 	-long-messages SelectScript.g4
 
 clean:
-	cd runtime; make clean
+	cd SandhillSkipper; make clean
