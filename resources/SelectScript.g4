@@ -143,7 +143,7 @@ fragment M : ('M'|'m') ; fragment Z : ('Z'|'z') ;
  *------------------------------------------------------------------*/
 
 prog
-	: (elem_ += stmt END)+
+	: (elem_ += stmt) (END elem_ += stmt)* END?
 ;
 
 assign
