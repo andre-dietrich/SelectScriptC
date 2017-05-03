@@ -227,6 +227,12 @@ public interface SelectScriptVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitEx_eq(SelectScriptParser.Ex_eqContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link SelectScriptParser#import_s2}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitImport_s2(SelectScriptParser.Import_s2Context ctx);
+	/**
 	 * Visit a parse tree produced by {@link SelectScriptParser#function}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -274,6 +280,12 @@ public interface SelectScriptVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitPipe(SelectScriptParser.PipeContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link SelectScriptParser#pipe_allowed}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPipe_allowed(SelectScriptParser.Pipe_allowedContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link SelectScriptParser#procedure}.
 	 * @param ctx the parse tree

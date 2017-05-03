@@ -17,7 +17,8 @@
     (iss  6   "fak(3);")
     (iss  24  "fak(4);")
     (iss  120 "fak(5);")
-    (iss  720 "fak(6);")))
+    (iss  720 "fak(6);")
+    (vm:exit env)))
 
 (deftest ackermann
   (let [env (vm:init 100 100 0)]
@@ -54,4 +55,5 @@
     (iss   7  "A(0,6);")
     (iss   8  "A(1,6);")
     (iss  15  "A(2,6);")
-    (iss 509  "A(3,6);")))
+    (iss 509  "A(3,6);")
+    (vm:exit env)))

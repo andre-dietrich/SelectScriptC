@@ -20,7 +20,9 @@
     (iss {"a_1" 1, "a_2" [1 2 3], "a_3" ["ababab" #{3 4}]}
          "dict_ = {'a_1': 1, 'a_2': [1, 2, 3], a_3: list_[5]};              ")
     (iss {"a_1" 1, "a_2" [1 2 3], "a_3" ["ababab", #{3 99}]}
-         "dict_['a_3', 1, 1] = 99; dict_;")))
+         "dict_['a_3', 1, 1] = 99; dict_;")
+    (vm:exit env)))
+
 
 (deftest listing_2
   (let [env (vm:init 100 100 0)]
@@ -39,7 +41,9 @@
          "          product = product * counter;      # var = IF (..,..,..);"
          "      );                                    #                     "
          "  );                                        # var = SELECT .. ;   "
-         "fac(5);                                                           ")))
+         "fac(5);                                                           ")
+    (vm:exit env)))
+
 
 (deftest listing_3
   (let [env (vm:init 100 100 0)]
@@ -48,18 +52,19 @@
     (iss 120        "fac2 = PROC(x)                                     "
                     "'Calculate factorial for given x with recursion.'  "
                     ": IF ( $x, $x * fac2($x - 1), 1);                  "
-                    "fac2(5); ")))
+                    "fac2(5); ")
+    (vm:exit env)))
 
 
 (deftest listing_4
   (let [env (vm:init 100 100 0)]
     (iss   {"dietrich" ["analogRead" "pinRead" "pinWrite"]
-            "nardi"    ["analogRead" "pinRead"]
+            "fessel"   ["analogRead" "pinRead"]
             "zug"      ["analogRead" "pinRead"]}
 
-          "db_user = {id:   [    1     ,   2   ,    3   ],                  "
-          "           name: ['dietrich', 'zug' , 'nardi'],                  "
-          "           pass: ['pretty'  , 'c00l', 'sofar']};                 "
+          "db_user = {id:   [    1     ,   2   ,     3   ],                  "
+          "           name: ['dietrich', 'zug' , 'fessel'],                  "
+          "           pass: ['pretty'  , 'c00l', 'sofar' ]};                 "
           "                                                                 "
           "db_func = [['analogRead', [3, 1, 2]], ['pinWrite', [1, 7, 9]],   "
           "           ['pinRead',    [1, 3, 2]], ['serial',   [2, 1, 5]]];  "
@@ -75,7 +80,9 @@
           "   GROUP BY $db_user['name']                                     "
           "      LIMIT 7                                                    "
           "         AS list;    # or AS void, value, list, set, dict        "
-          "                                                                 ")))
+          "                                                                 ")
+    (vm:exit env)))
+
 
 (deftest listing_5
   (let [env (vm:init 100 100 0)]
@@ -92,7 +99,9 @@
     (iss    true
             "<=(*a);")
     (iss    false
-            "!=(1, *a);")))
+            "!=(1, *a);")
+    (vm:exit env)))
+
 
 (deftest listing_6
   (let [env (vm:init 100 100 0)]
@@ -103,13 +112,14 @@
     (iss    [10 11 10 11 15 11 10 12 12]
             "Map = SELECT int($) FROM dist;                             ")
     (iss    [nil 10.766667 11.133334 12.5 12.699999 12.5 11.599999 12.033332 nil]
-            "MapEx = SELECT try( ($(-1)$ + $ + $(1)$) / 3.0,            "
+            "MapEx = SELECT try( ($[-1]$ + $ + $[1]$) / 3.0,            "
             "                    None )                                 "
             "          FROM dist;                                       ")
     (iss    11.833333
             "Reduce = (SELECT $sum@+($) FROM dist                       "
             "      START WITH $sum=0                                    "
-            "              AS void) / len(dist);                        ")))
+            "              AS void) / len(dist);                        ")
+    (vm:exit env)))
 
 
 (deftest listing_7
@@ -138,4 +148,5 @@
             "                                                              "
             "ir_array = [ref ir0, ref ir1, ref ir2, ref ir3, ref ir4];     "
             "                                                              "
-            "dist = select $.read() from ir_array;                         ")))
+            "dist = select $.read() from ir_array;                         ")
+    (vm:exit env)))

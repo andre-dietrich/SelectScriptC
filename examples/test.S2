@@ -1,0 +1,8 @@
+import("examples/filter.S2");
+
+db = {temp: [1,1,2,3,4,5,6,4,3,2,1]};
+
+clean = db.temp
+        |> filter(PROC(x):if($x < 1.5, 1.5, $x))  # minimum filter
+        |> filter(PROC(x):if($x > 4.5, 4.5, $x))  # maximum filter
+        |> mean() ;                               #

@@ -13,7 +13,8 @@
     (iss  22    "a=-a;  ")
     (iss  22.2  "a=22.2;")
     (iss -22.2  "a=-a;  ")
-    (iss  22.2  "a=-a;  ")))
+    (iss  22.2  "a=-a;  ")
+    (vm:exit env)))
 
 
 (deftest addition
@@ -29,7 +30,8 @@
            [1,2,1,2]] "a=22+a;        ")
     (iss #{1 2}       "a={1}; a=a+2;  ")
     (iss #{1 2}       "a=a+2;         ")
-    (iss #{1 2 3}     "a=a+3;         ")))
+    (iss #{1 2 3}     "a=a+3;         ")
+    (vm:exit env)))
 
 (deftest substitution
   (let [env (vm:init 100 100 0)]
@@ -38,7 +40,8 @@
     (iss -23    "a=-22;   a=a-1; ")
     (iss -23.0  "a=-22.0; a=a-1; ")
     (iss  21    "a=22;    a=a-True; ")
-    (iss  21.0  "a=22.0;  a=a-True; ")))
+    (iss  21.0  "a=22.0;  a=a-True; ")
+    (vm:exit env)))
 
 
 (deftest multiplication
@@ -53,7 +56,8 @@
     (iss          []  "a=[1,2,3]; a*0;  ")
     (iss     [1 2 3]  "a=[1,2,3]; a*1;  ")
     (iss [33 2 3 33
-          2 3 33 2 3] "a=[33,2,3]; a*3; ")))
+          2 3 33 2 3] "a=[33,2,3]; a*3; ")
+    (vm:exit env)))
 
 
 (deftest division
@@ -61,14 +65,16 @@
     (iss  11   "a=22;  a/2;   ")
     (iss  44.0 "a=22;  a/0.5; ")
     (iss -11   "a=-22; a/2;   ")
-    (iss -44.0  "a=-22; a/0.5; ")))
+    (iss -44.0  "a=-22; a/0.5; ")
+    (vm:exit env)))
 
 
 (deftest modulo
   (let [env (vm:init 100 100 0)]
     (iss  0  "a=22;  a % 2; ")
     (iss  1  "a=22;  a % 3; ")
-    (iss  1  "a=22.; a % 3; ")))
+    (iss  1  "a=22.; a % 3; ")
+    (vm:exit env)))
 
 
 (deftest power
@@ -94,7 +100,8 @@
     (iss 1.414222 "a** 0.5;")
     (iss 2.828460 "a** 1.5;")
     (iss 0.353555 "a**-1.5;")
-    (iss 0.707111 "a**-0.5;")))
+    (iss 0.707111 "a**-0.5;")
+    (vm:exit env)))
 
 (deftest AND
   (let [env (vm:init 100 100 0)]
@@ -104,7 +111,8 @@
     (iss false "false and false;")
 
     (iss nil   "true  and none; ")
-    (iss false "false and none;")))
+    (iss false "false and none;")
+    (vm:exit env)))
 
 (deftest OR
   (let [env (vm:init 100 100 0)]
@@ -114,7 +122,8 @@
     (iss false "false or false;")
 
     (iss true  "true  or none; ")
-    (iss nil   "false or none; ")))
+    (iss nil   "false or none; ")
+    (vm:exit env)))
 
 (deftest XOR
   (let [env (vm:init 100 100 0)]
@@ -124,14 +133,16 @@
     (iss false "false xor false;")
 
     (iss nil   "true  xor none; ")
-    (iss nil   "false xor none; ")))
+    (iss nil   "false xor none; ")
+    (vm:exit env)))
 
 
 (deftest NOT
   (let [env (vm:init 100 100 0)]
     (iss false "not true; ")
     (iss true  "not false;")
-    (iss nil   "not none; ")))
+    (iss nil   "not none; ")
+    (vm:exit env)))
 
 
 (deftest EQ
@@ -153,7 +164,8 @@
 
     (iss true  "{1,2} == {1,2};  ")
     (iss true  "{1,2} == {2,1};  ")
-    (iss false "{1,2} == {1,2,3};")))
+    (iss false "{1,2} == {1,2,3};")
+    (vm:exit env)))
 
 (deftest LT
   (let [env (vm:init 100 100 0)]
@@ -174,7 +186,8 @@
     (iss false  "{1,2} < {1,3};  ")
     (iss false  "{1,3} < {1,2};  ")
     (iss true   "{1,2} < {1,2,3};")
-    (iss false  "{1,2,3} < {1,2};")))
+    (iss false  "{1,2,3} < {1,2};")
+    (vm:exit env)))
 
 
 (deftest GT
@@ -196,7 +209,8 @@
     (iss false  "{1,3} > {1,2};  ")
     (iss false  "{1,2} > {1,3};  ")
     (iss true   "{1,2,3} > {1,2};")
-    (iss false  "{1,2} > {1,2,3};")))
+    (iss false  "{1,2} > {1,2,3};")
+    (vm:exit env)))
 
 (deftest IN
   (let [env (vm:init 100 100 0)]
@@ -204,29 +218,40 @@
     (iss false "55 in a;")
 
     (iss true  "a={2,3,1}; 3 in a;")
-    (iss false "55 in a;")))
+    (iss false "55 in a;")
+    (vm:exit env)))
+
 
 (deftest IAND
   (let [env (vm:init 100 100 0)]
     (iss 8    "12&9; ")
-    (iss 4    "12&6; ")))
+    (iss 4    "12&6; ")
+    (vm:exit env)))
+
 
 (deftest IOR
   (let [env (vm:init 100 100 0)]
     (iss 111 "11|100;")
-    (iss 203 "11|200;")))
+    (iss 203 "11|200;")
+    (vm:exit env)))
+
 
 (deftest IXOR
   (let [env (vm:init 100 100 0)]
     (iss 110 "11^101;")
-    (iss 194 "11^201;")))
+    (iss 194 "11^201;")
+    (vm:exit env)))
+
 
 (deftest INV
   (let [env (vm:init 100 100 0)]
     (iss -12 "~11; ")
-    (iss   1 "~-2;")))
+    (iss   1 "~-2;")
+    (vm:exit env)))
+
 
 (deftest SHIFT
   (let [env (vm:init 100 100 0)]
     (iss 2048 "1<<11; ")
-    (iss    1 "2048>>11;")))
+    (iss    1 "2048>>11;")
+    (vm:exit env)))

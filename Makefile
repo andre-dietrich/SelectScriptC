@@ -14,4 +14,7 @@ antlr:
 	-long-messages SelectScript.g4
 
 clean:
+	rm -f hs_err_pid*.log
+	rm native/linux-x86-64/libS2.so
+	lein clean
 	cd SandhillSkipper; make clean

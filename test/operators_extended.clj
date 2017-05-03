@@ -18,7 +18,8 @@
     (iss  "16str"               "+(*a,1,'str'); ")
 
     (iss  [1,2,3,4,5,6]         "a@+(6);        ")
-    (iss  [1,2,3,4,5,6,"str"]   "a@+('str');    ")))
+    (iss  [1,2,3,4,5,6,"str"]   "a@+('str');    ")
+    (vm:exit env)))
 
 (deftest negative
   (let [env (vm:init 100 100 0)]
@@ -29,7 +30,8 @@
 
     (iss  #{1 2 3 4 5}          "a={1,2,3,4,5}; ")
     (iss  #{2 3 4 5}            "-(a,1);        ")
-    (iss  #{2 3 4 5}            "a@-(1);        ")))
+    (iss  #{2 3 4 5}            "a@-(1);        ")
+    (vm:exit env)))
 
 (deftest star
   (let [env (vm:init 100 100 0)]
@@ -43,11 +45,13 @@
            5,1,2,3,4,5]         "*(2,a,2);      ")
     (iss  [1,2,3,4,5,1,2,
            3,4,5,1,2,3,4,
-           5,1,2,3,4,5]         "a@*(4);        ")))
+           5,1,2,3,4,5]         "a@*(4);        ")
+    (vm:exit env)))
 
 (deftest not_equal
   (let [env (vm:init 100 100 0)]
     (iss [1 2 3 4 5]    "a=[1,2,3,4,5]; ")
     (iss true           "!=(*a);        ")
-    (iss true           "!=(*a,a);      ")))
+    (iss true           "!=(*a,a);      ")
     ;(iss false          "!=(*a,a,*a);   ")))
+    (vm:exit env)))

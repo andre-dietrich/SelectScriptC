@@ -23,7 +23,8 @@
          ss:execute
          ss:compile
          ss:repl
-         ss:server)
+         ss:server
+         ss:print-errors)
 
 
 (def cli-options
@@ -52,53 +53,62 @@
                 "                                       |_|        \n"))
 
   (let [{:keys [options arguments errors summary]} (parse-opts args cli-options)]
-    (if (:help options)
-      (println summary)
-      (if (:repl options)
-        (ss:repl (:optimize options))
-        (if (:server options)
-          (ss:server (:port options) (:optimize options))
-          (if (empty? arguments)
-            (ss:repl (:optimize options))
-            (with-local-vars [code (slurp (first arguments))]
+    (cond
+      (:help options)         (println    summary)
+      (:server options)       (ss:server  (:port options)
+                                          (:optimize options))
+      (or (:repl options)
+        (empty? arguments))   (ss:repl    (:optimize options))
+      :else (with-local-vars [code (slurp (first arguments))]
               (var-set code (parse @code))
-              (if (:optimize options)
-                (var-set code (optimize @code)))
-              (if (:parse-tree options)
-                (println @code))
-              (var-set code (assemble @code))
-              (if (:interim options)
-                (println @code))
-              (var-set code (cmp @code))
-              (if (:assembly options)
-                (dis @code))
-              (if (:bytecode options)
+              (if (= :error (first @code))
+                (ss:print-errors (second @code))
                 (do
-                  (loop [b @code]
-                    (if (not-empty b)
-                      (do
-                        (print (format "%d, " (first b)))
-                        (recur (rest b)))
-                      (println)))))
-              (if (:debug options)
-                (let [env (vm:init 100 100 1) prog (vm:prog @code)]
-                  (loop [status 0]
-                    (if (zero? status)
-                      (do
-                        (read-line)
-                        (recur (vm:exec env prog 1)))))
-                  (println "RESULT:" (vm:rslt env))))
+                  (var-set code (second @code))
+                  (if (:optimize options)   (var-set code (optimize @code)))
+                  (if (:parse-tree options) (println @code))
+                  (var-set code (assemble @code))
+                  (if (:interim options)    (println @code))
+                  (var-set code (cmp @code))
+                  (if (:assembly options)   (dis @code))
+                  (if (:bytecode options)
+                    (do
+                      (loop [b @code]
+                        (if (not-empty b)
+                          (do
+                            (print (format "%d, " (first b)))
+                            (recur (rest b)))
+                          (println)))))
+                  (if (:debug options)
+                    (let [env (vm:init 100 100 1) prog (vm:prog @code)]
+                      (loop [status 0]
+                        (if (zero? status)
+                          (do
+                            (read-line)
+                            (recur (vm:exec env prog 1)))))
+                      (println "RESULT:" (vm:rslt env)))
+                    (if (:execute options)
+                      (ss:execute @code false)))))))))
 
-              (if (:execute options)
-                (ss:execute @code false)))))))))
+
+(defn ss:print-errors [errors]
+  (binding [*out* *err*]
+    (loop [err errors]
+      (if (not (empty? err))
+        (do
+          (println (first err))
+          (recur (rest err)))))))
+
 
 (defn on-message [connection message optimization]
   (println message)
   (println "-----------------------------")
-  (let [bytecode (.encodeToString (Base64/getEncoder)
-                                  (byte-array (ss:compile message optimization)))]
-      (println bytecode)
-      (.send connection bytecode)))
+  (let [rslt (ss:compile message optimization)]
+    (println rslt)
+    (if (= :ok (first rslt))
+      (.send connection (.encodeToString  (Base64/getEncoder)
+                                          (byte-array
+                                            (second rslt)))))))
 
 
 (defn ss:server [port opt]
@@ -115,24 +125,33 @@
 
 (defn ss:repl [opt]
   (let [env (vm:init 100 100 -1)]
+    (println "(to quit press two times Ctrl-C)\n")
     (print ">>> ")
     (flush)
     (loop [code (read-line)]
-      ;(println)
-      (vm:exec env (vm:prog (ss:compile code opt)) 0)
-      (print (vm:rslt env) "\n>>> ")
-      (flush)
+      (let [rslt (ss:compile code opt)]
+        (case (first rslt)
+          :error  (ss:print-errors (second rslt))
+          :ok     (do
+                    (vm:exec env (vm:prog (second rslt)) 0)
+                    (println (vm:rslt env))))
+        (print  ">>> ")
+        (flush))
       (recur (read-line)))))
 
 
 (defn ss:compile [string opt]
-  (as-> string input
-    (parse input)
-    (if opt
-      (optimize input)
-      input)
-    (assemble input)
-    (cmp input)))
+  (let [rslt (parse string)]
+    (if (= :error (first rslt))
+      rslt
+      (as-> (second rslt) input
+        (if opt
+          (optimize input)
+          input)
+        (assemble input)
+        (cmp input)
+        (list :ok input)))))
+
 
 
 (defn ss:execute
@@ -147,5 +166,9 @@
 
 (defn ss:exec
   ([code op] (ss:exec (vm:init 100 10 0) code op))
-  ([env code op] (do (vm:exec env (vm:prog (ss:compile code op)) 0)
-                     (vm:rslt env))))
+  ([env code op] (let [rslt (ss:compile code op)]
+                    (if (= :ok (first rslt))
+                      (do
+                        (vm:exec env (vm:prog (second rslt)) 0)
+                        (vm:rslt env))
+                      (rslt)))))

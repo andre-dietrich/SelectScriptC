@@ -11,7 +11,8 @@
   (let [env (vm:init 100 100 0)]
     (iss [0 1 2]        "SELECT $     FROM [0,1,2] AS list;")
     (iss 0              "SELECT $     FROM [0,1,2] AS val; ")
-    (iss {"r" [0 1 2]}  "SELECT r:$   FROM [0,1,2] AS dict;")))
+    (iss {"r" [0 1 2]}  "SELECT r:$   FROM [0,1,2] AS dict;")
+    (vm:exit env)))
 
 (deftest simple_select2
   (let [env (vm:init 100 100 0)]
@@ -29,7 +30,9 @@
          "SELECT [$a, $b]     "
          "  FROM a, b:a       "
          " WHERE $a+$b==9     "
-         "    AS list;        ")))
+         "    AS list;        ")
+    (vm:exit env)))
+
 
 (deftest simple_dict
   (let [env (vm:init 100 100 0)]
@@ -42,13 +45,17 @@
          "SELECT [$['a'], $['b']]   "
          "  FROM c                  "
          " WHERE $['a']==$['b']     "
-         "    AS list;              ")))
+         "    AS list;              ")
+    (vm:exit env)))
+
 
 (deftest simple_void
   (let [env (vm:init 100 100 0)]
     (iss 0  "a = 0;")
     (iss 5  "SELECT a=a+1 FROM [1,2,3,4,5,6,7,8,9] WHERE $>4 AS void;")
-    (iss 5  "a;")))
+    (iss 5  "a;")
+    (vm:exit env)))
+
 
 (deftest simple_order
   (let [env (vm:init 100 100 0)]
@@ -63,7 +70,9 @@
          "    FROM a, b:a, c:a         "
          "   WHERE $a**2+$b**2==$c**2  "
          "ORDER BY $c DESC             "
-         "      AS list;               ")))
+         "      AS list;               ")
+    (vm:exit env)))
+
 
 (deftest simple_order2
   (let [env (vm:init 100 100 0)]
@@ -78,7 +87,9 @@
          "    FROM a, b:a, c:a             "
          "   WHERE $a**2+$b**2==$c**2      "
          "GROUP BY $c**2                   "
-         "       AS list;                  ")))
+         "       AS list;                  ")
+    (vm:exit env)))
+
 
 (deftest simple_limit
   (let [env (vm:init 100 100 0)]
@@ -95,7 +106,8 @@
     (iss [3 2 1 0]
          "FROM a ORDER BY $ DESC LIMIT 4 AS list;")
     (iss {"" [0 1 2 3] "x" [1 2 3 4]}
-         "SELECT $, x:$+1 FROM a LIMIT 4 AS dict;")))
+         "SELECT $, x:$+1 FROM a LIMIT 4 AS dict;")
+    (vm:exit env)))
 
 
 (deftest nesting
@@ -111,12 +123,13 @@
          "              FROM neighbours                           "
          "             WHERE $[0]() == $[1]()                     "
          "                AS list)                                "
-         "    AS list;                                            ")))
-
+         "    AS list;                                            ")
+    (vm:exit env)))
 
 (deftest select_val
   (let [env (vm:init 100 100 0)]
     (iss [0 1 2]    "a = [0,1,2];                       ")
     (iss 0          "SELECT $ FROM a AS val;            ")
     (iss 1          "SELECT $ FROM a WHERE $==1 AS val; ")
-    (iss nil        "SELECT $ FROM a WHERE $==9 AS val; ")))
+    (iss nil        "SELECT $ FROM a WHERE $==9 AS val; ")
+    (vm:exit env)))

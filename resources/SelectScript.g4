@@ -97,6 +97,8 @@ TRY : T R Y;
 RECUR : R E C U R;
 REF : R E F;
 
+IMPORT : I M P O R T;
+
 NEWLINE	: ('\r'? '\n') -> skip ; // {self.skip()};
 WS		: (' '|'\t'|'\n'|'\r')+ -> skip ; //{self.skip()} ;
 
@@ -107,7 +109,7 @@ STRING	: DQ .*? DQ | SQ .*? SQ ;
 FLOAT	: DIGIT* DOT DIGIT* ;
 INTEGER
 	: DIGIT+
-	| '0b' ('0'|'1')+
+	| '0b' ('0'|'1'|'_')+
 	| '0o' ('0'..'7')+
 	| '0x' (DIGIT | 'a'..'f' | 'A'..'F')+
 ;
@@ -224,6 +226,10 @@ expr
 	  | function)					# ex_else
 ;
 
+import_s2
+  :  IMPORT '(' file = STRING ')'
+;
+
 function
 	: del_ = function_del
 	| mem_ = function_mem
@@ -247,7 +253,7 @@ list
 ;
 
 loc
-	: LOC ((	'(' extra_=stmt ')' | extra2_ = IDENTIFIER ) LOC)? (id_=IDENTIFIER)?
+	: LOC ((	'[' extra_=stmt ']' | extra2_ = IDENTIFIER ) LOC)? (id_=IDENTIFIER)?
 ;
 
 loop
@@ -255,7 +261,11 @@ loop
 ;
 
 pipe
-	: (e = expr) (PIPE fct += function)+
+	: (e = expr) pipe_ = pipe_allowed
+;
+
+pipe_allowed
+	: (PIPE (function | special))+
 ;
 
 procedure
@@ -374,7 +384,8 @@ special2
 ;
 
 stmt
-	: assign
+	: import_s2
+	| assign
 	| pipe
 	| expr
 	| procedure

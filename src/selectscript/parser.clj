@@ -1,13 +1,14 @@
 (ns selectscript.parser
-  (:import (org.antlr.v4.runtime CommonTokenStream
-                                 ANTLRInputStream)
+  (:import (org.antlr.v4.runtime      CommonTokenStream
+                                      ANTLRInputStream)
            (org.antlr.v4.runtime.tree Tree
                                       ParseTree
                                       ParseTreeWalker
                                       ParseTreeVisitor)
            (S2 SelectScriptLexer
                SelectScriptParser
-               SelectScriptBaseVisitor))
+               SelectScriptBaseVisitor
+               SelectScriptErrorListener))
 
   (:use [selectscript.defines :only (ss:dict  ss:elem
                                      ss:exit  ss:fct
@@ -31,10 +32,12 @@
          -function_del
          -function_mem
          -if_expr
+         -import_s2
          -list
          -loc
          -loop
          -pipe
+         -pipe_allowed
          -procedure
          -procedure_params
          -prog
@@ -84,10 +87,12 @@
     (visitFunction_del [ctx] (-function_del ctx))
     (visitFunction_mem [ctx] (-function_mem ctx))
     (visitIf_expr      [ctx] (-if_expr      ctx))
+    (visitImport_s2    [ctx] (-import_s2    ctx))
     (visitList         [ctx] (-list         ctx))
     (visitLoc          [ctx] (-loc          ctx))
     (visitLoop         [ctx] (-loop         ctx))
     (visitPipe         [ctx] (-pipe         ctx))
+    (visitPipe_allowed [ctx] (-pipe_allowed ctx))
     (visitProcedure    [ctx] (-procedure    ctx))
     (visitProcedure_params [ctx] (-procedure_params    ctx))
     (visitProg         [ctx] (-prog         ctx))
@@ -150,12 +155,17 @@
 
 
 (defn parse [string]
-  (let [tree (.prog
-               (SelectScriptParser.
-                 (CommonTokenStream.
-                   (SelectScriptLexer.
-                     (ANTLRInputStream. string)))))]
-    (visit tree)))
+  (let [input (ANTLRInputStream. string)]
+    (let [lexer (SelectScriptLexer. input)]
+      (let [error-listener (new SelectScriptErrorListener)]
+        (let [token (CommonTokenStream. lexer)]
+          (let [parser (SelectScriptParser. token)]
+            (.removeErrorListeners parser)
+            (.addErrorListener parser error-listener)
+            (let [tree (.prog parser)]
+              (if (.hasErrors error-listener)
+                (list :error (into [] (.getErrors error-listener)))
+                (list :ok    (visit tree))))))))))
 
 
 (defn cutString [string]
@@ -280,6 +290,16 @@
           (-stmt else)
           (ss:val false))))
 
+(defn -import_s2 [ctx]
+  (let [rslt (-> ctx
+                  (.file)
+                  (.getText)
+                  (cutString)
+                  (slurp)
+                  (parse))]
+    (if (= :ok (first rslt))
+      (second rslt))))
+
 
 (defn -list [ctx]
   (ss:list (if-let [elem (.elem_ ctx)]
@@ -305,14 +325,26 @@
               nil))))
 
 (defn -pipe [ctx]
-  (loop [fct (map visit (.fct ctx)), e (visit (.e ctx))]
-    (if (empty? fct)
+  (loop [elem (-pipe_allowed (.pipe_ ctx)), e (visit (.e ctx))]
+    (if (empty? elem)
       e
-      (let [[f, name, parameter] (first fct)]
-        (recur (rest fct)
-               (ss:fct name (if (empty? parameter)
-                              [e]
-                              (concat [e] [parameter]))))))))
+      (let [pipe_elem (first elem)]
+        (recur (rest elem)
+               (let [[x, name, parameter] pipe_elem]
+                 [x, name, (if (empty? parameter)
+                             [e]
+                             (concat [e] parameter))]))))))
+
+
+(defn -pipe_allowed [ctx]
+  (let [end (.getChildCount ctx)]
+    (loop [i 1 elems []]
+      (if (< end i)
+        elems
+        (recur (+ i 2)
+               (concat elems
+                       (let [e (.getChild ctx i)]
+                         [(visit e)])))))))
 
 (defn -procedure [ctx]
   (ss:proc (if (.params_ ctx)

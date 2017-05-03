@@ -20,6 +20,7 @@
 (def stat_ (Function/getFunction "S2" "vm_ready"))
 (def rslt_ (Function/getFunction "S2" "vm_get_rslt"))
 (def size_ (Function/getFunction "S2" "vm_size"))
+(def exit_ (Function/getFunction "S2" "vm_free"))
 
 
 (defn vm:init
@@ -57,6 +58,8 @@
 (defn vm:rslt [env]
   (rslt->clj (.invoke rslt_ Pointer (to-array [env]))))
 
+(defn vm:exit [env]
+  (.invoke exit_ Void (to-array [env])))
 
 (defn dyn [func ret & args]
   (let [f (Function/getFunction "S2" (name func))]

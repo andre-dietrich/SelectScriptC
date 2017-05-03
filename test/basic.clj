@@ -17,18 +17,20 @@
     (iss   6  "3*2;")
     (iss 1.5  "3/2.;")
     (iss   8  "2**3;")
-    (iss   1  "3%2;")))
+    (iss   1  "3%2;")
+    (vm:exit env)))
 
 (deftest comments
   (let [env (vm:init 100 100 0)]
     (iss  1  "# line comments      "
-             "1; # 2;              ")))
+             "1; # 2;              ")
 ;             "                     ")
 ;    (iss  2  "# multiline comments "
 ;             "1;       /*          "
 ;             "2;                   "
 ;             "*/                   "
 ;             "                     ")))
+    (vm:exit env)))
 
 (deftest logical
   (let [env (vm:init 100 100 0)]
@@ -42,7 +44,8 @@
     (iss  false  "false and true;")
     (iss  true   "True OR True;  ")
     (iss  true   "FALSE OR True; ")
-    (iss  false  "True XOR True; ")))
+    (iss  false  "True XOR True; ")
+    (vm:exit env)))
 
 (deftest comparison
   (let [env (vm:init 100 100 0)]
@@ -50,14 +53,16 @@
     (iss  true   "1 < 2; ")
     (iss  true   "2 >= 2;")
     (iss  true   "2 != 3;")
-    (iss  false  "2 == 3;")))
+    (iss  false  "2 == 3;")
+    (vm:exit env)))
 
 (deftest precedence
   (let [env (vm:init 100 100 0)]
     (iss  14    "2+3*4;  ")
     (iss  20    "(2+3)*4;")
     (iss  83    "2+3**4; ")
-    (iss  true  "True OR False AND True;")))
+    (iss  true  "True OR False AND True;")
+    (vm:exit env)))
 
 (deftest array
   (let [env (vm:init 100 100 0)]
@@ -70,7 +75,8 @@
     (iss '(11 22) "b[0];")
     (iss 11 "b[0,0];")
     (iss 44 "b[1,1];")
-    (iss "abc" "b[2];")))
+    (iss "abc" "b[2];")
+    (vm:exit env)))
 
 (deftest array2
   (let [env (vm:init 100 100 0)]
@@ -81,23 +87,26 @@
     (iss '(11 6 3 (4 5 6 7))
          "a[1]=a[1]*a[2]; a;")
     (iss '(11 6 3 (99 5 6 7))
-         "a[3,0]=99; a;")))
+         "a[3,0]=99; a;")
+    (vm:exit env)))
 
 (deftest dict
   (let [env (vm:init 100 100 0)]
     (iss {"a" 22, "b22" "test"}
          "a={'a':22, 'b22':'test'};")
     (iss    22  "a['a'];")
-    (iss "test" "a['b22'];")))
+    (iss "test" "a['b22'];")
+    (vm:exit env)))
 
 (deftest dict2
   (let [env (vm:init 100 100 0)]
     (iss {"a" 22, "b22" "test"}
          "a={'a':22, 'b22':'test'};")
-   (iss {"a" 999, "b22" "test"}
-        "a['a']=999; a;")
-   (iss {"a" 999, "b22" [1 2 3 4]}
-        "a['b22']=[1,2,3,4]; a;")))
+    (iss {"a" 999, "b22" "test"}
+         "a['a']=999; a;")
+    (iss {"a" 999, "b22" [1 2 3 4]}
+         "a['b22']=[1,2,3,4]; a;")
+    (vm:exit env)))
 
 (deftest dict3
   (let [env (vm:init 100 100 0)]
@@ -106,7 +115,9 @@
     (iss {"a" 999, "b22" "test"}
          "a.a=999; a;")
     (iss {"a" 999, "b22" [1 2 3 4]}
-         "a.b22=[1,2,3,4]; a;")))
+         "a.b22=[1,2,3,4]; a;")
+    (vm:exit env)))
+
 
 (deftest SEQUENCE
   (let [env (vm:init 100 100 0)]
@@ -115,7 +126,8 @@
     (iss 2  "c;")
 
     (iss 9  "(1;2;3;4+5;);")
-    (iss 9  "(1;(1;4+5;););")))
+    (iss 9  "(1;(1;4+5;););")
+    (vm:exit env)))
 
 
 (deftest IF
@@ -126,20 +138,24 @@
     (iss true   "IF( True );               ")
     (iss false  "IF( FALSE );              ")
     (iss false  "IF( True, False);         ")
-    (iss true   "IF( False, False, True);  ")))
+    (iss true   "IF( False, False, True);  ")
+    (vm:exit env)))
+
 
 (deftest LOOP
   (let [env (vm:init 100 100 0)]
     (iss  0 "i=0;")
     (iss 10 "LOOP( IF(i==10, EXIT i, i=i+1) );")
     (iss  1 "i = a = 1;")
-    (iss 46 "LOOP( IF(i==10, EXIT a, (a=a+i; i=i+1;)));") == 46))
+    (iss 46 "LOOP( IF(i==10, EXIT a, (a=a+i; i=i+1;)));") == 46
+    (vm:exit env)))
 
 
 (deftest PRINT
   (let [env (vm:init 100 100 0)]
     (iss 4   "print(2+2);             ")
-    (iss "x" "print(2+2, True, \"x\");")))
+    (iss "x" "print(2+2, True, \"x\");")
+    (vm:exit env)))
 
 
 (deftest DEL_MEM
@@ -150,4 +166,5 @@
     (iss false           "mem(a);       ")
     (iss ["c" "b"]       "mem();        ")
     (iss true            "mem('b');     ")
-    (iss []              "del(); mem(); ")))
+    (iss []              "del(); mem(); ")
+    (vm:exit env)))

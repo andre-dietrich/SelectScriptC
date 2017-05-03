@@ -35,7 +35,7 @@
   :native-prefix "runtime"
 
 
-  :java-source-paths ["src/antlr"]
+  :java-source-paths ["src/antlr", "src/java"]
 
   ;:native-path "native"
 

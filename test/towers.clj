@@ -38,7 +38,8 @@
          "                 mov($m3[0], $m3[1],                      "
          "                 mov($m2[0], $m2[1],                      "
          "                 mov($m1[0], $m1[1], tower)))))))         "
-         "     as list;                                             ")))
+         "     as list;                                             ")
+    (vm:exit env)))
 
 (deftest simple_recursion
   (let [env (vm:init 100 100 0)]
@@ -68,7 +69,9 @@
          "START WITH $tower = tower                                 "
          "CONNECT BY $tower@mov($m[0], $m[1])                       "
          " STOP WITH $tower == None OR $step$ > 6                   "
-         "         AS LIST;                                         ")))
+         "         AS LIST;                                         ")
+    (vm:exit env)))
+
 
 (deftest no_cycle
   (let [env (vm:init 100 100 0)]
@@ -105,7 +108,8 @@
          "CONNECT BY NO CYCLE                                       "
          "           $tower@mov($m[0], $m[1])                       "
          " STOP WITH $tower == None OR $step$ > 6                   "
-         "         AS LIST;                                         ")))
+         "         AS LIST;                                         ")
+    (vm:exit env)))
 
 
 (deftest unique
@@ -151,4 +155,5 @@
          "CONNECT BY UNIQUE                                         "
          "           $tower@mov($m[0], $m[1])                       "
          " STOP WITH $tower == None OR $step$ > 14                  "
-         "         AS LIST;                                         ")))
+         "         AS LIST;                                         ")
+    (vm:exit env)))
