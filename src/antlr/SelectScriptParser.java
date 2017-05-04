@@ -156,6 +156,7 @@ public class SelectScriptParser extends Parser {
 			((ProgContext)_localctx).stmt = stmt();
 			((ProgContext)_localctx).elem_.add(((ProgContext)_localctx).stmt);
 			}
+			{
 			setState(95);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,0,_ctx);
@@ -184,6 +185,7 @@ public class SelectScriptParser extends Parser {
 				}
 			}
 
+			}
 			}
 		}
 		catch (RecognitionException re) {

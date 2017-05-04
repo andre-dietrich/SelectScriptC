@@ -4,14 +4,14 @@ all: lib antlr
 	lein uberjar
 
 install:
-	cp target/selectscript-0.1.0-SNAPSHOT-standalone.jar /usr/bin/S2c.jar
-	echo "#!/bin/bash" > /usr/bin/S2c
-	echo 'java -jar /usr/bin/S2c.jar "$$@"' >> /usr/bin/S2c
-	chmod a+x /usr/bin/S2c
+	cp target/selectscript-0.1.0-SNAPSHOT-standalone.jar /usr/local/bin/S2c.jar
+	echo "#!/bin/bash" > /usr/local/bin/S2c
+	echo 'java -jar /usr/local/bin/S2c.jar "$$@"' >> /usr/local/bin/S2c
+	chmod a+x /usr/local/bin/S2c
 
 uninstall:
-	rm -f /usr/bin/S2c.jar
-	rm -f /usr/bin/S2c
+	rm -f /usr/local/bin/S2c.jar
+	rm -f /usr/local/bin/S2c
 
 lib:
 	cd SandhillSkipper; make lib
