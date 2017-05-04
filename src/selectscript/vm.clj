@@ -9,6 +9,7 @@
          vm:rslt
          vm:size
          vm:status
+         vm:status_codes
          round
          rslt->clj)
 
@@ -22,6 +23,9 @@
 (def size_ (Function/getFunction "S2" "vm_size"))
 (def exit_ (Function/getFunction "S2" "vm_free"))
 
+(def vm:status_codes {:IDLE   0,
+                      :OK     1,
+                      :ERROR  2})
 
 (defn vm:init
   ([] (vm:init 100 100 0))

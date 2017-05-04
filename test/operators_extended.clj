@@ -8,6 +8,7 @@
 
 (deftest positive
   (let [env (vm:init 100 100 0)]
+    (println-stderr "testing: positive")
     (iss  [1,2,3,4,5]           "a=[1,2,3,4,5]; ")
     (iss  15                    "+(*a);         ")
     (iss  16                    "+(*a,1);       ")
@@ -23,6 +24,7 @@
 
 (deftest negative
   (let [env (vm:init 100 100 0)]
+    (println-stderr "testing: negative")
     (iss  [1,2,3,4,5]           "a=[1,2,3,4,5]; ")
     (iss  -13                   "-(*a);         ")
     (iss   85                   "-(100,*a);     ")
@@ -35,6 +37,7 @@
 
 (deftest star
   (let [env (vm:init 100 100 0)]
+    (println-stderr "testing: star")
     (iss  [1 2 3 4 5]           "a=[1,2,3,4,5]; ")
     (iss  120                   "*(*a);         ")
     (iss  1200                  "*(10,*a);      ")
@@ -50,6 +53,7 @@
 
 (deftest not_equal
   (let [env (vm:init 100 100 0)]
+    (println-stderr "testing: not_equal")
     (iss [1 2 3 4 5]    "a=[1,2,3,4,5]; ")
     (iss true           "!=(*a);        ")
     (iss true           "!=(*a,a);      ")

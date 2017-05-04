@@ -3,9 +3,11 @@
   (:use [selectscript.optimizer       :only (optimize)] :reload)
   (:use [selectscript.assembler       :only (assemble)] :reload)
   (:use [selectscript.compiler        :only (cmp)]      :reload)
-  (:use [selectscript.vm              :only (vm:init
+  (:use [selectscript.vm              :only (vm:status_codes
+                                             vm:init
                                              vm:exec
                                              vm:prog
+                                             vm:status
                                              vm:rslt)]  :reload)
   (:use [selectscript.disassembler    :only (dis)]      :reload)
 
@@ -132,9 +134,10 @@
       (let [rslt (ss:compile code opt)]
         (case (first rslt)
           :error  (ss:print-errors (second rslt))
-          :ok     (do
-                    (vm:exec env (vm:prog (second rslt)) 0)
-                    (println (vm:rslt env))))
+          :ok     (let [status (vm:exec env (vm:prog (second rslt)) 0)]
+                    (if (= status (:OK vm:status_codes))
+                      (println (vm:rslt env))
+                      (println "ERROR: " status))))
         (print  ">>> ")
         (flush))
       (recur (read-line)))))
@@ -160,15 +163,19 @@
   ([code debug]
    (let [env (vm:init 100 100 (if debug 1 0)) prog (vm:prog code)]
      (loop [status 0]
-       (if (zero? status)
+       (if (= (:IDLE vm:status_codes) status)
          (recur (vm:exec env prog (if debug 1 0)))))
-     (println "RESULT:" (vm:rslt env)))))
+     (let [status (vm:status env)]
+       (if (= status (:OK vm:status_codes))
+         (println "RESULT:" (vm:rslt env))
+         (println "ERROR: " status))))))
 
 (defn ss:exec
   ([code op] (ss:exec (vm:init 100 10 0) code op))
   ([env code op] (let [rslt (ss:compile code op)]
                     (if (= :ok (first rslt))
-                      (do
-                        (vm:exec env (vm:prog (second rslt)) 0)
-                        (vm:rslt env))
+                      (let [status (vm:exec env (vm:prog (second rslt)) 0)]
+                        (if (= status (:OK vm:status_codes))
+                          (vm:rslt env)
+                          :error))
                       (rslt)))))

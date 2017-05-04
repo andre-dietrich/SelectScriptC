@@ -230,7 +230,7 @@
                              (recur D (conc i [I]) (rest k)))))]
     (cmp code
          new_data
-         (conc asm [(count ids)] ids)
+         (conc asm (uint16->byte (count ids)) ids)
          sp
          local_vars)))
 
