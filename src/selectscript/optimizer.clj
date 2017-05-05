@@ -54,6 +54,7 @@
       :val   ast
       :var   ast
       :opX   (ss:opX (second ast) (optimize (last ast)))
+      :yield (ss:yield (optimize (second ast)))
       (cons
         (optimize (first ast))
         (if (second ast)

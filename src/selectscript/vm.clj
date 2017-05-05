@@ -24,8 +24,9 @@
 (def exit_ (Function/getFunction "S2" "vm_free"))
 
 (def vm:status_codes {:IDLE   0,
-                      :OK     1,
-                      :ERROR  2})
+                      :YIELD  1,
+                      :OK     2,
+                      :ERROR  3})
 
 (defn vm:init
   ([] (vm:init 100 100 0))

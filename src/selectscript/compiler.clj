@@ -77,6 +77,8 @@
           :IT_CYCLE     49,
           :IT_UNIQUE    50,
 
+          :YIELD        51,
+
           :OP           64,
           :OPX          96})
 
@@ -102,6 +104,8 @@
          cmp:jump_fwd
          cmp:sp_save
          cmp:pop
+
+         cmp:yield
 
          cmp:return_fjump
 

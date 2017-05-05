@@ -442,4 +442,10 @@ public interface SelectScriptVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitVariable(SelectScriptParser.VariableContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link SelectScriptParser#yield}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitYield(SelectScriptParser.YieldContext ctx);
 }

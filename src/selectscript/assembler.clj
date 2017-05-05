@@ -31,6 +31,7 @@
          asm:set
          asm:val
          asm:var
+         asm:yield
 
          optimize
          seq:loop
@@ -85,6 +86,7 @@
     :try    (asm:try   (rest ast)   pop)
     :val    (asm:val   (second ast) pop)
     :var    (asm:var   (second ast) pop)
+    :yield  (asm:yield (second ast) pop)
 
     (concat '((:SP_SAVE))
             (seq:loop ast true)
@@ -478,3 +480,9 @@
                                          (asm (first from) pop)))))))
 
 ;(asm (parse "f(); f();"))
+
+(defn asm:yield [ast pop]
+  (concat (asm ast false)
+          (if pop
+            '((:YIELD :POP))
+            '((:YIELD)))))

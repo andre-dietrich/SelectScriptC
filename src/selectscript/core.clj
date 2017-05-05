@@ -84,8 +84,10 @@
                   (if (:debug options)
                     (let [env (vm:init 100 100 1) prog (vm:prog @code)]
                       (loop [status 0]
-                        (if (zero? status)
+                        (if (< status (:OK vm:status_codes))
                           (do
+                            (if (= status (:YIELD vm:status_codes))
+                              (println "YIELD:" (vm:rslt env)))
                             (read-line)
                             (recur (vm:exec env prog 1)))))
                       (println "RESULT:" (vm:rslt env)))
@@ -137,7 +139,9 @@
           :ok     (let [status (vm:exec env (vm:prog (second rslt)) 0)]
                     (if (= status (:OK vm:status_codes))
                       (println (vm:rslt env))
-                      (println "ERROR: " status))))
+                      (if (= status (:YIELD vm:status_codes))
+                        (println "YIELD" (vm:rslt env))
+                        (println "ERROR: " status)))))
         (print  ">>> ")
         (flush))
       (recur (read-line)))))
@@ -162,9 +166,14 @@
    (ss:execute code false))
   ([code debug]
    (let [env (vm:init 100 100 (if debug 1 0)) prog (vm:prog code)]
+
      (loop [status 0]
-       (if (= (:IDLE vm:status_codes) status)
+       (println status)
+       (if (= status (:YIELD vm:status_codes))
+         (println "YIELD: " (vm:rslt env)))
+       (if (< status (:OK vm:status_codes))
          (recur (vm:exec env prog (if debug 1 0)))))
+
      (let [status (vm:status env)]
        (if (= status (:OK vm:status_codes))
          (println "RESULT:" (vm:rslt env))

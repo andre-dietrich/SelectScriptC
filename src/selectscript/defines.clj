@@ -69,6 +69,9 @@
 (defn ss:var [var]
   (list :var var))
 
+(defn ss:yield [expr]
+  (list :yield expr))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn ss:bool? [val]

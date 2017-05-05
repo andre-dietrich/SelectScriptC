@@ -19,7 +19,8 @@
                                      ss:recur ss:ref
                                      ss:sql   ss:set
                                      ss:try   ss:val
-                                     ss:val?  ss:var)]    :reload))
+                                     ss:val?  ss:var
+                                     ss:yield)]    :reload))
 
 (declare -atom
          -assign
@@ -57,6 +58,7 @@
          -try_expr
          -value
          -variable
+         -yield
 
          expr
          parse
@@ -113,6 +115,8 @@
     (visitValue        [ctx] (-value        ctx))
     (visitVariable     [ctx] (-variable     ctx))
 
+    (visitYield        [ctx] (-yield        ctx))
+
     (visitEx_ex        [ctx] (ss:op :EX  [(visit (.e1 ctx))]))
     (visitEx_not       [ctx] (ss:op :NOT [(visit (.e1 ctx))]))
     (visitEx_pos       [ctx] (visit (.e1 ctx)))
@@ -149,6 +153,7 @@
     (visitEx_and      [ctx] (expr :AND  ctx))
     (visitEx_xor      [ctx] (expr :XOR  ctx))
     (visitEx_or       [ctx] (expr :OR   ctx))))
+
 
 (defn visit [ctx]
   (.visit visitor ctx))
@@ -547,3 +552,6 @@
 
 (defn -variable [ctx]
   (ss:var (.getText ctx)))
+
+(defn -yield [ctx]
+  (ss:yield (visit (.elem_ ctx))))

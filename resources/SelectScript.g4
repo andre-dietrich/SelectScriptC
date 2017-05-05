@@ -99,6 +99,8 @@ REF : R E F;
 
 IMPORT : I M P O R T;
 
+YIELD : Y I E L D;
+
 NEWLINE	: ('\r'? '\n') -> skip ; // {self.skip()};
 WS		: (' '|'\t'|'\n'|'\r')+ -> skip ; //{self.skip()} ;
 
@@ -385,6 +387,7 @@ special2
 
 stmt
 	: import_s2
+	| yield
 	| assign
 	| pipe
 	| expr
@@ -414,4 +417,8 @@ value
 
 variable
 	: name_ = IDENTIFIER
+;
+
+yield
+	: YIELD elem_ = atom
 ;
