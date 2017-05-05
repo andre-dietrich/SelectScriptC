@@ -168,7 +168,6 @@
    (let [env (vm:init 100 100 (if debug 1 0)) prog (vm:prog code)]
 
      (loop [status 0]
-       (println status)
        (if (= status (:YIELD vm:status_codes))
          (println "YIELD: " (vm:rslt env)))
        (if (< status (:OK vm:status_codes))
