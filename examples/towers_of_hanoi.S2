@@ -1,0 +1,102 @@
+mov = PROC(Tower, frm, to)
+      "A simple tower move function that returns a new tower configuration:
+       mov([[3,2,1], [], []], 0, 1) -> [[3,2], [1], []]
+
+       In case of an unalowed move a None value gets returned:
+       mov([[3,2], [1], []], 0, 1)  -> None "
+      : (
+          IF( $Tower == None, EXIT None);
+
+          IF( not $Tower[$frm], EXIT None);
+
+          IF( $Tower[$to],
+              IF( $Tower[$frm][-1] > $Tower[$to][-1],
+                  EXIT None));
+
+          $Tower[$to]@+( $Tower[$frm][-1] );
+          $Tower[$frm]@pop();
+          $Tower;
+      );
+
+
+# initial tower configuration
+tower = [[3,2,1], [], []];
+
+# allowed moves [from, to]
+moves = [[0,1], [0,2], [1,0], [1,2], [2,0], [2,1]];
+
+# goal configuration
+finish = [[], [], [3,2,1]];
+
+
+
+# vanilla-approach: recusively test all combinations for 7 moves
+$start_time = time();
+rslt1 = SELECT [$m1, $m2, $m3, $m4, $m5, $m6, $m7]
+          FROM m1:moves, m2:moves, m3:moves, m4:moves,
+               m5:moves, m6:moves, m7:moves
+         WHERE finish == (tower
+                          |> mov($m1[0], $m1[1])
+                          |> mov($m2[0], $m2[1])
+                          |> mov($m3[0], $m3[1])
+                          |> mov($m4[0], $m4[1])
+                          |> mov($m5[0], $m5[1])
+                          |> mov($m6[0], $m6[1])
+                          |> mov($m7[0], $m7[1]))
+           AS list;
+
+print("######################################################################");
+print("first vanilla-approach search");
+print("time:   ", time()-$start_time);
+print("result: ", rslt1);
+
+
+
+$start_time = time();
+rslt2 = SELECT $m
+          FROM m:moves
+         WHERE finish == mov($tower, $m[0], $m[1])
+    START WITH $tower = tower
+    CONNECT BY $tower@mov($m[0], $m[1])
+     STOP WITH $tower == None OR $step$ > 6
+            AS list;
+
+print("######################################################################");
+print("simple CONNECT BY (recursive search)");
+print("time:   ", time()-$start_time);
+print("result: ", rslt2);
+
+
+
+$start_time = time();
+rslt3 = SELECT $tower
+          FROM m:moves
+         WHERE finish == mov($tower, $m[0], $m[1])
+    START WITH $tower = tower
+    CONNECT BY NO CYCLE
+               $tower@mov($m[0], $m[1])
+     STOP WITH $tower == None OR $step$ > 6
+            AS LIST;
+
+print("######################################################################");
+print("CONNECT BY with no cycles");
+print("time:   ", time()-$start_time);
+print("result: ", rslt3);
+
+
+rslt4 = SELECT $step$, $tower, $m
+          FROM m:moves
+         WHERE finish == mov($tower, $m[0], $m[1])
+    START WITH $tower = tower
+    CONNECT BY UNIQUE
+               $tower@mov($m[0], $m[1])
+     STOP WITH $tower == None OR $step$ > 7
+            AS LIST;
+
+print("######################################################################");
+print("CONNECT BY with UNIQUE");
+print("time:   ", time()-$start_time);
+print("result: ", rslt4);
+
+
+True;
