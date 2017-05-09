@@ -3,7 +3,7 @@
 all: lib antlr
 	lein uberjar
 
-install:
+install: 
 	cp target/selectscript-0.1.0-SNAPSHOT-standalone.jar /usr/local/bin/S2c.jar
 	echo "#!/bin/bash" > /usr/local/bin/S2c
 	echo 'java -jar /usr/local/bin/S2c.jar "$$@"' >> /usr/local/bin/S2c
@@ -25,7 +25,7 @@ antlr:
 	-long-messages SelectScript.g4
 
 clean:
-	rm -f hs_err_pid*.log
+	find . -name "*hs_err_pid*.log" | xargs rm -f
 	rm native/linux-x86-64/libS2.so
 	lein clean
 	cd SandhillSkipper; make clean

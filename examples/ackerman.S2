@@ -6,9 +6,13 @@ Ack = PROC(m, n) : IF ( not $m,
                              recur( $m - 1, 1),
                              recur( $m - 1, Ack($m, $n - 1))));
 
-SELECT print($count$, "Ack(", $m , ",", $n, ") =", Ack($m, $n))
-  FROM n:[0, 1, 2, 3, 4, 5, 6, 7, 8, 9], m:[0, 1, 2, 3]
-    AS void;
+
+SELECT print($count$,                 # current step
+             "Ack(",$m,",",$n,") =",  # string representation of called Ack
+             Ack($m, $n))             # calling ackerman with given parameters
+  FROM n:[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+       m:[0, 1, 2, 3]
+    AS void; # no real output is generated, only the last result gets returned
 
 /* OUTPUT:
  1 Ack( 0 , 0 ) = 1
