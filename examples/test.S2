@@ -90,6 +90,7 @@ rslt = SELECT $x, $x*$y
    CONNECT BY NO CYCLE | UNIQUE
               $f = $f + g
     STOP WITH $f > 12
+        LIMIT 12
            AS list|dict|dictionary|set|val|value|void;
 
 recur

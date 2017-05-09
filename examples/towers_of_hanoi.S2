@@ -1,21 +1,21 @@
-mov = PROC(Tower, frm, to)
-      "A simple tower move function that returns a new tower configuration:
-       mov([[3,2,1], [], []], 0, 1) -> [[3,2], [1], []]
+mov
+  = PROC(Tower, frm, to)
+    "A simple tower move function that returns a new tower configuration:
+     mov([[3,2,1], [], []], 0, 1) -> [[3,2], [1], []]
 
-       In case of an unalowed move a None value gets returned:
-       mov([[3,2], [1], []], 0, 1)  -> None "
-      : (
-          IF( $Tower == None, EXIT None);
+     In case of an unalowed move a None value gets returned:
+     mov([[3,2], [1], []], 0, 1)  -> None "
+    : ( IF( $Tower == None, EXIT None);
 
-          IF( not $Tower[$frm], EXIT None);
+        IF( not $Tower[$frm], EXIT None);
 
-          IF( $Tower[$to],
-              IF( $Tower[$frm][-1] > $Tower[$to][-1],
-                  EXIT None));
+        IF( $Tower[$to],
+            IF( $Tower[$frm][-1] > $Tower[$to][-1],
+                EXIT None));
 
-          $Tower[$to]@+( $Tower[$frm][-1] );
-          $Tower[$frm]@pop();
-          $Tower;
+        $Tower[$to]@+( $Tower[$frm][-1] );
+        $Tower[$frm]@pop();
+        $Tower;
       );
 
 

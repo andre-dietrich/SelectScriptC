@@ -1,10 +1,12 @@
 # run S2c -x ackerman.S2
 
-Ack = PROC(m, n) : IF ( not $m,
-                        $n + 1,
-                        IF ( not $n,
-                             recur( $m - 1, 1),
-                             recur( $m - 1, Ack($m, $n - 1))));
+Ack
+  = PROC(m, n)
+    : IF( not $m,
+          $n + 1,
+          IF( not $n,
+              recur( $m - 1, 1),
+              recur( $m - 1, Ack($m, $n - 1))));
 
 
 SELECT print($count$,                 # current step
