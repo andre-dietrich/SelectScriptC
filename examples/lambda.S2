@@ -1,18 +1,19 @@
-# generate
-#   = PROC(i, fin, rslt:[])
-#     : LOOP(
-#         IF( $i < $fin,
-#             ( $rslt@+($i);
-#               $i@+(1) ),
-#             EXIT $rslt );
-#     );
-
+range
+  = PROC(i, stop, step: 1, rslt: [])
+    : LOOP(
+        IF( $i < $stop,
+            ( $rslt@+($i);
+              $i@+($step);
+            ),
+            EXIT $rslt
+        );
+      );
 map
   = PROC(x, f)
     : SELECT $f($)
         FROM $x;
 
-filt
+filter
   = PROC(x, f)
     : SELECT $
         FROM $x
@@ -25,4 +26,18 @@ reduce
   START WITH $i = $init
           AS void;
 
+sort
+  = PROC(x, f:PROC(x):$x)
+    : SELECT $
+        FROM $x
+    ORDER BY $f($);
+
+max
+  = PROC(x)
+    : SELECT $max = IF($max < $, $, $max)
+        FROM $x
+  START WITH $max = NONE
+          AS void;
+
+True;
 #generate(0, 10)

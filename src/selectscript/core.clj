@@ -8,8 +8,11 @@
                                              vm:exec
                                              vm:prog
                                              vm:status
+                                             vm:reset
                                              vm:rslt)]  :reload)
   (:use [selectscript.disassembler    :only (dis)]      :reload)
+
+  (:require [clojure.term.colors :refer :all])
 
   (:require [clojure.tools.cli      :refer  [parse-opts]]
             [clojure.data.json      :as json]
@@ -47,12 +50,14 @@
 
 (defn -main [& args]
   (binding [*out* *err*]
-    (println    "  __      _           _   __           _       _   \n"
+    (println
+      (bold
+        (green  " __      _           _   __           _       _   \n"
                 "/ _\\ ___| | ___  ___| |_/ _\\ ___ _ __(_)_ __ | |_ \n"
                 "\\ \\ / _ \\ |/ _ \\/ __| __\\ \\ / __| '__| | '_ \\| __|\n"
                 "_\\ \\  __/ |  __/ (__| |__\\ \\ (__| |  | | |_) | |_ \n"
                 "\\__/\\___|_|\\___|\\___|\\__\\__/\\___|_|  |_| .__/ \\__|\n"
-                "                                       |_|        \n"))
+                "                                       |_|        \n"))))
 
   (let [{:keys [options arguments errors summary]} (parse-opts args cli-options)]
     (cond
@@ -87,7 +92,7 @@
                         (if (< status (:OK vm:status_codes))
                           (do
                             (if (= status (:YIELD vm:status_codes))
-                              (println "YIELD:" (vm:rslt env)))
+                              (println (grey "YIELD:" (vm:rslt env))))
                             (read-line)
                             (recur (vm:exec env prog 1)))))
                       (println "RESULT:" (vm:rslt env)))
@@ -140,8 +145,10 @@
                     (if (= status (:OK vm:status_codes))
                       (println (vm:rslt env))
                       (if (= status (:YIELD vm:status_codes))
-                        (println "YIELD" (vm:rslt env))
-                        (println "ERROR: " status)))))
+                        (println (grey "YIELD" (vm:rslt env)))
+                        (do
+                          (println (red  "ERROR: " status))
+                          (vm:reset env))))))
         (print  ">>> ")
         (flush))
       (recur (read-line)))))
@@ -176,7 +183,7 @@
      (let [status (vm:status env)]
        (if (= status (:OK vm:status_codes))
          (println "RESULT:" (vm:rslt env))
-         (println "ERROR: " status))))))
+         (println (red "ERROR: " status)))))))
 
 (defn ss:exec
   ([code op] (ss:exec (vm:init 100 10 0) code op))
