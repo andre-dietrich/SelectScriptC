@@ -23,6 +23,8 @@
 (def size_ (Function/getFunction "S2" "vm_size"))
 (def exit_ (Function/getFunction "S2" "vm_free"))
 
+(def reset_ (Function/getFunction "S2" "vm_reset"))
+
 (def vm:status_codes {:IDLE   0,
                       :YIELD  1,
                       :OK     2,
@@ -62,6 +64,9 @@
 
 (defn vm:rslt [env]
   (rslt->clj (.invoke rslt_ Pointer (to-array [env]))))
+
+(defn vm:reset [env]
+  (.invoke reset_ Void (to-array [env 0])))
 
 (defn vm:exit [env]
   (.invoke exit_ Void (to-array [env])))

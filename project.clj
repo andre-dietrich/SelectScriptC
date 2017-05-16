@@ -12,6 +12,7 @@
                  [org.clojure/tools.cli     "0.3.5"]
                  [org.antlr/antlr4-runtime  "4.5.3"]
                  [org.antlr/antlr4          "4.5.3"]
+                 [clojure-term-colors       "0.1.0-SNAPSHOT"]
                  ;; web-socket
                  ;[org.clojure/tools.logging "0.3.1"]
                  ;[environ                   "1.1.0"]
