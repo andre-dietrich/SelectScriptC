@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 range
   = PROC(i, stop, step: 1, rslt: [])
     : LOOP(
@@ -8,6 +9,18 @@ range
             EXIT $rslt
         );
       );
+=======
+#range
+#  = PROC(i, stop, step: 1, rslt: [])
+#    : LOOP(
+#        IF( $i < $stop,
+#            ( $rslt@+($i);
+#              $i@+($step);
+#            ),
+#            EXIT $rslt
+#        );
+#      );
+>>>>>>> dev
 map
   = PROC(x, f)
     : SELECT $f($)
@@ -40,4 +53,7 @@ max
           AS void;
 
 True;
+<<<<<<< HEAD
 #generate(0, 10)
+=======
+>>>>>>> dev

@@ -150,6 +150,7 @@
     (visitEx_ne       [ctx] (expr :NE   ctx))
     (visitEx_in       [ctx] (expr :IN   ctx))
     (visitEx_eq       [ctx] (expr :EQ   ctx))
+    (visitEx_id       [ctx] (expr :ID   ctx))
     (visitEx_and      [ctx] (expr :AND  ctx))
     (visitEx_xor      [ctx] (expr :XOR  ctx))
     (visitEx_or       [ctx] (expr :OR   ctx))))

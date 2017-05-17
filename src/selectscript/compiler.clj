@@ -8,12 +8,13 @@
           :DIV    5, :MOD    6, :POW    7,
           :LT     8, :LE     9, :GE    10,
           :GT    11, :NE    12, :EQ    13,
-          :AND   14, :XOR   15, :OR    16,
-          :IN    17,
-          :B_NOT 18, :B_AND 19,
-          :B_OR  20, :B_XOR 21,
-          :LEFT  22, :RIGHT 23,
-          :EX    24})
+          :ID    14,
+          :AND   16, :XOR   16, :OR    17,
+          :IN    18,
+          :B_NOT 19, :B_AND 20,
+          :B_OR  21, :B_XOR 22,
+          :LEFT  23, :RIGHT 24,
+          :EX    25})
 
 (def OP { :SP_SAVEX      0, :SP_SAVE     1,
           :RET           2, :RET_P       3,
