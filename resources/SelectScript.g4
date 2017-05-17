@@ -25,6 +25,7 @@ INV		: '~'  ;
 
 ASSIGN :  '=' ;
 
+ID  : '===';
 EQ	: '==' ;
 NE	: '!=' ;
 LE	: '<=' ;
@@ -217,6 +218,7 @@ expr
  	| e1=expr 	NE		e2=expr		# ex_ne
  	| e1=expr 	IN		e2=expr		# ex_in
  	| e1=expr 	EQ		e2=expr		# ex_eq
+	| e1=expr   ID    e2=expr   # ex_id
 	| e1=expr 	AND		e2=expr		# ex_and
 	| e1=expr 	XOR		e2=expr		# ex_xor
 	| e1=expr 	OR		e2=expr		# ex_or

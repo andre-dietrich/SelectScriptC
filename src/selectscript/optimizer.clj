@@ -150,6 +150,11 @@
       :LE  (opt_opc ss:le  :LE  params)
       :GT  (opt_opc ss:gt  :GT  params)
       :GE  (opt_opc ss:ge  :GE  params)
+      ; todo types
+      :ID  (let [p (distinct params)]
+             (if (= 1 (count p))
+               (ss:val true)
+               (ss:op :ID p)))
       :EQ  (let [p (distinct params)]
              (if (= 1 (count p))
                (ss:val true)

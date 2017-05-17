@@ -1,13 +1,13 @@
-range
-  = PROC(i, stop, step: 1, rslt: [])
-    : LOOP(
-        IF( $i < $stop,
-            ( $rslt@+($i);
-              $i@+($step);
-            ),
-            EXIT $rslt
-        );
-      );
+#range
+#  = PROC(i, stop, step: 1, rslt: [])
+#    : LOOP(
+#        IF( $i < $stop,
+#            ( $rslt@+($i);
+#              $i@+($step);
+#            ),
+#            EXIT $rslt
+#        );
+#      );
 map
   = PROC(x, f)
     : SELECT $f($)
@@ -40,4 +40,3 @@ max
           AS void;
 
 True;
-#generate(0, 10)
