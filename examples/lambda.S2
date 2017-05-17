@@ -41,5 +41,3 @@ max
           AS void;
 
 True;
-
-#generate(0, 10)
