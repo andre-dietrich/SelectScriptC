@@ -9,7 +9,7 @@
           :LT     8, :LE     9, :GE    10,
           :GT    11, :NE    12, :EQ    13,
           :ID    14,
-          :AND   16, :XOR   16, :OR    17,
+          :AND   15, :XOR   16, :OR    17,
           :IN    18,
           :B_NOT 19, :B_AND 20,
           :B_OR  21, :B_XOR 22,
@@ -151,7 +151,7 @@
                    (cmp:exit2 (rest asm) 2)))))
 
   ([code data asm sp local_vars]
-   ;(println "->>>>>" code data asm)
+   ;(println "->>>>>" code data asm local_vars)
    (if (empty? code)
      [data asm]
      (let [[cmd pop asm_] (cmp:cmd (first code) asm)]

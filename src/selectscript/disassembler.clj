@@ -113,11 +113,15 @@
                                        (nth code 3)
                                        (byte->int32 (take 4 code))))
                       (dis:prog (nthrest code 4) (+ 5 addr) data space))
-      #{:CST_DCT}   (let [len (byte->uint8 (first code))]
-                      (println (str (first code) ", // " len))
-                      (loop [i len, c (rest code), a (inc addr)]
+      #{:CST_DCT}   (let [len (byte->uint16 (take 2 code))]
+                      (println (format "%d, %d, // %d"
+                                    (nth code 0)
+                                    (nth code 1)
+                                    len))
+                      (loop [i len, c (nthrest code 2), a (+ addr 2)]
                         (if (zero? i)
-                          (dis:prog c (inc a) data space)
+                          (do
+                            (dis:prog c (inc a) data space))
                           (do
                             (print:space (inc space))
                             (print (str "" (first c) ", "))
