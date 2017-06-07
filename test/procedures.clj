@@ -67,3 +67,13 @@
     (iss ["22"]         "x@p(22);")
     (iss ["22", "22"]   "x@p(22);")
     (vm:exit env)))
+
+(deftest procedure_karl
+  (let [env (vm:init 100 100 0)]
+    (iss 0  "v = 0")
+    (iss 1  "p = PROC() : print(v@+(1)); 1;")
+    (iss 1  "p(); ")
+    (iss 2  "p(); ")
+    (iss 3  "p(); ")
+
+    (vm:exit env)))
