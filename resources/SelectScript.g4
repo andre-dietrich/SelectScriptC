@@ -274,7 +274,7 @@ pipe_allowed
 
 procedure
 	: PROCEDURE
-	  ( '(' params_ = procedure_params ')' )?
+	  ( ('(' ')') | ( '(' params_ = procedure_params ')' ) )?
 	  (info_=STRING)?
 	  COLON code_=stmt
 ;
