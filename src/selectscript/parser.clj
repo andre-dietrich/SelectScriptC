@@ -467,9 +467,10 @@
                          (if (string? (first elem))
                            elem
                            (case (first elem)
-                             :var [(second elem) elem]
-                             :loc [(second elem) elem]
-                             :fct [(second (second elem)) elem]
+                             :var  [(second elem) elem]
+                             :loc  [(second elem) elem]
+                             :fct  [(second (second elem)) elem]
+                             :elem [(str (last (last (last elem)))) elem]
                              ["" elem])))))))))
 
 (defn -special [ctx]

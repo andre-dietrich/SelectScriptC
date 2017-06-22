@@ -418,7 +418,7 @@ value
 ;
 
 variable
-	: name_ = IDENTIFIER
+	: name_ = (IDENTIFIER | DEL_F | MEM_F)
 ;
 
 yield
