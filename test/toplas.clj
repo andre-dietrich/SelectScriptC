@@ -122,31 +122,31 @@
     (vm:exit env)))
 
 
-(deftest listing_7
-  (let [env (vm:init 100 100 0)]
-    (iss    [0 2046 4092 6138 8184]
-            "analogRead = PROC(pin, res) : $pin * $res;                    "
-            "                                                              "
-            "ir0 = {                                                       "
-            "       pin:  0,                                               "
-            "       res:  1023,                                            "
-            "       init: PROC($, Pin, Res)                                "
-            "             'Set basic sensor parameters Pin and Resolution.'"
-            "             : ($.pin = $Pin; $.res = $Res;),                 "
-            "       read: PROC($)                                          "
-            "             'Read measurement'                               "
-            "             : $.dist = $.lin(analogRead($.pin, $.res)),      "
-            "       lin:  PROC($, volt)                                    "
-            "             'Linearize measurement to cm...'                 "
-            "             : $cm = $volt * 2                                "
-            "      };                                                      "
-            "                                                              "
-            "ir1 = ir0; ir1.init(1, 1023);                                 "
-            "ir2 = ir0; ir2.init(2, 1023);                                 "
-            "ir3 = ir0; ir3.init(3, 1023);                                 "
-            "ir4 = ir0; ir4.init(4, 1023);                                 "
-            "                                                              "
-            "ir_array = [ref ir0, ref ir1, ref ir2, ref ir3, ref ir4];     "
-            "                                                              "
-            "dist = select $.read() from ir_array;                         ")
-    (vm:exit env)))
+; (deftest listing_7
+;   (let [env (vm:init 100 100 0)]
+;     (iss    [0 2046 4092 6138 8184]
+;             "analogRead = PROC(pin, res) : $pin * $res;                    "
+;             "                                                              "
+;             "ir0 = {                                                       "
+;             "       pin:  0,                                               "
+;             "       res:  1023,                                            "
+;             "       init: PROC($, Pin, Res)                                "
+;             "             'Set basic sensor parameters Pin and Resolution.'"
+;             "             : ($.pin = $Pin; $.res = $Res;),                 "
+;             "       read: PROC($)                                          "
+;             "             'Read measurement'                               "
+;             "             : $.dist = $.lin(analogRead($.pin, $.res)),      "
+;             "       lin:  PROC($, volt)                                    "
+;             "             'Linearize measurement to cm...'                 "
+;             "             : $cm = $volt * 2                                "
+;             "      };                                                      "
+;             "                                                              "
+;             "ir1 = ir0; ir1.init(1, 1023);                                 "
+;             "ir2 = ir0; ir2.init(2, 1023);                                 "
+;             "ir3 = ir0; ir3.init(3, 1023);                                 "
+;             "ir4 = ir0; ir4.init(4, 1023);                                 "
+;             "                                                              "
+;             "ir_array = [ref ir0, ref ir1, ref ir2, ref ir3, ref ir4];     "
+;             "                                                              "
+;             "dist = select $.read() from ir_array;                         ")
+;     (vm:exit env)))
