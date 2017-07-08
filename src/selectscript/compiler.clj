@@ -79,6 +79,7 @@
           :IT_UNIQUE    50,
 
           :YIELD        51,
+          :PROC_LOAD    52,
 
           :OP           64,
           :OPX          96})

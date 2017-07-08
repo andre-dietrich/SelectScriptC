@@ -213,14 +213,16 @@
 
 (defn asm:proc [[params code info] pop]
   (if (not pop)
-    (concat (asm params false)
-            '((:PROC))
+    (concat '((:PROC))
             [info]
             [(concat '((:SP_SAVE))
-                    (if (list? (first code))
-                      (seq:loop code true)
-                      (asm code false))
-                    '((:RET_P)))])))
+                     (seq:loop params true true)
+                     (if (not= params ['(:val nil)])
+                       '((:PROC_LOAD)))
+                     (if (list? (first code))
+                       (seq:loop code true)
+                       (asm code false))
+                     '((:RET_P)))])))
 
 (defn asm:recur [ast _]
   (concat (seq:loop ast false)

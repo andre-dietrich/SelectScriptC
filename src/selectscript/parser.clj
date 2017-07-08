@@ -355,26 +355,30 @@
 (defn -procedure [ctx]
   (ss:proc (if (.params_ ctx)
              (-procedure_params (.params_ ctx))
-             (ss:val nil))
+             [(ss:val nil)])
            (-stmt (.code_ ctx))
            (if (.info_ ctx)
              (cutString (.getText (.info_ ctx)))
              "")))
 
+
 (defn -procedure_params [ctx]
   (let [end (.getChildCount ctx)]
-    (ss:dict (loop [i 0 elems []]
-               (if (< end i)
-                 elems
-                 (recur (+ i 2)
-                        (concat elems
-                                (let [e (.getChild ctx i)]
-                                  (if (= (type e)
-                                         S2.SelectScriptParser$Dict_elemContext)
-                                    [(visit e)]
-                                    (let [id (.getText e)]
-                                      [[(if (= "$" id) "" id)
-                                        (ss:val nil)]]))))))))))
+    (loop [i 0 elems []]
+      (if (< end i)
+        elems
+        (recur (+ i 2)
+               (concat elems
+                       (let [e (.getChild ctx i)]
+                         (if (= (type e)
+                                S2.SelectScriptParser$Dict_elemContext)
+                           (let [[var val] (visit e)]
+                             [(ss:op :assign
+                                     [(ss:loc var ()) val])])
+                           (let [id (.getText e)]
+                             [(ss:op :assign
+                                     [ (ss:loc (if (= "$" id) "" id) ())
+                                       (ss:val nil)])])))))))))
 
 
 (defn -prog [ctx]
