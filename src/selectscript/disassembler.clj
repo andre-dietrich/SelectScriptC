@@ -80,14 +80,14 @@
         :REC_SET}   (do
                       (println (format "%d," (first code)))
                       (dis:prog (rest code) (inc addr) data space))
-      #{:CST_LST
-        :CST_SET}   (do
+      #{:ENC_LIST
+        :ENC_SET}   (do
                       (println (format "%d, %d, // %d"
                                        (first  code)
                                        (second code)
                                        (byte->uint16 (take 2 code))))
                       (dis:prog (nthrest code 2) (+ 3 addr) data space))
-      #{:CST_F}     (do
+      #{:ENC_FLOAT} (do
                       (println (format "%d, %d, %d, %d, // %f"
                                        (nth code 0)
                                        (nth code 1)
@@ -98,14 +98,14 @@
       #{:TRY_1
         :FJUMP
         :JUMP
-        :CST_S}     (do
+        :ENC_INT2}  (do
                       (println (format "%d, %d, // %d"
                                        (first  code)
                                        (second code)
                                        (byte->int16 (take 2 code))))
                       (dis:prog (nthrest code 2) (+ 3 addr) data space))
 
-      #{:CST_I}     (do
+      #{:ENC_INT4}  (do
                       (println (format "%d, %d, %d, %d, // %d"
                                        (nth code 0)
                                        (nth code 1)
@@ -113,7 +113,7 @@
                                        (nth code 3)
                                        (byte->int32 (take 4 code))))
                       (dis:prog (nthrest code 4) (+ 5 addr) data space))
-      #{:CST_DCT}   (let [len (byte->uint16 (take 2 code))]
+      #{:ENC_DICT}  (let [len (byte->uint16 (take 2 code))]
                       (println (format "%d, %d, // %d"
                                     (nth code 0)
                                     (nth code 1)
@@ -129,7 +129,7 @@
                             (recur (dec i) (rest c) (inc a))))))
 
       #{:LOAD
-        :CST_STR
+        :ENC_STRING
         :LOC
         :LOCX
         :STORE
@@ -147,10 +147,10 @@
                                     (byte->uint8 (first code))))
                       (dis:prog (rest code) (+ 2 addr) data space))
 
-      #{:CST_B}     (do
+      #{:ENC_INT1}  (do
                       (println (str (first code) ", "))
                       (dis:prog (rest code) (+ 2 addr) data space))
-      #{:PROC}      (do
+      #{:ENC_PROC}  (do
                       (println (format "%d, // help: %s"
                                        (first code)
                                        (nth data (byte->uint8 (first code)))))

@@ -98,8 +98,8 @@
 (defn asm:dict [dict pop]
   (concat (seq:loop (map second dict) false)
           (list (if pop
-                  '(:CST_DCT :POP)
-                  '(:CST_DCT))
+                  '(:ENC_DICT :POP)
+                  '(:ENC_DICT))
                 (map first dict))))
 
 (defn asm:elem [[p1 p2] pop]
@@ -165,8 +165,8 @@
             (seq:loop ast false)
             ())
           (list (if pop
-                  '(:CST_LST :POP)
-                  '(:CST_LST))
+                  '(:ENC_LIST :POP)
+                  '(:ENC_LIST))
                 (count ast))))
 
 (defn asm:loc [[id extension pp] pop]
@@ -213,7 +213,7 @@
 
 (defn asm:proc [[params code info] pop]
   (if (not pop)
-    (concat '((:PROC))
+    (concat '((:ENC_PROC))
             [info]
             [(concat '((:SP_SAVE))
                      (seq:loop params true true)
@@ -226,7 +226,7 @@
 
 (defn asm:recur [ast _]
   (concat (seq:loop ast false)
-          ['(:CST_LST) (count ast)]
+          ['(:ENC_LIST) (count ast)]
           '((:RECUR))))
 
 (defn asm:ref [ast pop]
@@ -238,7 +238,7 @@
     (concat (if (not-empty ast)
               (seq:loop ast false)
               ())
-            (list '(:CST_SET) (count ast)))))
+            (list '(:ENC_SET) (count ast)))))
 
 (defn asm:sql [[from select where start connect stop group order limit as] pop]
   (with-local-vars [asm '((:SP_SAVE))]
@@ -261,7 +261,7 @@
         (var-set asm (concat @asm START))
 
         (if (.contains C_OPT :IT_UNIQUE)
-          (var-set asm (concat @asm ['(:CST_LST) 0 '(:STORE :POP) "__uniq"])))
+          (var-set asm (concat @asm ['(:ENC_LIST) 0 '(:STORE :POP) "__uniq"])))
 
 
         (if (not (= () CONNECT STOP))
@@ -281,7 +281,7 @@
                                           ()
                                           '((:RETURN_FJUMP) -5))
                                         (first SELECT)
-                                        (list '(:CST_LST) (count (second SELECT)))
+                                        (list '(:ENC_LIST) (count (second SELECT)))
                                         (if (empty? C_OPT)
                                           ()
                                           (list C_OPT '(:RET_X)))
@@ -349,7 +349,7 @@
                                     '((:RET)))))
 
         (if (.contains C_OPT :IT_UNIQUE)
-          (var-set asm (concat @asm ['(:CST_STR) "__uniq"
+          (var-set asm (concat @asm ['(:ENC_STRING) "__uniq"
                                      '(:LOAD) "del"
                                      '(:CALL_FCT :POP) 1])))
 
@@ -357,16 +357,16 @@
 
 (defn asm:sql_as [type ids]
   (case type
-    :set    (list '(:CST_SET) 0)
+    :set    (list '(:ENC_SET) 0)
     :dict   (concat (loop [i ids asm ()]
                       (if (empty? i)
                         asm
                         (recur (rest i)
-                               (concat asm (list '(:CST_LST) 0)))))
-                    (list '(:CST_DCT) ids))
-    :list   (list '(:CST_LST) 0)
-    :val    '((:CST_N))
-    :void   '((:CST_N))))
+                               (concat asm (list '(:ENC_LIST) 0)))))
+                    (list '(:ENC_DICT) ids))
+    :list   (list '(:ENC_LIST) 0)
+    :val    '((:ENC_NONE))
+    :void   '((:ENC_NONE))))
 
 (defn asm:sql_connect [ast]
   (if (empty? (first ast))
@@ -383,7 +383,7 @@
       (let [next_elems (nthrest elem 2)]
         (if (not-empty next_elems)
           (recur next_elems))))
-    (concat @expr '((:CST_DCT)) (list @ids))))
+    (concat @expr '((:ENC_DICT)) (list @ids))))
 
 (defn asm:sql_select [elements]
   (with-local-vars [expr (), ids ()]
@@ -416,7 +416,7 @@
 (defn asm:sql_group [ast, ids]
   (if (empty? ast)
     ()
-    (concat '((:CST_DCT) ())
+    (concat '((:ENC_DICT) ())
             '((:IT_NEXT3))
             '((:FJUMP_BK_X) 5 -5)
             (asm ast false)
@@ -430,7 +430,7 @@
       (let [[expr dir] (first elem)
             asm_expr (asm expr false)]
         (concat rslt
-                '((:CST_0))
+                '((:ENC_FALSE))
                 '((:IT_ORDER))
                 '((:FJUMP_BK_X) 5 -5)
                 '((:IT_NEXT1))
@@ -457,16 +457,16 @@
 (defn asm:val [val pop]
   (if (not pop)
     (cond
-      (nil?     val)  '((:CST_N))
-      (false?   val)  '((:CST_0))
-      (true?    val)  '((:CST_1))
+      (nil?     val)  '((:ENC_NONE))
+      (false?   val)  '((:ENC_FALSE))
+      (true?    val)  '((:ENC_TRUE))
       (integer? val)  (if (and (< -127 val) (> 127 val))
-                        (list '(:CST_B) val)
+                        (list '(:ENC_INT1) val)
                         (if (and (< -32767 val) (> 32767 val))
-                          (list '(:CST_S) val)
-                          (list '(:CST_I) val)))
-      (float?   val)  (list '(:CST_F) val)
-      (string?  val)  (list '(:CST_STR) val))))
+                          (list '(:ENC_INT2) val)
+                          (list '(:ENC_INT4) val)))
+      (float?   val)  (list '(:ENC_FLOAT) val)
+      (string?  val)  (list '(:ENC_STRING) val))))
 
 (defn asm:var [ast pop]
   (if (not pop)

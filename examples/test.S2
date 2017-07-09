@@ -1,9 +1,7 @@
-#a = PROC(x:2, y:3) : ($x * $y);
+a = [0,1,2,3,4];
 
-#a();
-
-
-fak = proc(x, rslt:1)
-    : IF ($x, recur($x-1, $rslt*$x), $rslt);
-
-fak(2);
+SELECT [$a**2, $b**2, $c**2]
+    FROM a, b:a, c:a
+   WHERE $a**2+$b**2==$c**2
+GROUP BY $c**2
+       AS list;

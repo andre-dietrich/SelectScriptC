@@ -16,73 +16,75 @@
           :LEFT  23, :RIGHT 24,
           :EX    25})
 
-(def OP { :SP_SAVEX      0, :SP_SAVE     1,
-          :RET           2, :RET_P       3,
-          :CST_N         4,
-          :CST_0         5,
-          :CST_1         6,
-          :CST_B         7,
-          :CST_S         8,
-          :CST_I         9,
-          :CST_F        10,
+(def OP { :ENC_NONE    0,
+          :ENC_TRUE    1,
+          :ENC_FALSE   2,
+          :ENC_INT1    3,
+          :ENC_INT2    4,
+          :ENC_INT4    5,
+          :ENC_FLOAT   6,
+          :ENC_LIST    7,
+          :ENC_SET     8,
+          :ENC_PROC    9,
+          :ENC_STRING 10,
+          :ENC_DICT   11,
 
-          :CST_STR      11,
-          :CST_LST      12,
-          :CST_SET      13,
-          :CST_DCT      14,
+          :SP_SAVEX   12,
+          :SP_SAVE    13,
+          :RET        14,
+          :RET_P      15,
 
-          :LOC          15,
-          :LOCX         16,
-          :LOAD         17,
-          :ELEM         18,
+          :LOC        16,
+          :LOCX       17,
+          :LOAD       18,
+          :ELEM       19,
 
-          :STORE        19,
-          :STORE_RF     20,
-          :STORE_LOC    21,
+          :STORE      20,
+          :STORE_RF   21,
+          :STORE_LOC  22,
 
-          :CALL_FCTX    22,
-          :CALL_FCT     23,
+          :CALL_FCTX  23,
+          :CALL_FCT   24,
 
-          :FJUMP        24,
-          :JUMP         25,
+          :FJUMP      25,
+          :JUMP       26,
 
-          :PROC         26,
+          :IT_INIT    27,
+          :IT_NEXT0   28,
+          :IT_NEXT1   29,
+          :IT_NEXT2   30,
+          :IT_NEXT3   31,
+          :IT_STORE   32,
+          :IT_LIMIT   33,
 
-          :IT_INIT      27,
-          :IT_NEXT0     28,
-          :IT_NEXT1     29,
-          :IT_NEXT2     30,
-          :IT_NEXT3     31,
-          :IT_STORE     32,
-          :IT_LIMIT     33,
+          :IT_GROUP   34,
+          :IT_ORDER   35,
+          :IT_AS      36,
 
-          :IT_GROUP     34,
-          :IT_ORDER     35,
-          :IT_AS        36,
+          :EXIT       37,
+          :REC_SET    38,
 
-          :EXIT         37,
-          :REC_SET      38,
+          :TRY_1      39,
+          :TRY_0      40,
 
-          :TRY_1        39,
-          :TRY_0        40,
+          :REF        41,
 
-          :REF          41,
+          :IT_INITX   42,
+          :IT_STOREX  43,
+          :CHK_FIRST  44,
+          :RETX       45,
+          :IT_STOREX2 46,
+          :LOC_STEP   47,
+          :LOC_COUNT  48,
+          :IT_CYCLE   49,
+          :IT_UNIQUE  50,
 
-          :IT_INITX     42,
-          :IT_STOREX    43,
-          :CHK_FIRST    44,
-          :RETX         45,
-          :IT_STOREX2   46,
-          :LOC_STEP     47,
-          :LOC_COUNT    48,
-          :IT_CYCLE     49,
-          :IT_UNIQUE    50,
+          :YIELD      51,
+          :PROC_LOAD  52,
 
-          :YIELD        51,
-          :PROC_LOAD    52,
+          :OP         64,
+          :OPX        96})
 
-          :OP           64,
-          :OPX          96})
 
 (declare cmp
          cmp:cmd
@@ -158,16 +160,16 @@
      (let [[cmd pop asm_] (cmp:cmd (first code) asm)]
        (condp contains? cmd
          ;#{:IT_GROUP}     (cmp:base       (rest code) data asm_ uint8->byte  sp)
-         #{:CST_B}        (cmp:base       (rest code) data asm_ int8->byte   sp local_vars)
-         #{:CST_F}        (cmp:base       (rest code) data asm_ float->byte  sp local_vars)
-         #{:CST_I}        (cmp:base       (rest code) data asm_ int32->byte  sp local_vars)
-         #{:CST_S}        (cmp:base       (rest code) data asm_ int16->byte  sp local_vars)
-         #{:CST_LST
-           :CST_SET}      (cmp:base       (rest code) data asm_ uint16->byte sp local_vars)
+         #{:ENC_INT1}     (cmp:base       (rest code) data asm_ int8->byte   sp local_vars)
+         #{:ENC_FLOAT}    (cmp:base       (rest code) data asm_ float->byte  sp local_vars)
+         #{:ENC_INT4}     (cmp:base       (rest code) data asm_ int32->byte  sp local_vars)
+         #{:ENC_INT2}     (cmp:base       (rest code) data asm_ int16->byte  sp local_vars)
+         #{:ENC_LIST
+           :ENC_SET}      (cmp:base       (rest code) data asm_ uint16->byte sp local_vars)
          #{:CALL_FCTX
            :CALL_FCT
            :IT_GROUP}     (cmp:base       (rest code) data asm_ uint8->byte  sp local_vars)
-         #{:CST_STR
+         #{:ENC_STRING
            :LOAD
            :LOC
            :LOCX
@@ -178,8 +180,8 @@
          #{:EXIT}         (cmp:exit         (rest code) data asm_ sp local_vars)
          #{:IF}           (cmp:if           (rest code) data asm_ sp local_vars)
          #{:TRY_1}        (cmp:try          (rest code) data asm_ sp local_vars)
-         #{:PROC}         (cmp:proc         (rest code) data asm_ sp local_vars)
-         #{:CST_DCT}      (cmp:dict         (rest code) data asm_ sp local_vars)
+         #{:ENC_PROC}     (cmp:proc         (rest code) data asm_ sp local_vars)
+         #{:ENC_DICT}     (cmp:dict         (rest code) data asm_ sp local_vars)
          #{:RECUR}        (cmp:recur        (rest code) data asm_ sp local_vars)
          #{:SP_SAVE}      (cmp:sp_save      (rest code) data asm_ sp local_vars)
          #{:FJUMP_FW_X}   (cmp:jump_fwd     (rest code) data asm_ sp local_vars)
