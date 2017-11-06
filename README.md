@@ -164,7 +164,7 @@ cat ackerman.h
 /*0058*/               STORE_LOC|P, 1, // "n"
 /*0060*/               PROC_LOAD,
 /*0061*/               LOC,         0, // "m"
-...
+. . .
 ```
 
 ### Debug
