@@ -173,7 +173,7 @@ A SelectScript program can also be executed in Debug-mode, which executes every
 command step-wise and outputs the current state of the stack and the global
 memory. Use Enter to step through a program:
 
-````bash
+``` bash
 S2c -d ackerman.S2
 
  __      _           _   __           _       _
@@ -205,6 +205,7 @@ Every statement is closed with a semicolon; and the last statement of a script
 or a sub-script defines its return value.
 
 ### Comments
+
 ```
 # this is a single line comment
 
