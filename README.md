@@ -9,7 +9,7 @@ procedural, functional, (object-oriented), declarative and relational aspects.
 
 There is syntax highlighting support for several editors available:
 
-| Atom  | [github.com/ESS-OVGU/language-selectscript](https://github.com/ESS-OVGU/language-selectscript) |
+| Atom  | [github.com/andre-dietrich/language-selectscript](https://github.com/andre-dietrich/language-selectscript) |
 |-------|------------------------------------------------------------------------------------------------|
 | Emacs | [github.com/fin-ger/select-script-mode](https://github.com/fin-ger/select-script-mode)         |
 
@@ -39,7 +39,8 @@ the compiler was implemented in Clojure.
 
 ``` bash
 cd SelectScriptC
-make
+lein install      # install all Clojure dependencies
+make              # build the entire project
 ```
 
 Run the following command to install the `S2c` to `/usr/local/bin`.
