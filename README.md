@@ -28,7 +28,7 @@ This system was only tested on Linux and Arduino...
 The following command will download the entire project:
 
 ``` bash
-git clone --recursive  https://github.com/ESS-OVGU/SelectScriptC.git
+git clone --recursive  https://github.com/andre-dietrich/SelectScriptC.git
 ```
 
 ### Build
