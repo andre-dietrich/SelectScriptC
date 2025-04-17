@@ -1,7 +1,10 @@
-.PHONY: all test clean compiler sketch
+.PHONY: download all test clean compiler sketch
 
-all: lib antlr
+all: download lib antlr
 	lein uberjar
+
+download:
+	lein install || true
 
 install: 
 	cp target/selectscript-0.1.0-SNAPSHOT-standalone.jar /usr/local/bin/S2c.jar
