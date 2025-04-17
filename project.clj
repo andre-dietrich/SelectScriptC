@@ -35,6 +35,8 @@
   :native-path "runtime"
   :native-prefix "runtime"
 
+  ;; Add Java compiler options to target Java 8 compatibility
+  :javac-options ["-source" "1.8" "-target" "1.8"]
 
   :java-source-paths ["src/antlr", "src/java"]
 
